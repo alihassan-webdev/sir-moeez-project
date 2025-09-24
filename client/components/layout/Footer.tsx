@@ -3,13 +3,15 @@ import Container from "@/components/layout/Container";
 
 export default function Footer() {
   return (
-    <footer className="border-t bg-background/60">
+    <footer className="border-t bg-white">
       <Container className="py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link
               to="/"
-              className="text-xl font-extrabold tracking-tight text-foreground"
+              className="text-xl font-extrabold tracking-tight text-black pointer-events-none cursor-default select-none"
+              aria-disabled="true"
+              tabIndex={-1}
             >
               PaperGen
             </Link>
@@ -22,22 +24,42 @@ export default function Footer() {
             <div className="text-sm font-semibold text-foreground">Product</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#home" className="text-black hover:opacity-80">
+                <a
+                  href="#home"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   Home
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="text-black hover:opacity-80">
+                <a
+                  href="#how-it-works"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   How it works
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="text-black hover:opacity-80">
+                <a
+                  href="#pricing"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   Pricing
                 </a>
               </li>
               <li>
-                <Link to="/app" className="text-black hover:opacity-80">
+                <Link
+                  to="/app"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                >
                   Get started
                 </Link>
               </li>
@@ -50,12 +72,22 @@ export default function Footer() {
             </div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#faq" className="text-black hover:opacity-80">
+                <a
+                  href="#faq"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   FAQ
                 </a>
               </li>
               <li>
-                <Link to="/app" className="text-black hover:opacity-80">
+                <Link
+                  to="/app"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                >
                   Guides
                 </Link>
               </li>
@@ -66,12 +98,22 @@ export default function Footer() {
             <div className="text-sm font-semibold text-foreground">Company</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#home" className="text-black hover:opacity-80">
+                <a
+                  href="#home"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   About
                 </a>
               </li>
               <li>
-                <Link to="/app" className="text-black hover:opacity-80">
+                <Link
+                  to="/app"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                >
                   Contact
                 </Link>
               </li>

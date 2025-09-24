@@ -43,17 +43,10 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 const MAX_SIZE = 15 * 1024 * 1024; // 15MB
 
-// API endpoint selection: env override > Netlify functions > Vercel/Node API
+// API endpoint selection: env override -> Netlify serverless proxy (always)
 const API_URL = (() => {
   const env = import.meta.env.VITE_PREDICT_ENDPOINT as string | undefined;
-  if (env) return env;
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    const isNetlify = host.includes("netlify.app") || host.includes("netlify");
-    if (isNetlify) return "/.netlify/functions/proxy";
-  }
-  // No default direct URL; use fallback list below to adapt to envs (dev, vercel, netlify)
-  return "";
+  return env && env.trim() ? env : "/.netlify/functions/proxy";
 })();
 
 function ExternalPdfSelector({
@@ -149,7 +142,7 @@ function ExternalPdfSelector({
   const mergeSelected = useCallback(
     async (paths: string[]) => {
       setIsMerging(true);
-      
+
       try {
         if (!paths.length) {
           onLoadFile(null);
@@ -158,15 +151,15 @@ function ExternalPdfSelector({
         }
 
         // Validate paths
-        if (!paths.every(p => typeof p === 'string' && p.trim().length > 0)) {
-          throw new Error('Invalid PDF paths provided');
+        if (!paths.every((p) => typeof p === "string" && p.trim().length > 0)) {
+          throw new Error("Invalid PDF paths provided");
         }
 
         const { PDFDocument, PDFPage } = await import("pdf-lib");
-        
+
         // Create a new merged PDF
         const mergedPdf = await PDFDocument.create();
-        
+
         // Ensure deterministic order by chapter name
         const ordered = chapterOptionsForSubject
           .filter((c) => paths.includes(c.path))
@@ -177,31 +170,36 @@ function ExternalPdfSelector({
         const fetchResults = await Promise.allSettled(
           ordered.map(async (p) => {
             try {
-              if (pdfBytesCache.current.has(p)) return { path: p, success: true };
-              
+              if (pdfBytesCache.current.has(p))
+                return { path: p, success: true };
+
               const found = entries.find((e) => e.path === p);
               if (!found) {
                 console.warn(`PDF not found for path: ${p}`);
-                return { path: p, success: false, error: 'PDF not found' };
+                return { path: p, success: false, error: "PDF not found" };
               }
-              
+
               const controller = new AbortController();
               const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
-              
+
               try {
-                const res = await fetch(found.url, { signal: controller.signal });
+                const res = await fetch(found.url, {
+                  signal: controller.signal,
+                });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                
+
                 const bytes = await res.arrayBuffer();
-                if (bytes.byteLength === 0) throw new Error('Empty PDF file');
-                
+                if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+
                 // Validate it's actually a PDF
                 const header = new Uint8Array(bytes, 0, 4);
-                const headerStr = Array.from(header).map(b => String.fromCharCode(b)).join('');
-                if (headerStr !== '%PDF') {
-                  throw new Error('Invalid PDF file format');
+                const headerStr = Array.from(header)
+                  .map((b) => String.fromCharCode(b))
+                  .join("");
+                if (headerStr !== "%PDF") {
+                  throw new Error("Invalid PDF file format");
                 }
-                
+
                 pdfBytesCache.current.set(p, bytes);
                 return { path: p, success: true };
               } finally {
@@ -209,28 +207,34 @@ function ExternalPdfSelector({
               }
             } catch (error) {
               console.error(`Failed to load PDF ${p}:`, error);
-              return { 
-                path: p, 
-                success: false, 
-                error: error instanceof Error ? error.message : 'Unknown error' 
+              return {
+                path: p,
+                success: false,
+                error: error instanceof Error ? error.message : "Unknown error",
               };
             }
-          })
+          }),
         );
 
         // Check for failed downloads
-        const failed = fetchResults.filter((r): r is PromiseRejectedResult => 
-          r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)
+        const failed = fetchResults.filter(
+          (r): r is PromiseRejectedResult =>
+            r.status === "rejected" ||
+            (r.status === "fulfilled" && !r.value.success),
         );
 
         if (failed.length > 0) {
-          const errorMessages = failed.map(f => 
-            f.status === 'rejected' 
-              ? f.reason?.message || 'Unknown error' 
-              : (f as any).value?.error || 'Failed to load PDF'
-          ).join('; ');
-          
-          throw new Error(`Failed to load ${failed.length} PDF(s): ${errorMessages}`);
+          const errorMessages = failed
+            .map((f) =>
+              f.status === "rejected"
+                ? f.reason?.message || "Unknown error"
+                : (f as any).value?.error || "Failed to load PDF",
+            )
+            .join("; ");
+
+          throw new Error(
+            `Failed to load ${failed.length} PDF(s): ${errorMessages}`,
+          );
         }
 
         // Merge PDFs with progress tracking
@@ -238,58 +242,59 @@ function ExternalPdfSelector({
         for (const p of ordered) {
           const bytes = pdfBytesCache.current.get(p);
           if (!bytes) continue;
-          
+
           try {
-            const src = await PDFDocument.load(bytes, { 
+            const src = await PDFDocument.load(bytes, {
               ignoreEncryption: true,
-              throwOnInvalidObject: true
+              throwOnInvalidObject: true,
             });
-            
+
             const pageIndices = src.getPageIndices();
             if (pageIndices.length === 0) {
               console.warn(`PDF has no pages: ${p}`);
               continue;
             }
-            
+
             const copiedPages = await mergedPdf.copyPages(src, pageIndices);
             copiedPages.forEach((page) => mergedPdf.addPage(page));
             mergedPageCount += copiedPages.length;
-            
           } catch (error) {
             console.error(`Error processing PDF ${p}:`, error);
-            throw new Error(`Failed to process PDF ${p.split('/').pop() || 'unknown'}: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`);
+            throw new Error(
+              `Failed to process PDF ${p.split("/").pop() || "unknown"}: ${
+                error instanceof Error ? error.message : "Unknown error"
+              }`,
+            );
           }
         }
-        
+
         if (mergedPageCount === 0) {
-          throw new Error('No valid pages found in the selected PDFs');
+          throw new Error("No valid pages found in the selected PDFs");
         }
 
         // Generate the merged PDF
         const mergedBytes = await mergedPdf.save();
-        const safeSubjectName = (selectedSubjectName || 'subject')
-          .replace(/[^\w\s-]/g, '') // Remove special chars
-          .replace(/\s+/g, '_')      // Replace spaces with underscores
-          .substring(0, 50);          // Limit length
-          
+        const safeSubjectName = (selectedSubjectName || "subject")
+          .replace(/[^\w\s-]/g, "") // Remove special chars
+          .replace(/\s+/g, "_") // Replace spaces with underscores
+          .substring(0, 50); // Limit length
+
         const fname = `${safeSubjectName}_${mergedPageCount}_pages_${new Date().toISOString().slice(0, 10)}.pdf`;
-        
+
         const file = new File([mergedBytes], fname, {
-          type: 'application/pdf',
-          lastModified: Date.now()
+          type: "application/pdf",
+          lastModified: Date.now(),
         });
-        
+
         onLoadFile(file);
-        
       } catch (err) {
-        console.error('PDF merge error:', err);
-        const errorMessage = err instanceof Error ? err.message : 'Failed to merge PDFs';
-        toast({ 
-          title: 'Merge Failed', 
+        console.error("PDF merge error:", err);
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to merge PDFs";
+        toast({
+          title: "Merge Failed",
           description: errorMessage,
-          variant: 'destructive'
+          variant: "destructive",
         });
         onLoadFile(null);
         throw err; // Re-throw to allow callers to handle the error
@@ -394,7 +399,9 @@ function ExternalPdfSelector({
     <div className="rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
         {/* Class */}
-        <div className={`transition-all duration-200 ease-out ${isLocked ? "opacity-50 pointer-events-none" : ""}`}>
+        <div
+          className={`transition-all duration-200 ease-out ${isLocked ? "opacity-50 pointer-events-none" : ""}`}
+        >
           <label className="text-sm font-medium text-muted-foreground">
             Class
           </label>
@@ -560,7 +567,9 @@ function ExternalPdfSelector({
         </div>
 
         {/* Institute Name */}
-        <div className={`transition-all duration-200 ease-out ${!canEnterInstitute ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+        <div
+          className={`transition-all duration-200 ease-out ${!canEnterInstitute ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+        >
           <label className="text-sm font-medium text-muted-foreground">
             Institute Name
           </label>
@@ -585,10 +594,16 @@ function ExternalPdfSelector({
           disabled={!canGenerate}
           onClick={async () => {
             if (!selectedClass) {
-              return toast({ title: "Select class", description: "Please select a class first." });
+              return toast({
+                title: "Select class",
+                description: "Please select a class first.",
+              });
             }
             if (!selectedSubjectName) {
-              return toast({ title: "Select subject", description: "Please select a subject." });
+              return toast({
+                title: "Select subject",
+                description: "Please select a subject.",
+              });
             }
             if (selectedChapterPaths.length === 0) {
               return toast({
@@ -603,7 +618,10 @@ function ExternalPdfSelector({
               });
             }
             if (!instituteName.trim()) {
-              return toast({ title: "Enter institute name", description: "Institute name is required." });
+              return toast({
+                title: "Enter institute name",
+                description: "Institute name is required.",
+              });
             }
 
             const subjectName = selectedSubjectName || "";
@@ -794,10 +812,8 @@ export default function Index() {
         const form = new FormData();
         form.append("pdf", theFile);
         form.append("query", q);
-        // External APIs may expect the field name "file"; include both for compatibility
-        if (isExternal) {
-          form.append("file", theFile);
-        }
+        // Include both common field names for maximum compatibility via proxy
+        form.append("file", theFile);
 
         const res = await withTimeout(
           fetch(finalUrl, {
@@ -858,10 +874,8 @@ export default function Index() {
       // If direct request failed (network/CORS) or returned non-OK, try internal proxies
       if (!res || !res.ok) {
         const proxies = [
-          "/.netlify/functions/proxy", // Vite dev proxy path (works locally)
-          "/api/generate-questions", // Netlify redirect path (production on Netlify)
-          "/api/proxy", // Express/Vercel proxy
-          "/proxy", // Alternate express proxy path
+          "/.netlify/functions/proxy", // Netlify serverless proxy (primary)
+          "/api/generate-questions", // Netlify redirect path -> functions/proxy
         ];
         for (const proxyPath of proxies) {
           try {
@@ -879,7 +893,7 @@ export default function Index() {
       if (!res) {
         // If we get here, it likely failed due to CORS or network. Provide a helpful error.
         throw new Error(
-          "Network or CORS error. If deployed on Netlify set VITE_PREDICT_ENDPOINT='/.netlify/functions/proxy' and PREDICT_ENDPOINT='https://api-va5v.onrender.com', or on Vercel set VITE_PREDICT_ENDPOINT='/api/proxy' and PREDICT_ENDPOINT='https://api-va5v.onrender.com'. Alternatively, enable CORS on the API.",
+          "Network error. Ensure VITE_PREDICT_ENDPOINT='/.netlify/functions/proxy' and deploy the Netlify proxy. Also set PREDICT_ENDPOINT='https://api-va5v.onrender.com' on the server.",
         );
       }
 
