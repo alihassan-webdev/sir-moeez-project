@@ -43,17 +43,10 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 const MAX_SIZE = 15 * 1024 * 1024; // 15MB
 
-// API endpoint selection: env override > Netlify functions > Vercel/Node API
+// API endpoint selection: env override -> Netlify serverless proxy (always)
 const API_URL = (() => {
   const env = import.meta.env.VITE_PREDICT_ENDPOINT as string | undefined;
-  if (env) return env;
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    const isNetlify = host.includes("netlify.app") || host.includes("netlify");
-    if (isNetlify) return "/.netlify/functions/proxy";
-  }
-  // No default direct URL; use fallback list below to adapt to envs (dev, vercel, netlify)
-  return "";
+  return env && env.trim() ? env : "/.netlify/functions/proxy";
 })();
 
 function ExternalPdfSelector({
@@ -794,10 +787,8 @@ export default function Index() {
         const form = new FormData();
         form.append("pdf", theFile);
         form.append("query", q);
-        // External APIs may expect the field name "file"; include both for compatibility
-        if (isExternal) {
-          form.append("file", theFile);
-        }
+        // Include both common field names for maximum compatibility via proxy
+        form.append("file", theFile);
 
         const res = await withTimeout(
           fetch(finalUrl, {
@@ -858,10 +849,8 @@ export default function Index() {
       // If direct request failed (network/CORS) or returned non-OK, try internal proxies
       if (!res || !res.ok) {
         const proxies = [
-          "/.netlify/functions/proxy", // Vite dev proxy path (works locally)
-          "/api/generate-questions", // Netlify redirect path (production on Netlify)
-          "/api/proxy", // Express/Vercel proxy
-          "/proxy", // Alternate express proxy path
+          "/.netlify/functions/proxy", // Netlify serverless proxy (primary)
+          "/api/generate-questions", // Netlify redirect path -> functions/proxy
         ];
         for (const proxyPath of proxies) {
           try {
@@ -879,7 +868,7 @@ export default function Index() {
       if (!res) {
         // If we get here, it likely failed due to CORS or network. Provide a helpful error.
         throw new Error(
-          "Network or CORS error. If deployed on Netlify set VITE_PREDICT_ENDPOINT='/.netlify/functions/proxy' and PREDICT_ENDPOINT='https://api-va5v.onrender.com', or on Vercel set VITE_PREDICT_ENDPOINT='/api/proxy' and PREDICT_ENDPOINT='https://api-va5v.onrender.com'. Alternatively, enable CORS on the API.",
+          "Network error. Ensure VITE_PREDICT_ENDPOINT='/.netlify/functions/proxy' and deploy the Netlify proxy. Also set PREDICT_ENDPOINT='https://api-va5v.onrender.com' on the server."
         );
       }
 
