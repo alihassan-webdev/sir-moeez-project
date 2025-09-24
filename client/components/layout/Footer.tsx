@@ -24,22 +24,42 @@ export default function Footer() {
             <div className="text-sm font-semibold text-foreground">Product</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#home" className="text-black pointer-events-none cursor-default select-none" aria-disabled="true" tabIndex={-1}>
+                <a
+                  href="#home"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   Home
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="text-black pointer-events-none cursor-default select-none" aria-disabled="true" tabIndex={-1}>
+                <a
+                  href="#how-it-works"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   How it works
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="text-black pointer-events-none cursor-default select-none" aria-disabled="true" tabIndex={-1}>
+                <a
+                  href="#pricing"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   Pricing
                 </a>
               </li>
               <li>
-                <Link to="/app" className="text-black pointer-events-none cursor-default select-none" aria-disabled={true} tabIndex={-1}>
+                <Link
+                  to="/app"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                >
                   Get started
                 </Link>
               </li>
@@ -52,12 +72,22 @@ export default function Footer() {
             </div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#faq" className="text-black pointer-events-none cursor-default select-none" aria-disabled="true" tabIndex={-1}>
+                <a
+                  href="#faq"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   FAQ
                 </a>
               </li>
               <li>
-                <Link to="/app" className="text-black pointer-events-none cursor-default select-none" aria-disabled={true} tabIndex={-1}>
+                <Link
+                  to="/app"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                >
                   Guides
                 </Link>
               </li>
@@ -68,12 +98,22 @@ export default function Footer() {
             <div className="text-sm font-semibold text-foreground">Company</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#home" className="text-black pointer-events-none cursor-default select-none" aria-disabled="true" tabIndex={-1}>
+                <a
+                  href="#home"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
                   About
                 </a>
               </li>
               <li>
-                <Link to="/app" className="text-black pointer-events-none cursor-default select-none" aria-disabled={true} tabIndex={-1}>
+                <Link
+                  to="/app"
+                  className="text-black pointer-events-none cursor-default select-none"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                >
                   Contact
                 </Link>
               </li>
