@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import Container from "@/components/layout/Container";
+import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -268,171 +269,182 @@ export default function MCQs() {
     (mcqCount ?? 0) >= 5;
 
   return (
-    <div>
-      <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 -mt-5">
-        <div className="absolute inset-0 bg-background -z-10" />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
-            MCQ Generator
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Generate multiple-choice questions only, with four options (a–d).
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto mt-10 max-w-5xl space-y-6">
-        {error && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive-foreground">
-            {error}
-          </div>
-        )}
-
-        <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-            {/* Class */}
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Class
-              </label>
-              <Select
-                value={selectedClass}
-                onValueChange={(v) => setSelectedClass(v)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {classOptions.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+    <div className="min-h-svh">
+      <Container className="py-6">
+        <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+          <aside className="hidden md:block">
+            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
+              <SidebarPanelInner />
             </div>
-
-            {/* Subject */}
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Subject
-              </label>
-              <Select
-                value={selectedSubject}
-                onValueChange={(v) => setSelectedSubject(v)}
-              >
-                <SelectTrigger className="w-full" disabled={!selectedClass}>
-                  <SelectValue
-                    placeholder={
-                      selectedClass ? "Select subject" : "Select class first"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {subjects.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Chapter */}
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Chapter (PDF)
-              </label>
-              <Select value={selectedPdfPath} onValueChange={handleSelectPdf}>
-                <SelectTrigger className="w-full" disabled={!selectedSubject}>
-                  <SelectValue
-                    placeholder={
-                      selectedSubject
-                        ? "Select chapter"
-                        : "Select subject first"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {chapterOptions.map((opt) => (
-                    <SelectItem key={opt.path} value={opt.path}>
-                      {opt.name.replace(/\.pdf$/i, "")}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* MCQ Count */}
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Number of MCQs
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min={5}
-                  max={100}
-                  value={mcqCount ?? ""}
-                  onChange={(e) =>
-                    setMcqCount(
-                      e.currentTarget.value === ""
-                        ? null
-                        : Number(e.currentTarget.value),
-                    )
-                  }
-                  className="w-32 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
-                  placeholder="e.g. 20"
-                />
-                <button
-                  type="button"
-                  onClick={() => setMcqCount(10)}
-                  className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-                >
-                  10
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMcqCount(20)}
-                  className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-                >
-                  20
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMcqCount(30)}
-                  className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-                >
-                  30
-                </button>
+          </aside>
+          <div>
+            <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 -mt-5">
+              <div className="absolute inset-0 bg-background -z-10" />
+              <div className="relative mx-auto max-w-3xl text-center">
+                <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
+                  MCQ Generator
+                </h1>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Generate multiple-choice questions only, with four options (a–d).
+                </p>
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div className="mt-6 flex items-center gap-3">
-            <Button disabled={!canGenerate} onClick={runSubmit}>
-              {loading ? "Generating..." : "Generate MCQs"}
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={!result || loading}
-              onClick={downloadPdf}
-            >
-              Download PDF
-            </Button>
+            <section className="mx-auto mt-10 max-w-5xl space-y-6">
+              {error && (
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive-foreground">
+                  {error}
+                </div>
+              )}
+
+              <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                  {/* Class */}
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Class
+                    </label>
+                    <Select
+                      value={selectedClass}
+                      onValueChange={(v) => setSelectedClass(v)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select class" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {classOptions.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Subject */}
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Subject
+                    </label>
+                    <Select
+                      value={selectedSubject}
+                      onValueChange={(v) => setSelectedSubject(v)}
+                    >
+                      <SelectTrigger className="w-full" disabled={!selectedClass}>
+                        <SelectValue
+                          placeholder={
+                            selectedClass ? "Select subject" : "Select class first"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Chapter */}
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Chapter (PDF)
+                    </label>
+                    <Select value={selectedPdfPath} onValueChange={handleSelectPdf}>
+                      <SelectTrigger className="w-full" disabled={!selectedSubject}>
+                        <SelectValue
+                          placeholder={
+                            selectedSubject
+                              ? "Select chapter"
+                              : "Select subject first"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {chapterOptions.map((opt) => (
+                          <SelectItem key={opt.path} value={opt.path}>
+                            {opt.name.replace(/\.pdf$/i, "")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* MCQ Count */}
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Number of MCQs
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={5}
+                        max={100}
+                        value={mcqCount ?? ""}
+                        onChange={(e) =>
+                          setMcqCount(
+                            e.currentTarget.value === ""
+                              ? null
+                              : Number(e.currentTarget.value),
+                          )
+                        }
+                        className="w-32 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
+                        placeholder="e.g. 20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setMcqCount(10)}
+                        className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                      >
+                        10
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMcqCount(20)}
+                        className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                      >
+                        20
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMcqCount(30)}
+                        className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                      >
+                        30
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center gap-3">
+                  <Button disabled={!canGenerate} onClick={runSubmit}>
+                    {loading ? "Generating..." : "Generate MCQs"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    disabled={!result || loading}
+                    onClick={downloadPdf}
+                  >
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+
+              {result && (
+                <div className="w-full max-w-4xl mx-auto">
+                  <h3 className="text-sm font-semibold mb-2">Result</h3>
+                  <div
+                    className="rounded-md bg-background p-4 text-base leading-7 whitespace-pre-wrap break-words"
+                    dangerouslySetInnerHTML={{ __html: formatMcqHtml(result) }}
+                  />
+                </div>
+              )}
+            </section>
           </div>
         </div>
-
-        {result && (
-          <div className="w-full max-w-4xl mx-auto">
-            <h3 className="text-sm font-semibold mb-2">Result</h3>
-            <div
-              className="rounded-md bg-background p-4 text-base leading-7 whitespace-pre-wrap break-words"
-              dangerouslySetInnerHTML={{ __html: formatMcqHtml(result) }}
-            />
-          </div>
-        )}
-      </section>
+      </Container>
     </div>
   );
 }
