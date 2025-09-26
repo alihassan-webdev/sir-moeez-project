@@ -25,9 +25,12 @@ export default function Header() {
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <Link
           to="/"
-          className="text-xl font-extrabold tracking-tight text-black"
+          className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
         >
-          PaperGen
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            PG
+          </span>
+          <span>PaperGen</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-3">
