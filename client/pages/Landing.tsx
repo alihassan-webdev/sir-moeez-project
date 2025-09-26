@@ -86,7 +86,7 @@ export default function Landing() {
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={35000} duration={3000} format="comma" />
+                  <CountUp end={35000} format="comma" />
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   Papers generated
@@ -198,7 +198,7 @@ export default function Landing() {
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1 text-primary">���</span>
+                    <span className="mt-1 text-primary">•</span>
                     <span>
                       Works perfectly on mobile devices as well as PC.
                     </span>
