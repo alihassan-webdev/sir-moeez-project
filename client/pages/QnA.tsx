@@ -282,7 +282,7 @@ export default function QnA() {
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
               {error && (
-                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive-foreground">
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-black">
                   {error}
                 </div>
               )}

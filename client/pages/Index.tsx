@@ -896,7 +896,7 @@ export default function Index() {
       if (!res) {
         // If we get here, it likely failed due to CORS or network. Provide a helpful error.
         throw new Error(
-          "Network error. Ensure VITE_PREDICT_ENDPOINT='/.netlify/functions/proxy' and deploy the Netlify proxy. Also set PREDICT_ENDPOINT='https://api-va5v.onrender.com' on the server.",
+          "Network error. Please try again.",
         );
       }
 
@@ -1049,7 +1049,7 @@ export default function Index() {
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
               <div className="flex flex-col gap-4">
                 {error && (
-                  <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive-foreground">
+                  <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-black">
                     {error}
                   </div>
                 )}
