@@ -54,7 +54,7 @@ export default function Header() {
             FAQ
           </a>
           <Button asChild>
-            <Link to="/app">Login</Link>
+            <Link to="/get-started">Login</Link>
           </Button>
         </nav>
 
@@ -118,7 +118,7 @@ export default function Header() {
           </a>
           <div className="pt-2">
             <Button asChild>
-              <Link to="/app" onClick={() => setOpen(false)}>
+              <Link to="/get-started" onClick={() => setOpen(false)}>
                 Login
               </Link>
             </Button>
