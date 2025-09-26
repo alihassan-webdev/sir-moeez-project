@@ -147,35 +147,89 @@ export default function MCQs() {
 
     try {
       setLoading(true);
-      const form = new FormData();
-      form.append("pdf", file);
-      form.append("file", file);
-      form.append("query", prompt);
 
-      const res = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        45000,
-      );
-      if (!res.ok) throw new Error(await res.text());
+      const sendTo = async (urlStr: string, timeoutMs: number) => {
+        const isExternal = /^https?:/i.test(urlStr);
+        const form = new FormData();
+        form.append("pdf", file);
+        form.append("file", file);
+        form.append("query", prompt);
+        const res = await withTimeout(
+          fetch(urlStr, {
+            method: "POST",
+            body: form,
+            headers: { Accept: "application/json" },
+            ...(isExternal
+              ? {
+                  mode: "cors" as const,
+                  credentials: "omit" as const,
+                  referrerPolicy: "no-referrer" as const,
+                }
+              : {}),
+          }),
+          timeoutMs,
+        );
+        return res;
+      };
+
+      let res: Response | null = null;
+      if (API_URL) {
+        try {
+          res = await sendTo(API_URL, 45000);
+        } catch {
+          res = null;
+        }
+      }
+      if (!res || !res.ok) {
+        const proxies = [
+          "/.netlify/functions/proxy",
+          "/api/generate-questions",
+        ];
+        for (const proxyPath of proxies) {
+          try {
+            const attempt = await sendTo(proxyPath, 55000);
+            if (attempt && attempt.ok) {
+              res = attempt;
+              break;
+            }
+          } catch {}
+        }
+      }
+
+      if (!res) {
+        throw new Error("Network error. Please try again.");
+      }
+      if (!res.ok) {
+        let detail = "";
+        try {
+          detail = await res.clone().text();
+        } catch (e) {
+          detail = res.statusText || "";
+        }
+        throw new Error(detail || `HTTP ${res.status}`);
+      }
+
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
-        const json = await res.json();
-        const text =
-          typeof json === "string"
-            ? json
-            : (json?.questions ?? json?.result ?? json?.message ?? "");
-        setResult(String(text));
+        try {
+          const json = await res.clone().json();
+          const text =
+            typeof json === "string"
+              ? json
+              : (json?.questions ?? json?.result ?? json?.message ?? "");
+          setResult(String(text));
+        } catch {
+          const txt = await res.clone().text().catch(() => "");
+          setResult(txt);
+        }
       } else {
-        setResult(await res.text());
+        const txt = await res.clone().text();
+        setResult(txt);
       }
     } catch (err: any) {
       const msg =
         err?.message === "timeout"
-          ? "Request timed out."
+          ? "Request timed out. Please try again."
           : err?.message || "Request failed";
       setError(msg);
       toast({ title: "Request failed", description: msg });
