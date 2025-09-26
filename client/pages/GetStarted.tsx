@@ -90,7 +90,7 @@ export default function GetStarted() {
               to="/"
               className="hidden sm:inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
             >
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 PG
               </span>
               <span>PaperGen</span>
