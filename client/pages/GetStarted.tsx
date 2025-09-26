@@ -11,7 +11,6 @@ import {
   LayoutGrid,
   Menu,
 } from "lucide-react";
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader } from "@/components/ui/drawer";
 
 function NavItem({
   to,
@@ -82,35 +81,6 @@ export default function GetStarted() {
     <div className="min-h-svh">
       {/* Main content with sidebar */}
       <Container className="py-6">
-        <div className="md:hidden mb-4">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <button
-                className="inline-flex items-center gap-2 rounded-md border border-input bg-white px-3 py-2 card-yellow-shadow"
-                aria-label="Open navigation"
-              >
-                <Menu className="h-5 w-5" aria-hidden="true" />
-                <span className="text-sm font-medium">Menu</span>
-              </button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader className="border-b">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">PG</span>
-                  <span className="text-lg font-extrabold">PaperGen</span>
-                </div>
-              </DrawerHeader>
-              <div className="p-4">
-                <nav className="flex flex-col gap-2">
-                  <NavItem to="/get-started" icon={LayoutGrid} label="Dashboard" active={pathname === "/get-started"} />
-                  <NavItem to="/mcqs" icon={ListChecks} label="Generate MCQs" active={pathname === "/mcqs"} />
-                  <NavItem to="/qna" icon={MessageSquare} label="Generate Q&A" active={pathname === "/qna"} />
-                  <NavItem to="/app" icon={FileText} label="Generate Exam" active={pathname === "/app"} />
-                </nav>
-              </div>
-            </DrawerContent>
-          </Drawer>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
           {/* Sidebar (md+) */}
           <aside className="hidden md:block">
