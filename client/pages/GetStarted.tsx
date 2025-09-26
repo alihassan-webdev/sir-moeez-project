@@ -177,19 +177,19 @@ export default function GetStarted() {
             {/* Quick create */}
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Quick create</h2>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 auto-rows-fr">
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
                 <Link
                   to="/mcqs"
-                  className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
                 >
                   <div className="flex flex-col items-center text-center h-full">
-                    <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
                       <ListChecks
-                        className="h-9 w-9 sm:h-10 sm:w-10"
+                        className="h-7 w-7 sm:h-8 sm:w-8"
                         aria-hidden="true"
                       />
                     </div>
-                    <div className="text-lg font-semibold">Generate MCQs</div>
+                    <div className="text-base font-semibold">Generate MCQs</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Create multiple-choice questions from chapters
                     </div>
@@ -198,16 +198,16 @@ export default function GetStarted() {
 
                 <Link
                   to="/qna"
-                  className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
                 >
                   <div className="flex flex-col items-center text-center h-full">
-                    <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
                       <MessageSquare
-                        className="h-9 w-9 sm:h-10 sm:w-10"
+                        className="h-7 w-7 sm:h-8 sm:w-8"
                         aria-hidden="true"
                       />
                     </div>
-                    <div className="text-lg font-semibold">Generate Q&A</div>
+                    <div className="text-base font-semibold">Generate Q&A</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Generate question–answer cards for quick revision
                     </div>
@@ -216,16 +216,16 @@ export default function GetStarted() {
 
                 <Link
                   to="/app"
-                  className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
                 >
                   <div className="flex flex-col items-center text-center h-full">
-                    <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
                       <FileText
-                        className="h-9 w-9 sm:h-10 sm:w-10"
+                        className="h-7 w-7 sm:h-8 sm:w-8"
                         aria-hidden="true"
                       />
                     </div>
-                    <div className="text-lg font-semibold">Generate Exam</div>
+                    <div className="text-base font-semibold">Generate Exam</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Open the Test Paper Generator
                     </div>
@@ -251,7 +251,7 @@ export default function GetStarted() {
                       key={cls}
                       className="rounded-xl bg-white border border-input p-5 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 transition"
                     >
-                      <div className="text-lg font-semibold">{cls}</div>
+                      <div className="text-base font-semibold">{cls}</div>
                       <div className="text-xs text-muted-foreground mt-1">
                         {subjSet.size} subjects • {total} chapters
                       </div>
