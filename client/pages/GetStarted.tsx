@@ -9,7 +9,6 @@ import {
   BookOpen,
   Folder,
   LayoutGrid,
-  Menu,
 } from "lucide-react";
 
 function NavItem({
