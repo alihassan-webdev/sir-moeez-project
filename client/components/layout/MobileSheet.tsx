@@ -1,0 +1,81 @@
+import * as React from "react";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import SidebarStats from "@/components/layout/SidebarStats";
+import { Link } from "react-router-dom";
+
+export default function MobileSheet() {
+  const [open, setOpen] = React.useState(false);
+  const path = window.location.pathname;
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          className="inline-flex items-center gap-2 rounded-md border border-input bg-white px-3 py-2 card-yellow-shadow"
+          aria-label="Open navigation"
+        >
+          <Menu className="h-5 w-5" aria-hidden="true" />
+          <span className="text-sm font-medium">Menu</span>
+        </button>
+      </SheetTrigger>
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle>Navigate</SheetTitle>
+        </SheetHeader>
+        <div className="mt-2 flex flex-col gap-2 p-2">
+          <SheetClose asChild>
+            <Link
+              to="/get-started"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/get-started" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Dashboard
+            </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/mcqs"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/mcqs" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Generate MCQs
+            </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/qna"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/qna" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Generate Q&A
+            </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/app"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Generate Exam
+            </Link>
+          </SheetClose>
+        </div>
+
+        <div className="mt-4 p-2">
+          <div className="text-sm font-semibold text-muted-foreground px-1">Stats</div>
+          <div className="mt-2">
+            <SidebarStats />
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
