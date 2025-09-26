@@ -21,21 +21,6 @@ export default function GetStarted() {
           >
             <div className="flex flex-col items-center text-center h-full">
               <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
-                <FileText className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
-              </div>
-              <div className="text-lg font-semibold">Generate Exam</div>
-              <div className="text-xs text-muted-foreground mt-1">
-                Open the Test Paper Generator
-              </div>
-            </div>
-          </Link>
-
-          <Link
-            to="/app"
-            className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
-          >
-            <div className="flex flex-col items-center text-center h-full">
-              <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
                 <ListChecks className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
               </div>
               <div className="text-lg font-semibold">Generate MCQs</div>
@@ -56,6 +41,21 @@ export default function GetStarted() {
               <div className="text-lg font-semibold">Generate Q&A</div>
               <div className="text-xs text-muted-foreground mt-1">
                 Generate question–answer cards for quick revision
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            to="/app"
+            className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+          >
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                <FileText className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
+              </div>
+              <div className="text-lg font-semibold">Generate Exam</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Open the Test Paper Generator
               </div>
             </div>
           </Link>
