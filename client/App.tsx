@@ -18,7 +18,6 @@ import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
 import MCQs from "./pages/MCQs";
 import QnA from "./pages/QnA";
-import { AnimatePresence, motion } from "framer-motion";
 
 const queryClient = new QueryClient();
 
