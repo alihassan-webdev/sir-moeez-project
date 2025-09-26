@@ -120,6 +120,13 @@ export function AppLayout({ children }: PropsWithChildren) {
                         </Link>
                       </SheetClose>
                     </div>
+
+                    <div className="mt-4 p-2">
+                      <div className="text-sm font-semibold text-muted-foreground px-1">Stats</div>
+                      <div className="mt-2">
+                        <SidebarStats />
+                      </div>
+                    </div>
                   </SheetContent>
                 </Sheet>
               </div>
