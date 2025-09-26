@@ -122,6 +122,17 @@ export default function GetStarted() {
               </div>
             </div>
 
+            {/* Welcome text */}
+            <div className="mt-4 rounded-xl bg-white p-6 border border-input card-yellow-shadow">
+              <h2 className="text-2xl font-bold">Welcome to PaperGen</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Generate MCQs, Q&A cards and full exam papers quickly from your
+                uploaded chapters. Choose a class, select a subject and chapters,
+                then customise the number of questions or marks — PaperGen will
+                create printable PDFs ready to use for tests or revision.
+              </p>
+            </div>
+
             {/* Quick create */}
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Quick create</h2>
