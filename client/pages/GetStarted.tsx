@@ -14,14 +14,14 @@ export default function GetStarted() {
           Choose an action to begin. Click below to open the Test Paper Generator.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 auto-rows-fr">
           <Link
             to="/app"
-            className="group w-full sm:w-72 rounded-xl border bg-white p-6 card-yellow-shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+            className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
           >
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-3 text-primary group-hover:bg-primary/15">
-                <FileText className="h-10 w-10" aria-hidden="true" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                <FileText className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
               </div>
               <div className="text-lg font-semibold">Generate Exam</div>
               <div className="text-xs text-muted-foreground mt-1">
@@ -32,11 +32,11 @@ export default function GetStarted() {
 
           <Link
             to="/app"
-            className="group w-full sm:w-72 rounded-xl border bg-white p-6 card-yellow-shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+            className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
           >
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-3 text-primary group-hover:bg-primary/15">
-                <ListChecks className="h-10 w-10" aria-hidden="true" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                <ListChecks className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
               </div>
               <div className="text-lg font-semibold">Generate MCQs</div>
               <div className="text-xs text-muted-foreground mt-1">
@@ -47,11 +47,11 @@ export default function GetStarted() {
 
           <Link
             to="/app"
-            className="group w-full sm:w-72 rounded-xl border bg-white p-6 card-yellow-shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+            className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
           >
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-3 text-primary group-hover:bg-primary/15">
-                <MessageSquare className="h-10 w-10" aria-hidden="true" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
+                <MessageSquare className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
               </div>
               <div className="text-lg font-semibold">Generate Q&A</div>
               <div className="text-xs text-muted-foreground mt-1">
