@@ -31,7 +31,7 @@ export default function GetStarted() {
           </Link>
 
           <Link
-            to="/app"
+            to="/qna"
             className="group w-full h-full rounded-xl border bg-white p-5 sm:p-6 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
           >
             <div className="flex flex-col items-center text-center h-full">
