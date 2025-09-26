@@ -72,62 +72,15 @@ export function AppLayout({ children }: PropsWithChildren) {
             )}
             {isToolRoute && (
               <div className="md:hidden">
+                {/* Controlled Sheet to avoid accidental double toggles */}
                 <Sheet>
-                  <SheetTrigger asChild>
-                    <button
-                      className="inline-flex items-center gap-2 rounded-md border border-input bg-white px-3 py-2 card-yellow-shadow"
-                      aria-label="Open navigation"
-                    >
-                      <Menu className="h-5 w-5" aria-hidden="true" />
-                      <span className="text-sm font-medium">Menu</span>
-                    </button>
-                  </SheetTrigger>
-                  <SheetContent side="right">
-                    <SheetHeader>
-                      <SheetTitle>Navigate</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-2 flex flex-col gap-2 p-2">
-                      <SheetClose asChild>
-                        <Link
-                          to="/get-started"
-                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/get-started" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
-                        >
-                          Dashboard
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          to="/mcqs"
-                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/mcqs" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
-                        >
-                          Generate MCQs
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          to="/qna"
-                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/qna" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
-                        >
-                          Generate Q&A
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          to="/app"
-                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
-                        >
-                          Generate Exam
-                        </Link>
-                      </SheetClose>
-                    </div>
-
-                    <div className="mt-4 p-2">
-                      <div className="text-sm font-semibold text-muted-foreground px-1">Stats</div>
-                      <div className="mt-2">
-                        <SidebarStats />
-                      </div>
-                    </div>
-                  </SheetContent>
+                  {({ open, onOpenChange }) => {
+                    // Radix sheet does not currently provide this render-prop by default,
+                    // so instead use local state below (declared above).
+                    return (
+                      <MobileSheet />
+                    );
+                  }}
                 </Sheet>
               </div>
             )}
