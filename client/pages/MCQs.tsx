@@ -439,7 +439,15 @@ export default function MCQs() {
                     </label>
                     <Select
                       value={selectedPdfPath}
-                      onValueChange={handleSelectPdf}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: chapter onValueChange", v);
+                        handleSelectPdf(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: chapter onOpenChange", open, { selectedSubject, chapterOptions });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
