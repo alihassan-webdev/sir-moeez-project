@@ -86,15 +86,6 @@ export default function GetStarted() {
         <Container className="pt-6 pb-4">
           <div className="flex items-center justify-center sm:justify-between gap-4">
             {/* Brand like landing */}
-            <Link
-              to="/"
-              className="hidden sm:inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
-            >
-              <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                PG
-              </span>
-              <span>PaperGen</span>
-            </Link>
                       </div>
         </Container>
       </div>
