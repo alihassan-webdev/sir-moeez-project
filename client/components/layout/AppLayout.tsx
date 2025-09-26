@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import SidebarStats from "@/components/layout/SidebarStats";
+import MobileSheet from "@/components/layout/MobileSheet";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
