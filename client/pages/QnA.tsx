@@ -368,7 +368,15 @@ export default function QnA() {
                     <Select
                       key={`chapter-${selectedSubject || "none"}`}
                       value={selectedPdfPath}
-                      onValueChange={handleSelectPdf}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: chapter onValueChange", v);
+                        handleSelectPdf(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: chapter onOpenChange", open, { selectedSubject, chapterOptions });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
