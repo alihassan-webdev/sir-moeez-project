@@ -25,8 +25,8 @@ export function AppLayout({ children }: PropsWithChildren) {
 
   return (
     <div className="flex min-h-svh w-full flex-col">
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background px-4">
-        <div className="flex w-full items-center gap-2">
+      <header className="sticky top-0 z-30 border-b bg-background">
+        <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
           <Link to="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black">
             <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">PG</span>
             <span>PaperGen</span>
