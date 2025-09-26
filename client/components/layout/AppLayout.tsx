@@ -63,7 +63,7 @@ export function AppLayout({ children }: PropsWithChildren) {
             ) : (
               <Button
                 variant="outline"
-                className="inline-flex items-center gap-2 bg-primary/10 border-primary/60"
+                className="hidden md:inline-flex items-center gap-2 bg-primary/10 border-primary/60"
                 onClick={() => navigate("/get-started")}
               >
                 <ArrowLeft className="h-4 w-4" />
