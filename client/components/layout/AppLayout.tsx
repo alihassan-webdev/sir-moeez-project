@@ -90,7 +90,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                       <SheetClose asChild>
                         <Link
                           to="/get-started"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm bg-primary text-primary-foreground hover:text-primary-foreground"
+                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/get-started" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
                         >
                           Dashboard
                         </Link>
@@ -98,7 +98,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                       <SheetClose asChild>
                         <Link
                           to="/mcqs"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/mcqs" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
                         >
                           Generate MCQs
                         </Link>
@@ -106,7 +106,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                       <SheetClose asChild>
                         <Link
                           to="/qna"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/qna" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
                         >
                           Generate Q&A
                         </Link>
@@ -114,7 +114,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                       <SheetClose asChild>
                         <Link
                           to="/app"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                          className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
                         >
                           Generate Exam
                         </Link>
