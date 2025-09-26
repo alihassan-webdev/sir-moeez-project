@@ -35,7 +35,7 @@ export function AppLayout({ children }: PropsWithChildren) {
 
   return (
     <div className="flex min-h-svh w-full flex-col">
-      <header className="sticky top-0 z-30 border-b bg-white">
+      <header className="w-full sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b border-input">
         <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
           <Link
             to="/"
