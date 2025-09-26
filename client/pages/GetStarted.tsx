@@ -25,7 +25,7 @@ function NavItem({
   return (
     <Link
       to={to}
-      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+      className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${
         active ? "bg-primary text-primary-foreground" : "hover:bg-primary/10"
       }`}
     >
@@ -95,16 +95,7 @@ export default function GetStarted() {
               </span>
               <span>PaperGen</span>
             </Link>
-            <div className="text-center flex-1 sm:flex-none">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
-                PaperGen Workspace
-              </h1>
-              <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-                Create MCQs, Q&A cards, and full exams from your syllabus PDFs.
-                Start with Quick Create or explore by class.
-              </p>
-            </div>
-          </div>
+                      </div>
         </Container>
       </div>
 
