@@ -78,18 +78,6 @@ export default function GetStarted() {
 
   return (
     <div className="min-h-svh">
-      {/* Top hero with brand and new title */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="h-28 bg-gradient-to-b from-primary/10 to-transparent" />
-        </div>
-        <Container className="pt-6 pb-4">
-          <div className="flex items-center justify-center sm:justify-between gap-4">
-            {/* Brand like landing */}
-                      </div>
-        </Container>
-      </div>
-
       {/* Main content with sidebar */}
       <Container className="py-6">
         <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
