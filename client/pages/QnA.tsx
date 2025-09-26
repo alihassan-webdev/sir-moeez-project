@@ -329,7 +329,15 @@ export default function QnA() {
                     <Select
                       key={`subject-${selectedClass || "none"}`}
                       value={selectedSubject}
-                      onValueChange={(v) => setSelectedSubject(v)}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: subject onValueChange", v);
+                        setSelectedSubject(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: subject onOpenChange", open, { selectedClass, subjects });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
