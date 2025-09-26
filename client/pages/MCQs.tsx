@@ -81,6 +81,18 @@ export default function MCQs() {
     setResult(null);
   }, [selectedClass, byClass]);
 
+  // Debug: log key variables to help diagnose subject selection issues
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: classOptions=", classOptions);
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: selectedClass=", selectedClass);
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: subjectOptions=", subjectOptions);
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: subjects=", subjects);
+  }, [classOptions, selectedClass, subjectOptions, subjects]);
+
   useEffect(() => {
     const arr = (subjectOptions || []).filter(
       (s) => selectedSubject && subjectOf(s.path) === selectedSubject,
