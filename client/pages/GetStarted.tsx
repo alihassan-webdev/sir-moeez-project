@@ -11,7 +11,17 @@ import {
   LayoutGrid,
 } from "lucide-react";
 
-function NavItem({ to, icon: Icon, label, active }: { to: string; icon: React.ComponentType<any>; label: string; active?: boolean }) {
+function NavItem({
+  to,
+  icon: Icon,
+  label,
+  active,
+}: {
+  to: string;
+  icon: React.ComponentType<any>;
+  label: string;
+  active?: boolean;
+}) {
   return (
     <Link
       to={to}
@@ -28,13 +38,23 @@ function NavItem({ to, icon: Icon, label, active }: { to: string; icon: React.Co
 export default function GetStarted() {
   const { pathname } = useLocation();
   // Build real stats from bundled PDFs
-  const pdfModules = import.meta.glob("/datafiles/**/*.pdf", { as: "url", eager: true }) as Record<string, string>;
+  const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
+    as: "url",
+    eager: true,
+  }) as Record<string, string>;
   const entries = React.useMemo(
-    () => Object.entries(pdfModules).map(([path, url]) => ({ path, url, name: path.split("/").pop() || "file.pdf" })),
+    () =>
+      Object.entries(pdfModules).map(([path, url]) => ({
+        path,
+        url,
+        name: path.split("/").pop() || "file.pdf",
+      })),
     [pdfModules],
   );
   const byClass = React.useMemo(() => {
-    return entries.reduce<Record<string, { path: string; url: string; name: string }[]>>((acc, cur) => {
+    return entries.reduce<
+      Record<string, { path: string; url: string; name: string }[]>
+    >((acc, cur) => {
       const m = cur.path.replace(/^\/?datafiles\//, "");
       const cls = m.split("/")[0] || "Other";
       if (!acc[cls]) acc[cls] = [];
@@ -66,7 +86,10 @@ export default function GetStarted() {
         <Container className="pt-6 pb-4">
           <div className="flex items-center justify-center sm:justify-between gap-4">
             {/* Brand like landing */}
-            <Link to="/" className="hidden sm:inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-black">
+            <Link
+              to="/"
+              className="hidden sm:inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
+            >
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 PG
               </span>
@@ -77,7 +100,8 @@ export default function GetStarted() {
                 PaperGen Workspace
               </h1>
               <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-                Create MCQs, Q&A cards, and full exams from your syllabus PDFs. Start with Quick Create or explore by class.
+                Create MCQs, Q&A cards, and full exams from your syllabus PDFs.
+                Start with Quick Create or explore by class.
               </p>
             </div>
           </div>
@@ -90,27 +114,61 @@ export default function GetStarted() {
           {/* Sidebar (md+) */}
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-20">
-              <div className="mb-3 px-1 text-xs font-semibold text-muted-foreground">Navigation</div>
+              <div className="mb-3 px-1 text-xs font-semibold text-muted-foreground">
+                Navigation
+              </div>
               <nav className="flex flex-col gap-1">
-                <NavItem to="/get-started" icon={LayoutGrid} label="Dashboard" active={pathname === "/get-started"} />
-                <NavItem to="/mcqs" icon={ListChecks} label="Generate MCQs" active={pathname === "/mcqs"} />
-                <NavItem to="/qna" icon={MessageSquare} label="Generate Q&A" active={pathname === "/qna"} />
-                <NavItem to="/app" icon={FileText} label="Generate Exam" active={pathname === "/app"} />
+                <NavItem
+                  to="/get-started"
+                  icon={LayoutGrid}
+                  label="Dashboard"
+                  active={pathname === "/get-started"}
+                />
+                <NavItem
+                  to="/mcqs"
+                  icon={ListChecks}
+                  label="Generate MCQs"
+                  active={pathname === "/mcqs"}
+                />
+                <NavItem
+                  to="/qna"
+                  icon={MessageSquare}
+                  label="Generate Q&A"
+                  active={pathname === "/qna"}
+                />
+                <NavItem
+                  to="/app"
+                  icon={FileText}
+                  label="Generate Exam"
+                  active={pathname === "/app"}
+                />
               </nav>
 
               <div className="mt-5 border-t pt-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">Classes</div>
-                    <div className="text-lg font-extrabold">{classes.length}</div>
+                    <div className="text-xs font-semibold text-muted-foreground">
+                      Classes
+                    </div>
+                    <div className="text-lg font-extrabold">
+                      {classes.length}
+                    </div>
                   </div>
                   <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">Subjects</div>
-                    <div className="text-lg font-extrabold">{subjects.length}</div>
+                    <div className="text-xs font-semibold text-muted-foreground">
+                      Subjects
+                    </div>
+                    <div className="text-lg font-extrabold">
+                      {subjects.length}
+                    </div>
                   </div>
                   <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">Chapters</div>
-                    <div className="text-lg font-extrabold">{chaptersCount}</div>
+                    <div className="text-xs font-semibold text-muted-foreground">
+                      Chapters
+                    </div>
+                    <div className="text-lg font-extrabold">
+                      {chaptersCount}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -132,7 +190,9 @@ export default function GetStarted() {
                 <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
                 <div>
                   <div className="text-sm font-semibold">Subjects</div>
-                  <div className="text-lg font-extrabold">{subjects.length}</div>
+                  <div className="text-lg font-extrabold">
+                    {subjects.length}
+                  </div>
                 </div>
               </div>
               <div className="rounded-xl bg-white border border-input px-5 py-4 card-yellow-shadow flex items-center gap-3">
@@ -154,10 +214,15 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
-                      <ListChecks className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
+                      <ListChecks
+                        className="h-9 w-9 sm:h-10 sm:w-10"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="text-lg font-semibold">Generate MCQs</div>
-                    <div className="text-xs text-muted-foreground mt-1">Create multiple-choice questions from chapters</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Create multiple-choice questions from chapters
+                    </div>
                   </div>
                 </Link>
 
@@ -167,10 +232,15 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
-                      <MessageSquare className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
+                      <MessageSquare
+                        className="h-9 w-9 sm:h-10 sm:w-10"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="text-lg font-semibold">Generate Q&A</div>
-                    <div className="text-xs text-muted-foreground mt-1">Generate question–answer cards for quick revision</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Generate question–answer cards for quick revision
+                    </div>
                   </div>
                 </Link>
 
@@ -180,10 +250,15 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-3.5 sm:p-4 mb-3 text-primary group-hover:bg-primary/15">
-                      <FileText className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true" />
+                      <FileText
+                        className="h-9 w-9 sm:h-10 sm:w-10"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="text-lg font-semibold">Generate Exam</div>
-                    <div className="text-xs text-muted-foreground mt-1">Open the Test Paper Generator</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Open the Test Paper Generator
+                    </div>
                   </div>
                 </Link>
               </div>

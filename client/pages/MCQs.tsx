@@ -46,7 +46,10 @@ export default function MCQs() {
     }, {});
   }, [entries]);
 
-  const classOptions = React.useMemo(() => Object.keys(byClass).sort(), [byClass]);
+  const classOptions = React.useMemo(
+    () => Object.keys(byClass).sort(),
+    [byClass],
+  );
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [subjectOptions, setSubjectOptions] = useState<
     { path: string; url: string; name: string }[]
@@ -80,11 +83,7 @@ export default function MCQs() {
     const arr = (subjectOptions || []).filter(
       (s) => selectedSubject && subjectOf(s.path) === selectedSubject,
     );
-    setChapterOptions(
-      arr
-        .slice()
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    );
+    setChapterOptions(arr.slice().sort((a, b) => a.name.localeCompare(b.name)));
     setSelectedPdfPath("");
     setFile(null);
   }, [selectedSubject, subjectOptions]);
@@ -172,7 +171,10 @@ export default function MCQs() {
         setResult(await res.text());
       }
     } catch (err: any) {
-      const msg = err?.message === "timeout" ? "Request timed out." : err?.message || "Request failed";
+      const msg =
+        err?.message === "timeout"
+          ? "Request timed out."
+          : err?.message || "Request failed";
       setError(msg);
       toast({ title: "Request failed", description: msg });
     } finally {
@@ -183,22 +185,30 @@ export default function MCQs() {
   const formatMcqHtml = (txt: string) => {
     if (!txt) return "";
     // escape HTML
-    const escape = (s: string) => s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+    const escape = (s: string) =>
+      s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
     let out = escape(txt);
     // MCQ question lines
-    out = out.replace(/^(\s*Q\d+\.)\s*(.*)$/gim, '<p class="text-lg font-semibold mb-2"><strong>$1</strong> $2</p>');
+    out = out.replace(
+      /^(\s*Q\d+\.)\s*(.*)$/gim,
+      '<p class="text-lg font-semibold mb-2"><strong>$1</strong> $2</p>',
+    );
     // options a) b) c) d)
-    out = out.replace(/^\s*([a-d])\)\s*(.*)$/gim, '<div class="ml-6 mb-1"><strong class="mr-2">$1)</strong>$2</div>');
+    out = out.replace(
+      /^\s*([a-d])\)\s*(.*)$/gim,
+      '<div class="ml-6 mb-1"><strong class="mr-2">$1)</strong>$2</div>',
+    );
     // spacing
     out = out.replace(/\n{2,}/g, '</p><p class="mb-3">');
-    out = out.replace(/\n/g, '<br />');
-    if (!out.startsWith('<p') && !out.startsWith('<div')) out = `<p class="mb-3">${out}</p>`;
+    out = out.replace(/\n/g, "<br />");
+    if (!out.startsWith("<p") && !out.startsWith("<div"))
+      out = `<p class="mb-3">${out}</p>`;
     return out;
   };
 
@@ -242,33 +252,53 @@ export default function MCQs() {
 
       doc.save(`mcqs_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`);
     } catch (err) {
-      toast({ title: "Download failed", description: "Could not generate PDF." });
+      toast({
+        title: "Download failed",
+        description: "Could not generate PDF.",
+      });
     }
   };
 
-  const canGenerate = !!selectedClass && !!selectedSubject && !!selectedPdfPath && !!file && !loading && (mcqCount ?? 0) >= 5;
+  const canGenerate =
+    !!selectedClass &&
+    !!selectedSubject &&
+    !!selectedPdfPath &&
+    !!file &&
+    !loading &&
+    (mcqCount ?? 0) >= 5;
 
   return (
     <div>
       <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 -mt-5">
         <div className="absolute inset-0 bg-background -z-10" />
         <div className="relative mx-auto max-w-3xl text-center">
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">MCQ Generator</h1>
-          <p className="mt-3 text-sm text-muted-foreground">Generate multiple-choice questions only, with four options (a–d).</p>
+          <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
+            MCQ Generator
+          </h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Generate multiple-choice questions only, with four options (a–d).
+          </p>
         </div>
       </section>
 
       <section className="mx-auto mt-10 max-w-5xl space-y-6">
         {error && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive-foreground">{error}</div>
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive-foreground">
+            {error}
+          </div>
         )}
 
         <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
             {/* Class */}
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Class</label>
-              <Select value={selectedClass} onValueChange={(v) => setSelectedClass(v)}>
+              <label className="text-sm font-medium text-muted-foreground">
+                Class
+              </label>
+              <Select
+                value={selectedClass}
+                onValueChange={(v) => setSelectedClass(v)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select class" />
                 </SelectTrigger>
@@ -284,10 +314,19 @@ export default function MCQs() {
 
             {/* Subject */}
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Subject</label>
-              <Select value={selectedSubject} onValueChange={(v) => setSelectedSubject(v)}>
+              <label className="text-sm font-medium text-muted-foreground">
+                Subject
+              </label>
+              <Select
+                value={selectedSubject}
+                onValueChange={(v) => setSelectedSubject(v)}
+              >
                 <SelectTrigger className="w-full" disabled={!selectedClass}>
-                  <SelectValue placeholder={selectedClass ? "Select subject" : "Select class first"} />
+                  <SelectValue
+                    placeholder={
+                      selectedClass ? "Select subject" : "Select class first"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {subjects.map((s) => (
@@ -301,10 +340,18 @@ export default function MCQs() {
 
             {/* Chapter */}
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Chapter (PDF)</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Chapter (PDF)
+              </label>
               <Select value={selectedPdfPath} onValueChange={handleSelectPdf}>
                 <SelectTrigger className="w-full" disabled={!selectedSubject}>
-                  <SelectValue placeholder={selectedSubject ? "Select chapter" : "Select subject first"} />
+                  <SelectValue
+                    placeholder={
+                      selectedSubject
+                        ? "Select chapter"
+                        : "Select subject first"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {chapterOptions.map((opt) => (
@@ -318,14 +365,22 @@ export default function MCQs() {
 
             {/* MCQ Count */}
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Number of MCQs</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Number of MCQs
+              </label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
                   min={5}
                   max={100}
                   value={mcqCount ?? ""}
-                  onChange={(e) => setMcqCount(e.currentTarget.value === "" ? null : Number(e.currentTarget.value))}
+                  onChange={(e) =>
+                    setMcqCount(
+                      e.currentTarget.value === ""
+                        ? null
+                        : Number(e.currentTarget.value),
+                    )
+                  }
                   className="w-32 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                   placeholder="e.g. 20"
                 />
@@ -358,7 +413,11 @@ export default function MCQs() {
             <Button disabled={!canGenerate} onClick={runSubmit}>
               {loading ? "Generating..." : "Generate MCQs"}
             </Button>
-            <Button variant="secondary" disabled={!result || loading} onClick={downloadPdf}>
+            <Button
+              variant="secondary"
+              disabled={!result || loading}
+              onClick={downloadPdf}
+            >
               Download PDF
             </Button>
           </div>
