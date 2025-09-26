@@ -69,7 +69,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                 Back
               </Button>
             )}
-            {isGetStarted && (
+            {isToolRoute && (
               <div className="md:hidden">
                 <Sheet>
                   <SheetTrigger asChild>
