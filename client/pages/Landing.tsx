@@ -78,7 +78,7 @@ export default function Landing() {
             <div className="mt-5 flex items-end justify-center gap-4 sm:gap-6">
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={1200} duration={2500} format="comma" />
+                  <CountUp end={1200} format="comma" />
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   Teachers using PaperGen
@@ -198,7 +198,7 @@ export default function Landing() {
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1 text-primary">•</span>
+                    <span className="mt-1 text-primary">���</span>
                     <span>
                       Works perfectly on mobile devices as well as PC.
                     </span>
