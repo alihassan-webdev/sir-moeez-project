@@ -169,7 +169,7 @@ const PricingCard = ({
         "bg-white text-foreground",
         "border-input hover:border-primary/50",
         "card-yellow-shadow",
-        isPopular && "outline outline-1 outline-primary/60",
+        isPopular && "border-2 border-primary/60 shadow-lg",
       )}
     >
       {isHighlighted && <HighlightedBackground />}
