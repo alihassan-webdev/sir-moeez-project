@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 
 export function AppLayout({ children }: PropsWithChildren) {
@@ -28,8 +35,13 @@ export function AppLayout({ children }: PropsWithChildren) {
     <div className="flex min-h-svh w-full flex-col">
       <header className="sticky top-0 z-30 border-b bg-background">
         <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black">
-            <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">PG</span>
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
+          >
+            <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              PG
+            </span>
             <span>PaperGen</span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
@@ -74,16 +86,36 @@ export function AppLayout({ children }: PropsWithChildren) {
                     </SheetHeader>
                     <div className="mt-2 flex flex-col gap-2 p-2">
                       <SheetClose asChild>
-                        <Link to="/get-started" className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10">Dashboard</Link>
+                        <Link
+                          to="/get-started"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Dashboard
+                        </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Link to="/mcqs" className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10">Generate MCQs</Link>
+                        <Link
+                          to="/mcqs"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Generate MCQs
+                        </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Link to="/qna" className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10">Generate Q&A</Link>
+                        <Link
+                          to="/qna"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Generate Q&A
+                        </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Link to="/app" className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10">Generate Exam</Link>
+                        <Link
+                          to="/app"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Generate Exam
+                        </Link>
                       </SheetClose>
                     </div>
                   </SheetContent>
