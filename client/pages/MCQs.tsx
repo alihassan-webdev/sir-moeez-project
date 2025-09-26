@@ -387,12 +387,14 @@ export default function MCQs() {
                       Subject
                     </label>
                     <Select
+                      key={`subject-${selectedClass || "none"}`}
+                      disabled={!selectedClass}
                       value={selectedSubject}
                       onValueChange={(v) => setSelectedSubject(v)}
                     >
                       <SelectTrigger
                         className="w-full"
-                        disabled={!selectedClass}
+                        aria-disabled={!selectedClass}
                       >
                         <SelectValue
                           placeholder={
@@ -418,12 +420,14 @@ export default function MCQs() {
                       Chapter (PDF)
                     </label>
                     <Select
+                      key={`chapter-${selectedSubject || "none"}`}
+                      disabled={!selectedSubject}
                       value={selectedPdfPath}
                       onValueChange={handleSelectPdf}
                     >
                       <SelectTrigger
                         className="w-full"
-                        disabled={!selectedSubject}
+                        aria-disabled={!selectedSubject}
                       >
                         <SelectValue
                           placeholder={
