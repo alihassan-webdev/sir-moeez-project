@@ -433,6 +433,7 @@ function ExternalPdfSelector({
             Subject
           </label>
           <Select
+            key={`subject-${selectedClass || "none"}`}
             value={selectedSubjectName}
             onValueChange={(name) => handleSelectSubject(name)}
           >
