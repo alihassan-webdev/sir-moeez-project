@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
+import MCQs from "./pages/MCQs";
 import { AnimatePresence, motion } from "framer-motion";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,14 @@ function AnimatedRoutes() {
             element={
               <PageWrapper>
                 <Index />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/mcqs"
+            element={
+              <PageWrapper>
+                <MCQs />
               </PageWrapper>
             }
           />
