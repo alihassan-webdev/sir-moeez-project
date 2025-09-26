@@ -79,6 +79,18 @@ export default function QnA() {
     setResult(null);
   }, [selectedClass, byClass]);
 
+  // Debug: log key variables to help diagnose subject selection issues
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: classOptions=", classOptions);
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: selectedClass=", selectedClass);
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: subjectOptions=", subjectOptions);
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: subjects=", subjects);
+  }, [classOptions, selectedClass, subjectOptions, subjects]);
+
   useEffect(() => {
     const arr = (subjectOptions || []).filter(
       (s) => selectedSubject && subjectOf(s.path) === selectedSubject,
