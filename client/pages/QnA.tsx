@@ -318,10 +318,15 @@ export default function QnA() {
                       value={selectedSubject}
                       onValueChange={(v) => setSelectedSubject(v)}
                     >
-                      <SelectTrigger className="w-full" disabled={!selectedClass}>
+                      <SelectTrigger
+                        className="w-full"
+                        disabled={!selectedClass}
+                      >
                         <SelectValue
                           placeholder={
-                            selectedClass ? "Select subject" : "Select class first"
+                            selectedClass
+                              ? "Select subject"
+                              : "Select class first"
                           }
                         />
                       </SelectTrigger>
@@ -339,8 +344,14 @@ export default function QnA() {
                     <label className="text-sm font-medium text-muted-foreground">
                       Chapter (PDF)
                     </label>
-                    <Select value={selectedPdfPath} onValueChange={handleSelectPdf}>
-                      <SelectTrigger className="w-full" disabled={!selectedSubject}>
+                    <Select
+                      value={selectedPdfPath}
+                      onValueChange={handleSelectPdf}
+                    >
+                      <SelectTrigger
+                        className="w-full"
+                        disabled={!selectedSubject}
+                      >
                         <SelectValue
                           placeholder={
                             selectedSubject

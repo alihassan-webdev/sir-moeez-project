@@ -219,7 +219,10 @@ export default function MCQs() {
               : (json?.questions ?? json?.result ?? json?.message ?? "");
           setResult(String(text));
         } catch {
-          const txt = await res.clone().text().catch(() => "");
+          const txt = await res
+            .clone()
+            .text()
+            .catch(() => "");
           setResult(txt);
         }
       } else {
@@ -341,7 +344,8 @@ export default function MCQs() {
                   MCQ Generator
                 </h1>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Generate multiple-choice questions only, with four options (a–d).
+                  Generate multiple-choice questions only, with four options
+                  (a–d).
                 </p>
               </div>
             </section>
@@ -386,10 +390,15 @@ export default function MCQs() {
                       value={selectedSubject}
                       onValueChange={(v) => setSelectedSubject(v)}
                     >
-                      <SelectTrigger className="w-full" disabled={!selectedClass}>
+                      <SelectTrigger
+                        className="w-full"
+                        disabled={!selectedClass}
+                      >
                         <SelectValue
                           placeholder={
-                            selectedClass ? "Select subject" : "Select class first"
+                            selectedClass
+                              ? "Select subject"
+                              : "Select class first"
                           }
                         />
                       </SelectTrigger>
@@ -408,8 +417,14 @@ export default function MCQs() {
                     <label className="text-sm font-medium text-muted-foreground">
                       Chapter (PDF)
                     </label>
-                    <Select value={selectedPdfPath} onValueChange={handleSelectPdf}>
-                      <SelectTrigger className="w-full" disabled={!selectedSubject}>
+                    <Select
+                      value={selectedPdfPath}
+                      onValueChange={handleSelectPdf}
+                    >
+                      <SelectTrigger
+                        className="w-full"
+                        disabled={!selectedSubject}
+                      >
                         <SelectValue
                           placeholder={
                             selectedSubject

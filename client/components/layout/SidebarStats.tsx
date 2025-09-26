@@ -29,7 +29,10 @@ export default function SidebarStats() {
     }, {});
   }, [entries]);
 
-  const classesCount = React.useMemo(() => Object.keys(byClass).length, [byClass]);
+  const classesCount = React.useMemo(
+    () => Object.keys(byClass).length,
+    [byClass],
+  );
 
   const subjectsCount = React.useMemo(() => {
     const s = new Set<string>();
@@ -49,15 +52,21 @@ export default function SidebarStats() {
     <div className="mt-5 border-t pt-4">
       <div className="grid grid-cols-1 gap-3">
         <div className="rounded-lg border border-input bg-white px-4 py-3">
-          <div className="text-xs font-semibold text-muted-foreground">Classes</div>
+          <div className="text-xs font-semibold text-muted-foreground">
+            Classes
+          </div>
           <div className="text-lg font-extrabold">{classesCount}</div>
         </div>
         <div className="rounded-lg border border-input bg-white px-4 py-3">
-          <div className="text-xs font-semibold text-muted-foreground">Subjects</div>
+          <div className="text-xs font-semibold text-muted-foreground">
+            Subjects
+          </div>
           <div className="text-lg font-extrabold">{subjectsCount}</div>
         </div>
         <div className="rounded-lg border border-input bg-white px-4 py-3">
-          <div className="text-xs font-semibold text-muted-foreground">Chapters</div>
+          <div className="text-xs font-semibold text-muted-foreground">
+            Chapters
+          </div>
           <div className="text-lg font-extrabold">{chaptersCount}</div>
         </div>
       </div>

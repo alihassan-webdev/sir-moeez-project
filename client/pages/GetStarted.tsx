@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
-
 export default function GetStarted() {
   const { pathname } = useLocation();
   // Build real stats from bundled PDFs

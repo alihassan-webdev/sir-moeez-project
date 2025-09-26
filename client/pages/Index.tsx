@@ -895,9 +895,7 @@ export default function Index() {
 
       if (!res) {
         // If we get here, it likely failed due to CORS or network. Provide a helpful error.
-        throw new Error(
-          "Network error. Please try again.",
-        );
+        throw new Error("Network error. Please try again.");
       }
 
       const contentType = res.headers.get("content-type") || "";
@@ -1059,7 +1057,9 @@ export default function Index() {
                   <ExternalPdfSelector
                     onLoadFile={(f) => setFile(f)}
                     onSetPrompt={(p) => setQuery(p)}
-                    onGenerate={async (p?: string) => await runSubmit(undefined, p)}
+                    onGenerate={async (p?: string) =>
+                      await runSubmit(undefined, p)
+                    }
                     onReset={onReset}
                     loading={loading}
                     onSetInstitute={(name) => setInstitute(name)}
@@ -1081,7 +1081,10 @@ export default function Index() {
                             if (!result) return;
                             try {
                               const { jsPDF } = await import("jspdf");
-                              const doc = new jsPDF({ unit: "pt", format: "a4" });
+                              const doc = new jsPDF({
+                                unit: "pt",
+                                format: "a4",
+                              });
 
                               // Layout metrics
                               const margin = 64; // slightly tighter than 1in
@@ -1094,7 +1097,9 @@ export default function Index() {
                               let y = margin;
 
                               // Filename helper
-                              function makeFilenameFromPrompt(q: string | undefined) {
+                              function makeFilenameFromPrompt(
+                                q: string | undefined,
+                              ) {
                                 const raw = (q || "").trim();
                                 if (!raw) return "exam-paper";
                                 const verbs = [
@@ -1114,7 +1119,10 @@ export default function Index() {
                                 while (changed) {
                                   changed = false;
                                   for (const v of verbs) {
-                                    const re = new RegExp("^" + v + "\\s+", "i");
+                                    const re = new RegExp(
+                                      "^" + v + "\\s+",
+                                      "i",
+                                    );
                                     if (re.test(s)) {
                                       s = s.replace(re, "").trim();
                                       changed = true;
@@ -1168,11 +1176,20 @@ export default function Index() {
                                 ? Number(marksMatch[1])
                                 : undefined;
                               if (typeof totalMarks === "number") {
-                                doc.text(`Total Marks: ${totalMarks}`, margin, y);
+                                doc.text(
+                                  `Total Marks: ${totalMarks}`,
+                                  margin,
+                                  y,
+                                );
                               }
-                              doc.text(`Generated: ${dateStr}`, pageW - margin, y, {
-                                align: "right",
-                              });
+                              doc.text(
+                                `Generated: ${dateStr}`,
+                                pageW - margin,
+                                y,
+                                {
+                                  align: "right",
+                                },
+                              );
                               y += 18;
 
                               // Light bordered content box for professional look
@@ -1187,16 +1204,21 @@ export default function Index() {
                                 .replace(/\n{3,}/g, "\n\n");
                               const cleaned = rawText
                                 .split("\n")
-                                .filter((l) => !/^\s*\**\s*Distribution:/i.test(l))
+                                .filter(
+                                  (l) => !/^\s*\**\s*Distribution:/i.test(l),
+                                )
                                 .filter(
                                   (l) =>
-                                    !/^\s*\**\s*Class\s*\d+.*Exam\s*Paper/i.test(l),
+                                    !/^\s*\**\s*Class\s*\d+.*Exam\s*Paper/i.test(
+                                      l,
+                                    ),
                                 )
                                 .join("\n");
                               const renumbered = (() => {
                                 const lines = cleaned.split(/\r?\n/);
                                 let count = 0;
-                                const headingRe = /^\s*Section\s+[A-Z0-9\-–].*$/i;
+                                const headingRe =
+                                  /^\s*Section\s+[A-Z0-9\-–].*$/i;
                                 const qRe = /^\s*(?:Q\.?\s*)?\d+\.\s*/i;
                                 const optionRe =
                                   /^\s*(?:[A-Da-d][\).]|\([A-Da-d]\))\s+/;
@@ -1227,7 +1249,10 @@ export default function Index() {
                               const paraGap = 10;
 
                               function ensurePageSpace(linesNeeded = 1) {
-                                if (y + lineHeight * linesNeeded > pageH - margin) {
+                                if (
+                                  y + lineHeight * linesNeeded >
+                                  pageH - margin
+                                ) {
                                   // Close current page box
                                   doc.setDrawColor(140);
                                   doc.setLineWidth(1.2);
@@ -1253,7 +1278,12 @@ export default function Index() {
                                   doc.text(headingTitle, margin, y);
                                   doc.setDrawColor(220);
                                   doc.setLineWidth(0.5);
-                                  doc.line(margin, y + 6, pageW - margin, y + 6);
+                                  doc.line(
+                                    margin,
+                                    y + 6,
+                                    pageW - margin,
+                                    y + 6,
+                                  );
                                   y += 16;
 
                                   // Reset box top for new page
@@ -1270,15 +1300,23 @@ export default function Index() {
 
                                 const isSection =
                                   /^\s*(Section\s+[A-Z0-9\-–].*)$/i.test(text);
-                                const isQuestion = /^\s*(?:\d+)\.\s+/.test(text);
+                                const isQuestion = /^\s*(?:\d+)\.\s+/.test(
+                                  text,
+                                );
                                 const isOptionLine =
-                                  /^\s*([A-Da-d][\).]|\([A-Da-d]\))\s+/.test(text);
+                                  /^\s*([A-Da-d][\).]|\([A-Da-d]\))\s+/.test(
+                                    text,
+                                  );
 
                                 if (isSection) {
                                   doc.setFont("times", "bold");
                                   doc.setFontSize(15);
                                   ensurePageSpace(2);
-                                  doc.text(text.replace(/\*\*/g, ""), margin, y);
+                                  doc.text(
+                                    text.replace(/\*\*/g, ""),
+                                    margin,
+                                    y,
+                                  );
                                   y += 8;
                                   doc.setDrawColor(210);
                                   doc.setLineWidth(0.6);
@@ -1288,7 +1326,10 @@ export default function Index() {
                                 }
 
                                 const measure = (t: string, bold: boolean) => {
-                                  doc.setFont("times", bold ? "bold" : "normal");
+                                  doc.setFont(
+                                    "times",
+                                    bold ? "bold" : "normal",
+                                  );
                                   return doc.getTextWidth(t);
                                 };
                                 const drawStyledLine = (
@@ -1303,21 +1344,30 @@ export default function Index() {
                                     .filter(Boolean)
                                     .map((seg) => {
                                       if (/^\*\*[^*]+\*\*$/.test(seg)) {
-                                        return { text: seg.slice(2, -2), bold: true };
+                                        return {
+                                          text: seg.slice(2, -2),
+                                          bold: true,
+                                        };
                                       }
                                       return { text: seg, bold: baseBold };
                                     });
                                   // Tokenize by spaces preserving them
-                                  const tokens: { text: string; bold: boolean }[] =
-                                    [];
+                                  const tokens: {
+                                    text: string;
+                                    bold: boolean;
+                                  }[] = [];
                                   for (const p of parts) {
                                     const pieces = p.text.split(/(\s+)/);
                                     for (const piece of pieces) {
                                       if (piece === "") continue;
-                                      tokens.push({ text: piece, bold: p.bold });
+                                      tokens.push({
+                                        text: piece,
+                                        bold: p.bold,
+                                      });
                                     }
                                   }
-                                  let line: { text: string; bold: boolean }[] = [];
+                                  let line: { text: string; bold: boolean }[] =
+                                    [];
                                   let lineW = 0;
                                   let cursorX = x;
                                   const flush = () => {
@@ -1338,7 +1388,10 @@ export default function Index() {
                                   };
                                   for (const tk of tokens) {
                                     const w = measure(tk.text, tk.bold);
-                                    if (lineW + w > maxW && tk.text.trim() !== "") {
+                                    if (
+                                      lineW + w > maxW &&
+                                      tk.text.trim() !== ""
+                                    ) {
                                       flush();
                                       // Avoid starting line with plain space
                                       if (tk.text.trim() === "") continue;
@@ -1353,7 +1406,9 @@ export default function Index() {
                                 for (let i = 0; i < lines.length; i++) {
                                   let l = lines[i];
                                   const isOption =
-                                    /^\s*(?:[A-Da-d][\).]|\([A-Da-d]\))\s+/.test(l);
+                                    /^\s*(?:[A-Da-d][\).]|\([A-Da-d]\))\s+/.test(
+                                      l,
+                                    );
                                   const indent = isOption ? 18 : 0;
                                   // Normalize "Q1." -> "Q.1."
                                   l = l.replace(
@@ -1382,7 +1437,10 @@ export default function Index() {
                                 boxLeft - BORDER_PAD_X,
                                 boxTop - BORDER_PAD_Y_TOP,
                                 boxRight - boxLeft + BORDER_PAD_X * 2,
-                                y - boxTop + BORDER_PAD_Y_TOP + BORDER_PAD_Y_BOTTOM,
+                                y -
+                                  boxTop +
+                                  BORDER_PAD_Y_TOP +
+                                  BORDER_PAD_Y_BOTTOM,
                                 6,
                                 6,
                               );
