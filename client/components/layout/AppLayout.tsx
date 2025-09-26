@@ -20,6 +20,7 @@ export function AppLayout({ children }: PropsWithChildren) {
   const [routeLoading, setRouteLoading] = useState(false);
   const navigate = useNavigate();
   const isGetStarted = path === "/get-started";
+  const isToolRoute = ["/get-started", "/mcqs", "/qna", "/app"].includes(path);
 
   useSwipeNavigation(() => {
     if (window.history.length > 1) navigate(-1);
@@ -68,7 +69,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                 Back
               </Button>
             )}
-            {isGetStarted && (
+            {isToolRoute && (
               <div className="md:hidden">
                 <Sheet>
                   <SheetTrigger asChild>
@@ -88,7 +89,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                       <SheetClose asChild>
                         <Link
                           to="/get-started"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm bg-primary text-primary-foreground hover:text-primary-foreground"
                         >
                           Dashboard
                         </Link>

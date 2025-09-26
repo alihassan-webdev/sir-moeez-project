@@ -30,7 +30,7 @@ export default function Login() {
     try {
       login(em);
       toast({ title: "Welcome", description: "Logged in (demo)." });
-      navigate("/", { replace: true });
+      navigate("/get-started", { replace: true });
     } finally {
       setLoading(false);
     }

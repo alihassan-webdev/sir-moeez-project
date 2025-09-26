@@ -8,32 +8,8 @@ import {
   Layers,
   BookOpen,
   Folder,
-  LayoutGrid,
 } from "lucide-react";
-
-function NavItem({
-  to,
-  icon: Icon,
-  label,
-  active,
-}: {
-  to: string;
-  icon: React.ComponentType<any>;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      to={to}
-      className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${
-        active ? "bg-primary text-primary-foreground" : "hover:bg-primary/10"
-      }`}
-    >
-      <Icon className="h-4 w-4" aria-hidden="true" />
-      <span className="font-medium">{label}</span>
-    </Link>
-  );
-}
+import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
 export default function GetStarted() {
   const { pathname } = useLocation();
@@ -84,35 +60,7 @@ export default function GetStarted() {
           {/* Sidebar (md+) */}
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <div className="mb-3 px-1 text-xs font-semibold text-muted-foreground">
-                Navigation
-              </div>
-              <nav className="flex flex-col gap-1">
-                <NavItem
-                  to="/get-started"
-                  icon={LayoutGrid}
-                  label="Dashboard"
-                  active={pathname === "/get-started"}
-                />
-                <NavItem
-                  to="/mcqs"
-                  icon={ListChecks}
-                  label="Generate MCQs"
-                  active={pathname === "/mcqs"}
-                />
-                <NavItem
-                  to="/qna"
-                  icon={MessageSquare}
-                  label="Generate Q&A"
-                  active={pathname === "/qna"}
-                />
-                <NavItem
-                  to="/app"
-                  icon={FileText}
-                  label="Generate Exam"
-                  active={pathname === "/app"}
-                />
-              </nav>
+              <SidebarPanelInner />
 
               <div className="mt-5 border-t pt-4">
                 <div className="grid grid-cols-1 gap-3">
