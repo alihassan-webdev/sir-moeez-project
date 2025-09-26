@@ -26,7 +26,7 @@ function NavItem({
     <Link
       to={to}
       className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${
-        active ? "bg-primary text-primary-foreground" : "transition-colors hover:bg-primary/10"
+        active ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"
       }`}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />

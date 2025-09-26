@@ -88,7 +88,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                       <SheetClose asChild>
                         <Link
                           to="/get-started"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm bg-primary text-primary-foreground hover:text-primary-foreground"
                         >
                           Dashboard
                         </Link>
