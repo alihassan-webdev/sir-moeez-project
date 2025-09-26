@@ -445,11 +445,12 @@ export default function QnA() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-3">
-                  <Button disabled={!canGenerate} onClick={runSubmit}>
+                <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <Button className="w-full sm:w-auto" disabled={!canGenerate} onClick={runSubmit}>
                     {loading ? "Generating..." : "Generate Q&A"}
                   </Button>
                   <Button
+                    className="w-full sm:w-auto"
                     variant="secondary"
                     disabled={!result || loading}
                     onClick={downloadPdf}
