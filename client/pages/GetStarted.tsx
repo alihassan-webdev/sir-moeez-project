@@ -83,7 +83,7 @@ export default function GetStarted() {
         <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
           {/* Sidebar (md+) */}
           <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-20">
+            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <div className="mb-3 px-1 text-xs font-semibold text-muted-foreground">
                 Navigation
               </div>
