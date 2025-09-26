@@ -73,16 +73,7 @@ export function AppLayout({ children }: PropsWithChildren) {
             )}
             {isToolRoute && (
               <div className="md:hidden">
-                {/* Controlled Sheet to avoid accidental double toggles */}
-                <Sheet>
-                  {({ open, onOpenChange }) => {
-                    // Radix sheet does not currently provide this render-prop by default,
-                    // so instead use local state below (declared above).
-                    return (
-                      <MobileSheet />
-                    );
-                  }}
-                </Sheet>
+                <MobileSheet />
               </div>
             )}
           </div>
