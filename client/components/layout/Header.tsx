@@ -21,7 +21,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-input">
+    <header className="w-full sticky top-0 z-50 bg-white border-b border-input">
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <Link
           to="/"
