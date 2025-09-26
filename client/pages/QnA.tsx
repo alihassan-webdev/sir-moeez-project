@@ -79,6 +79,18 @@ export default function QnA() {
     setResult(null);
   }, [selectedClass, byClass]);
 
+  // Debug: log key variables to help diagnose subject selection issues
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: classOptions=", classOptions);
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: selectedClass=", selectedClass);
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: subjectOptions=", subjectOptions);
+    // eslint-disable-next-line no-console
+    console.log("QnA Debug: subjects=", subjects);
+  }, [classOptions, selectedClass, subjectOptions, subjects]);
+
   useEffect(() => {
     const arr = (subjectOptions || []).filter(
       (s) => selectedSubject && subjectOf(s.path) === selectedSubject,
@@ -315,8 +327,20 @@ export default function QnA() {
                       Subject
                     </label>
                     <Select
+                      key={`subject-${selectedClass || "none"}`}
                       value={selectedSubject}
-                      onValueChange={(v) => setSelectedSubject(v)}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: subject onValueChange", v);
+                        setSelectedSubject(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: subject onOpenChange", open, {
+                          selectedClass,
+                          subjects,
+                        });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
@@ -345,8 +369,20 @@ export default function QnA() {
                       Chapter (PDF)
                     </label>
                     <Select
+                      key={`chapter-${selectedSubject || "none"}`}
                       value={selectedPdfPath}
-                      onValueChange={handleSelectPdf}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: chapter onValueChange", v);
+                        handleSelectPdf(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("QnA Debug: chapter onOpenChange", open, {
+                          selectedSubject,
+                          chapterOptions,
+                        });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
@@ -415,11 +451,16 @@ export default function QnA() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-3">
-                  <Button disabled={!canGenerate} onClick={runSubmit}>
+                <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <Button
+                    className="w-full sm:w-auto"
+                    disabled={!canGenerate}
+                    onClick={runSubmit}
+                  >
                     {loading ? "Generating..." : "Generate Q&A"}
                   </Button>
                   <Button
+                    className="w-full sm:w-auto"
                     variant="secondary"
                     disabled={!result || loading}
                     onClick={downloadPdf}

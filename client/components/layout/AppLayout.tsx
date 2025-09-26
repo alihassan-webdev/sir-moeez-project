@@ -13,6 +13,8 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
+import SidebarStats from "@/components/layout/SidebarStats";
+import MobileSheet from "@/components/layout/MobileSheet";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -34,7 +36,7 @@ export function AppLayout({ children }: PropsWithChildren) {
 
   return (
     <div className="flex min-h-svh w-full flex-col">
-      <header className="sticky top-0 z-30 border-b bg-background">
+      <header className="w-full sticky top-0 z-30 bg-white border-b border-input">
         <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
           <Link
             to="/"
@@ -62,7 +64,7 @@ export function AppLayout({ children }: PropsWithChildren) {
             ) : (
               <Button
                 variant="outline"
-                className="inline-flex items-center gap-2 bg-primary/10 border-primary/60"
+                className="hidden md:inline-flex items-center gap-2 bg-primary/10 border-primary/60"
                 onClick={() => navigate("/get-started")}
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -71,56 +73,7 @@ export function AppLayout({ children }: PropsWithChildren) {
             )}
             {isToolRoute && (
               <div className="md:hidden">
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <button
-                      className="inline-flex items-center gap-2 rounded-md border border-input bg-white px-3 py-2 card-yellow-shadow"
-                      aria-label="Open navigation"
-                    >
-                      <Menu className="h-5 w-5" aria-hidden="true" />
-                      <span className="text-sm font-medium">Menu</span>
-                    </button>
-                  </SheetTrigger>
-                  <SheetContent side="right">
-                    <SheetHeader>
-                      <SheetTitle>Navigate</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-2 flex flex-col gap-2 p-2">
-                      <SheetClose asChild>
-                        <Link
-                          to="/get-started"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm bg-primary text-primary-foreground hover:text-primary-foreground"
-                        >
-                          Dashboard
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          to="/mcqs"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
-                        >
-                          Generate MCQs
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          to="/qna"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
-                        >
-                          Generate Q&A
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          to="/app"
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
-                        >
-                          Generate Exam
-                        </Link>
-                      </SheetClose>
-                    </div>
-                  </SheetContent>
-                </Sheet>
+                <MobileSheet />
               </div>
             )}
           </div>

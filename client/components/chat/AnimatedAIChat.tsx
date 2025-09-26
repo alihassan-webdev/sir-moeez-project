@@ -1015,6 +1015,7 @@ export default function AnimatedAIChat({
                   </Select>
 
                   <Select
+                    key={`subject-${selectedClass || "none"}`}
                     value={selectedSubject}
                     onValueChange={(v) => {
                       setSelectedSubject(v);

@@ -18,22 +18,11 @@ import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
 import MCQs from "./pages/MCQs";
 import QnA from "./pages/QnA";
-import { AnimatePresence, motion } from "framer-motion";
 
 const queryClient = new QueryClient();
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.18, ease: "easeOut" }}
-      className="min-h-[60vh] bg-background"
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className="min-h-[60vh] bg-background">{children}</div>;
 }
 
 function AnimatedRoutes() {
@@ -41,79 +30,72 @@ function AnimatedRoutes() {
   const isLanding = location.pathname === "/";
   if (isLanding) {
     return (
-      <AnimatePresence initial={false} mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/"
-            element={
-              <PageWrapper>
-                <Landing />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <PageWrapper>
-                <NotFound />
-              </PageWrapper>
-            }
-          />
-        </Routes>
-      </AnimatePresence>
+      <Routes location={location}>
+        <Route
+          path="/"
+          element={
+            <PageWrapper>
+              <Landing />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <PageWrapper>
+              <NotFound />
+            </PageWrapper>
+          }
+        />
+      </Routes>
     );
   }
+
   return (
     <AppLayout>
-      <AnimatePresence initial={false} mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/app"
-            element={
-              <PageWrapper>
-                <Index />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/mcqs"
-            element={
-              <PageWrapper>
-                <MCQs />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/get-started"
-            element={
-              <PageWrapper>
-                <GetStarted />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/qna"
-            element={
-              <PageWrapper>
-                <QnA />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/pricing"
-            element={<Navigate to="/#pricing" replace />}
-          />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route
-            path="*"
-            element={
-              <PageWrapper>
-                <NotFound />
-              </PageWrapper>
-            }
-          />
-        </Routes>
-      </AnimatePresence>
+      <Routes location={location}>
+        <Route
+          path="/app"
+          element={
+            <PageWrapper>
+              <Index />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/mcqs"
+          element={
+            <PageWrapper>
+              <MCQs />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/get-started"
+          element={
+            <PageWrapper>
+              <GetStarted />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/qna"
+          element={
+            <PageWrapper>
+              <QnA />
+            </PageWrapper>
+          }
+        />
+        <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
+        <Route
+          path="*"
+          element={
+            <PageWrapper>
+              <NotFound />
+            </PageWrapper>
+          }
+        />
+      </Routes>
     </AppLayout>
   );
 }

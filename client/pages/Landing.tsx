@@ -20,9 +20,12 @@ export default function Landing() {
       navigate("/#pricing");
     }
   };
+  // Shared duration for all counters so they finish together and faster
+  const sharedDuration = 1200; // milliseconds
+
   const CountUp = ({
     end,
-    duration = 2000,
+    duration = sharedDuration,
     format,
   }: {
     end: number;
@@ -35,12 +38,15 @@ export default function Landing() {
       const start = performance.now();
       const from = 0;
       const to = end;
+      // easeOutCubic for a snappier finish
+      const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
       const step = (now: number) => {
         const elapsed = now - start;
-        const t = Math.min(1, elapsed / duration);
+        const tRaw = Math.min(1, elapsed / duration);
+        const t = easeOutCubic(tRaw);
         const current = Math.floor(from + (to - from) * t);
         setValue(current);
-        if (t < 1) raf = requestAnimationFrame(step);
+        if (tRaw < 1) raf = requestAnimationFrame(step);
       };
       raf = requestAnimationFrame(step);
       return () => cancelAnimationFrame(raf);
@@ -72,7 +78,7 @@ export default function Landing() {
             <div className="mt-5 flex items-end justify-center gap-4 sm:gap-6">
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={1200} duration={2500} format="comma" />
+                  <CountUp end={1200} format="comma" />
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   Teachers using PaperGen
@@ -80,7 +86,7 @@ export default function Landing() {
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={35000} duration={3000} format="comma" />
+                  <CountUp end={35000} format="comma" />
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   Papers generated
@@ -88,7 +94,7 @@ export default function Landing() {
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={99} duration={2000} format="percent" />
+                  <CountUp end={99} format="percent" />
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   Satisfaction rating

@@ -81,6 +81,18 @@ export default function MCQs() {
     setResult(null);
   }, [selectedClass, byClass]);
 
+  // Debug: log key variables to help diagnose subject selection issues
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: classOptions=", classOptions);
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: selectedClass=", selectedClass);
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: subjectOptions=", subjectOptions);
+    // eslint-disable-next-line no-console
+    console.log("MCQs Debug: subjects=", subjects);
+  }, [classOptions, selectedClass, subjectOptions, subjects]);
+
   useEffect(() => {
     const arr = (subjectOptions || []).filter(
       (s) => selectedSubject && subjectOf(s.path) === selectedSubject,
@@ -388,7 +400,18 @@ export default function MCQs() {
                     </label>
                     <Select
                       value={selectedSubject}
-                      onValueChange={(v) => setSelectedSubject(v)}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: subject onValueChange", v);
+                        setSelectedSubject(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: subject onOpenChange", open, {
+                          selectedClass,
+                          subjects,
+                        });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
@@ -419,7 +442,18 @@ export default function MCQs() {
                     </label>
                     <Select
                       value={selectedPdfPath}
-                      onValueChange={handleSelectPdf}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: chapter onValueChange", v);
+                        handleSelectPdf(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: chapter onOpenChange", open, {
+                          selectedSubject,
+                          chapterOptions,
+                        });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
@@ -489,11 +523,16 @@ export default function MCQs() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-3">
-                  <Button disabled={!canGenerate} onClick={runSubmit}>
+                <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <Button
+                    className="w-full sm:w-auto"
+                    disabled={!canGenerate}
+                    onClick={runSubmit}
+                  >
                     {loading ? "Generating..." : "Generate MCQs"}
                   </Button>
                   <Button
+                    className="w-full sm:w-auto"
                     variant="secondary"
                     disabled={!result || loading}
                     onClick={downloadPdf}
