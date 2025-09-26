@@ -407,7 +407,10 @@ export default function MCQs() {
                       }}
                       onOpenChange={(open) => {
                         // eslint-disable-next-line no-console
-                        console.log("MCQs Debug: subject onOpenChange", open, { selectedClass, subjects });
+                        console.log("MCQs Debug: subject onOpenChange", open, {
+                          selectedClass,
+                          subjects,
+                        });
                       }}
                     >
                       <SelectTrigger
@@ -446,7 +449,10 @@ export default function MCQs() {
                       }}
                       onOpenChange={(open) => {
                         // eslint-disable-next-line no-console
-                        console.log("MCQs Debug: chapter onOpenChange", open, { selectedSubject, chapterOptions });
+                        console.log("MCQs Debug: chapter onOpenChange", open, {
+                          selectedSubject,
+                          chapterOptions,
+                        });
                       }}
                     >
                       <SelectTrigger
@@ -518,7 +524,11 @@ export default function MCQs() {
                 </div>
 
                 <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <Button className="w-full sm:w-auto" disabled={!canGenerate} onClick={runSubmit}>
+                  <Button
+                    className="w-full sm:w-auto"
+                    disabled={!canGenerate}
+                    onClick={runSubmit}
+                  >
                     {loading ? "Generating..." : "Generate MCQs"}
                   </Button>
                   <Button

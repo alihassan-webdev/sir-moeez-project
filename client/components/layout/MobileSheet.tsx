@@ -70,7 +70,9 @@ export default function MobileSheet() {
         </div>
 
         <div className="mt-4 p-2">
-          <div className="text-sm font-semibold text-muted-foreground px-1">Stats</div>
+          <div className="text-sm font-semibold text-muted-foreground px-1">
+            Stats
+          </div>
           <div className="mt-2">
             <SidebarStats />
           </div>

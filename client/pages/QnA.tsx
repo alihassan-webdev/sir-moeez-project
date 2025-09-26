@@ -336,7 +336,10 @@ export default function QnA() {
                       }}
                       onOpenChange={(open) => {
                         // eslint-disable-next-line no-console
-                        console.log("QnA Debug: subject onOpenChange", open, { selectedClass, subjects });
+                        console.log("QnA Debug: subject onOpenChange", open, {
+                          selectedClass,
+                          subjects,
+                        });
                       }}
                     >
                       <SelectTrigger
@@ -375,7 +378,10 @@ export default function QnA() {
                       }}
                       onOpenChange={(open) => {
                         // eslint-disable-next-line no-console
-                        console.log("QnA Debug: chapter onOpenChange", open, { selectedSubject, chapterOptions });
+                        console.log("QnA Debug: chapter onOpenChange", open, {
+                          selectedSubject,
+                          chapterOptions,
+                        });
                       }}
                     >
                       <SelectTrigger
@@ -446,7 +452,11 @@ export default function QnA() {
                 </div>
 
                 <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <Button className="w-full sm:w-auto" disabled={!canGenerate} onClick={runSubmit}>
+                  <Button
+                    className="w-full sm:w-auto"
+                    disabled={!canGenerate}
+                    onClick={runSubmit}
+                  >
                     {loading ? "Generating..." : "Generate Q&A"}
                   </Button>
                   <Button

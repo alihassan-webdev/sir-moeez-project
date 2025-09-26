@@ -22,11 +22,7 @@ import QnA from "./pages/QnA";
 const queryClient = new QueryClient();
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-[60vh] bg-background">
-      {children}
-    </div>
-  );
+  return <div className="min-h-[60vh] bg-background">{children}</div>;
 }
 
 function AnimatedRoutes() {
@@ -35,8 +31,22 @@ function AnimatedRoutes() {
   if (isLanding) {
     return (
       <Routes location={location}>
-        <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
-        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+        <Route
+          path="/"
+          element={
+            <PageWrapper>
+              <Landing />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <PageWrapper>
+              <NotFound />
+            </PageWrapper>
+          }
+        />
       </Routes>
     );
   }
@@ -44,12 +54,47 @@ function AnimatedRoutes() {
   return (
     <AppLayout>
       <Routes location={location}>
-        <Route path="/app" element={<PageWrapper><Index /></PageWrapper>} />
-        <Route path="/mcqs" element={<PageWrapper><MCQs /></PageWrapper>} />
-        <Route path="/get-started" element={<PageWrapper><GetStarted /></PageWrapper>} />
-        <Route path="/qna" element={<PageWrapper><QnA /></PageWrapper>} />
+        <Route
+          path="/app"
+          element={
+            <PageWrapper>
+              <Index />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/mcqs"
+          element={
+            <PageWrapper>
+              <MCQs />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/get-started"
+          element={
+            <PageWrapper>
+              <GetStarted />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/qna"
+          element={
+            <PageWrapper>
+              <QnA />
+            </PageWrapper>
+          }
+        />
         <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
-        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+        <Route
+          path="*"
+          element={
+            <PageWrapper>
+              <NotFound />
+            </PageWrapper>
+          }
+        />
       </Routes>
     </AppLayout>
   );
