@@ -98,7 +98,7 @@ export default function Landing() {
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
-                <Link to="/app">Get started</Link>
+                <Link to="/get-started">Get started</Link>
               </Button>
               <Button
                 asChild
@@ -210,7 +210,9 @@ export default function Landing() {
         <section id="how-it-works">
           <Container className="py-12">
             <div className="text-center space-y-4">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">How it works</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+                How it works
+              </h2>
               <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
                 Generate high-quality test papers in three simple steps — upload
                 syllabus or chapters, customize marks and question types, then

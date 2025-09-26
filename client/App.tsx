@@ -4,11 +4,20 @@ import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
+import GetStarted from "./pages/GetStarted";
+import MCQs from "./pages/MCQs";
+import QnA from "./pages/QnA";
 import { AnimatePresence, motion } from "framer-motion";
 
 const queryClient = new QueryClient();
@@ -66,7 +75,34 @@ function AnimatedRoutes() {
               </PageWrapper>
             }
           />
-          <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
+          <Route
+            path="/mcqs"
+            element={
+              <PageWrapper>
+                <MCQs />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/get-started"
+            element={
+              <PageWrapper>
+                <GetStarted />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/qna"
+            element={
+              <PageWrapper>
+                <QnA />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/pricing"
+            element={<Navigate to="/#pricing" replace />}
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route
             path="*"
