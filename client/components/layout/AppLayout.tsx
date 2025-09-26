@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 
@@ -25,31 +25,37 @@ export function AppLayout({ children }: PropsWithChildren) {
 
   return (
     <div className="flex min-h-svh w-full flex-col">
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background px-4">
-        <div className="ml-auto flex items-center gap-2">
-          {isGetStarted ? (
-            <Button
-              variant="outline"
-              className="inline-flex bg-primary/10 border-primary/60"
-              onClick={() => {
-                try {
-                  localStorage.clear();
-                } catch {}
-                navigate("/");
-              }}
-            >
-              Logout
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              className="inline-flex items-center gap-2 bg-primary/10 border-primary/60"
-              onClick={() => navigate("/get-started")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          )}
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background px-4">
+        <div className="flex w-full items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black">
+            <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">PG</span>
+            <span>PaperGen</span>
+          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            {isGetStarted ? (
+              <Button
+                variant="outline"
+                className="inline-flex bg-primary/10 border-primary/60"
+                onClick={() => {
+                  try {
+                    localStorage.clear();
+                  } catch {}
+                  navigate("/");
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="inline-flex items-center gap-2 bg-primary/10 border-primary/60"
+                onClick={() => navigate("/get-started")}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
