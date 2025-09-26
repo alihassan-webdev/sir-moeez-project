@@ -1,9 +1,17 @@
 import { PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Menu } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 
 export function AppLayout({ children }: PropsWithChildren) {
@@ -25,31 +33,96 @@ export function AppLayout({ children }: PropsWithChildren) {
 
   return (
     <div className="flex min-h-svh w-full flex-col">
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background px-4">
-        <div className="ml-auto flex items-center gap-2">
-          {isGetStarted ? (
-            <Button
-              variant="outline"
-              className="inline-flex bg-primary/10 border-primary/60"
-              onClick={() => {
-                try {
-                  localStorage.clear();
-                } catch {}
-                navigate("/");
-              }}
-            >
-              Logout
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              className="inline-flex items-center gap-2 bg-primary/10 border-primary/60"
-              onClick={() => navigate("/get-started")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          )}
+      <header className="sticky top-0 z-30 border-b bg-background">
+        <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
+          >
+            <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              PG
+            </span>
+            <span>PaperGen</span>
+          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            {isGetStarted ? (
+              <Button
+                variant="outline"
+                className="inline-flex bg-primary/10 border-primary/60"
+                onClick={() => {
+                  try {
+                    localStorage.clear();
+                  } catch {}
+                  navigate("/");
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="inline-flex items-center gap-2 bg-primary/10 border-primary/60"
+                onClick={() => navigate("/get-started")}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            )}
+            {isGetStarted && (
+              <div className="md:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button
+                      className="inline-flex items-center gap-2 rounded-md border border-input bg-white px-3 py-2 card-yellow-shadow"
+                      aria-label="Open navigation"
+                    >
+                      <Menu className="h-5 w-5" aria-hidden="true" />
+                      <span className="text-sm font-medium">Menu</span>
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="right">
+                    <SheetHeader>
+                      <SheetTitle>Navigate</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-2 flex flex-col gap-2 p-2">
+                      <SheetClose asChild>
+                        <Link
+                          to="/get-started"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Dashboard
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          to="/mcqs"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Generate MCQs
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          to="/qna"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Generate Q&A
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          to="/app"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm hover:bg-primary/10"
+                        >
+                          Generate Exam
+                        </Link>
+                      </SheetClose>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
