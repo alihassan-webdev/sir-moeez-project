@@ -88,7 +88,7 @@ export default function Header() {
 
       <div
         id="mobile-menu"
-        className={`md:hidden bg-background border-t border-input overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${open ? "max-h-96 opacity-100 pointer-events-auto" : "max-h-0 opacity-0 pointer-events-none"}`}
+        className={`md:hidden bg-white border-t border-input overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${open ? "max-h-96 opacity-100 pointer-events-auto" : "max-h-0 opacity-0 pointer-events-none"}`}
         aria-hidden={!open}
       >
         <div className="mx-auto max-w-6xl px-6 py-4 flex flex-col gap-3">
