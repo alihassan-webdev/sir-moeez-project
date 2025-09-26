@@ -13,6 +13,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
+import SidebarStats from "@/components/layout/SidebarStats";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
