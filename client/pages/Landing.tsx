@@ -94,7 +94,7 @@ export default function Landing() {
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={99} duration={2000} format="percent" />
+                  <CountUp end={99} format="percent" />
                 </div>
                 <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   Satisfaction rating
