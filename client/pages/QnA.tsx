@@ -315,6 +315,7 @@ export default function QnA() {
                       Subject
                     </label>
                     <Select
+                      key={`subject-${selectedClass || "none"}`}
                       value={selectedSubject}
                       onValueChange={(v) => setSelectedSubject(v)}
                     >
@@ -345,6 +346,7 @@ export default function QnA() {
                       Chapter (PDF)
                     </label>
                     <Select
+                      key={`chapter-${selectedSubject || "none"}`}
                       value={selectedPdfPath}
                       onValueChange={handleSelectPdf}
                     >
