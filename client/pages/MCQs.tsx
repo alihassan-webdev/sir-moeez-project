@@ -400,7 +400,15 @@ export default function MCQs() {
                     </label>
                     <Select
                       value={selectedSubject}
-                      onValueChange={(v) => setSelectedSubject(v)}
+                      onValueChange={(v) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: subject onValueChange", v);
+                        setSelectedSubject(v);
+                      }}
+                      onOpenChange={(open) => {
+                        // eslint-disable-next-line no-console
+                        console.log("MCQs Debug: subject onOpenChange", open, { selectedClass, subjects });
+                      }}
                     >
                       <SelectTrigger
                         className="w-full"
