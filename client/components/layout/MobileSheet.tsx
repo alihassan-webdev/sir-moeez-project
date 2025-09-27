@@ -19,11 +19,10 @@ export default function MobileSheet() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button
-          className="inline-flex items-center gap-2 rounded-md border border-input bg-white px-3 py-2 card-yellow-shadow"
+          className="inline-flex items-center justify-center rounded-md border border-input bg-white p-2 card-yellow-shadow"
           aria-label="Open navigation"
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
-          <span className="text-sm font-medium">Menu</span>
         </button>
       </SheetTrigger>
       <SheetContent side="right">
