@@ -57,6 +57,9 @@ export default function QnA() {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [chapterOptions, setChapterOptions] = useState<Entry[]>([]);
   const [selectedChapterPath, setSelectedChapterPath] = useState<string>("");
+  const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>([]);
+  const [isMerging, setIsMerging] = useState(false);
+  const pdfBytesCache = React.useRef<Map<string, ArrayBuffer>>(new Map());
   const [file, setFile] = useState<File | null>(null);
   const [qaCount, setQaCount] = useState<number | null>(10);
   const [loading, setLoading] = useState(false);
@@ -65,7 +68,13 @@ export default function QnA() {
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
-  const canEnterCount = !!selectedChapterPath;
+  const canEnterCount = selectedChapterPaths.length > 0;
+
+  const allChapterPaths = chapterOptions.map((c) => c.path);
+  const isAllSelected =
+    selectedChapterPaths.length > 0 &&
+    selectedChapterPaths.length === allChapterPaths.length;
+  const selectedCount = selectedChapterPaths.length;
 
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
