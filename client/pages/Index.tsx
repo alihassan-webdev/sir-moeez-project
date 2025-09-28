@@ -468,7 +468,7 @@ function ExternalPdfSelector({
                     ? "Merging..."
                     : selectedCount === 0
                       ? selectedSubjectName
-                        ? "Select chapters (PDFs)"
+                        ? "Select chapters"
                         : "Select subject first"
                       : isAllSelected
                         ? `All chapters selected (${selectedCount})`
