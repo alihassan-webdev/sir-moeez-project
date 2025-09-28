@@ -59,7 +59,9 @@ export default function MCQs() {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [chapterOptions, setChapterOptions] = useState<Entry[]>([]);
   const [selectedChapterPath, setSelectedChapterPath] = useState<string>("");
-  const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>([]);
+  const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>(
+    [],
+  );
   const [isMerging, setIsMerging] = useState(false);
   const pdfBytesCache = useRef<Map<string, ArrayBuffer>>(new Map());
   const [file, setFile] = useState<File | null>(null);
@@ -349,7 +351,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       </Select>
                     </div>
 
-                    <div className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+                    <div
+                      className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                    >
                       <label className="text-sm font-medium text-muted-foreground">
                         Subject
                       </label>
@@ -379,7 +383,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       </Select>
                     </div>
 
-                    <div className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+                    <div
+                      className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                    >
                       <label className="text-sm font-medium text-muted-foreground">
                         Chapters
                       </label>
@@ -408,7 +414,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                         <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
                           <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
                             <span>Chapters</span>
-                            <span className="text-xs">{selectedCount}/{allChapterPaths.length} selected</span>
+                            <span className="text-xs">
+                              {selectedCount}/{allChapterPaths.length} selected
+                            </span>
                           </DropdownMenuLabel>
                           <DropdownMenuCheckboxItem
                             checked={isAllSelected}
@@ -423,8 +431,12 @@ Use concise, exam-style wording suitable for classroom tests.`;
                               {chapterOptions.map((c) => (
                                 <DropdownMenuCheckboxItem
                                   key={c.path}
-                                  checked={selectedChapterPaths.includes(c.path)}
-                                  onCheckedChange={(check) => handleToggleChapter(c.path, Boolean(check))}
+                                  checked={selectedChapterPaths.includes(
+                                    c.path,
+                                  )}
+                                  onCheckedChange={(check) =>
+                                    handleToggleChapter(c.path, Boolean(check))
+                                  }
                                   className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
                                 >
                                   {c.name.replace(/\.pdf$/i, "")}
@@ -436,7 +448,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       </DropdownMenu>
                     </div>
 
-                    <div className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+                    <div
+                      className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                    >
                       <label className="text-sm font-medium text-muted-foreground">
                         Number of MCQs
                       </label>
