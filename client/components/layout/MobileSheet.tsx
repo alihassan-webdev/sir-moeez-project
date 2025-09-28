@@ -52,6 +52,16 @@ export default function MobileSheet() {
 
           <SheetClose asChild>
             <Link
+              to="/qna"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/qna" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Generate Q&A
+            </Link>
+          </SheetClose>
+
+          <SheetClose asChild>
+            <Link
               to="/app"
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
