@@ -69,6 +69,14 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        <Route
+          path="/mcqs"
+          element={
+            <PageWrapper>
+              <MCQs />
+            </PageWrapper>
+          }
+        />
         <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
         <Route
           path="*"
