@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ export default function Login() {
           <span className="inline-flex h-10 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">PG</span>
           <span>PaperGen</span>
         </div>
-        <div className="rounded-xl border border-input bg-white p-6 sm:p-8 card-yellow-shadow">
+        <div className="rounded-xl bg-white p-6 sm:p-8 card-yellow-shadow">
           <div className="mb-5 text-center">
             <h1 className="text-2xl font-bold">Log in</h1>
             <p className="text-sm text-muted-foreground">Continue with your email and password</p>
@@ -66,7 +66,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                className="input-black bg-black text-white placeholder:text-white/60 focus:bg-black focus-visible:bg-black focus-visible:ring-secondary focus-visible:border-secondary focus:border-secondary"
+                className="bg-white text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="grid gap-2">
@@ -78,19 +78,13 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                className="input-black bg-black text-white placeholder:text-white/60 focus:bg-black focus-visible:bg-black focus-visible:ring-secondary focus-visible:border-secondary focus:border-secondary"
+                className="bg-white text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <Button type="submit" className="w-full" variant="secondary" disabled={loading}>
               {loading ? "Logging in..." : "Log in"}
             </Button>
           </form>
-          <div className="text-xs text-muted-foreground mt-4 text-center">
-            Accounts are created in Firebase Authentication. No signup here.
-          </div>
-          <div className="mt-4 text-center">
-            <Link to="/" className="text-sm text-primary underline-offset-4 hover:underline">Back to home</Link>
-          </div>
         </div>
       </div>
     </div>
