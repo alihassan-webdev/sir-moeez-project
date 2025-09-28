@@ -70,7 +70,13 @@ export default function MCQs() {
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
-  const canEnterCount = !!selectedChapterPath;
+  const canEnterCount = selectedChapterPaths.length > 0;
+
+  const allChapterPaths = chapterOptions.map((c) => c.path);
+  const isAllSelected =
+    selectedChapterPaths.length > 0 &&
+    selectedChapterPaths.length === allChapterPaths.length;
+  const selectedCount = selectedChapterPaths.length;
 
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
