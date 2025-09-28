@@ -284,6 +284,17 @@ function ExternalPdfSelector({
           lastModified: Date.now(),
         });
 
+        // Enforce 15MB limit to avoid server rejection
+        if (file.size > MAX_SIZE) {
+          toast({
+            title: "PDF too large",
+            description: "Merged chapters exceed 15MB. Select fewer chapters.",
+            variant: "destructive",
+          });
+          onLoadFile(null);
+          return;
+        }
+
         onLoadFile(file);
       } catch (err) {
         console.error("PDF merge error:", err);
