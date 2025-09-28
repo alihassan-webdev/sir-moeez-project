@@ -849,7 +849,7 @@ export default function AnimatedAIChat({
                             doc.setFontSize(64);
                             doc.setTextColor(210);
                             doc.text(
-                              "Test Paper Generater",
+                              "Exam Generater",
                               pageW / 2,
                               pageH / 2,
                               { align: "center", angle: 45 },
