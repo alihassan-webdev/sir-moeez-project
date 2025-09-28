@@ -1,5 +1,3 @@
-import { BadgeCheck } from "lucide-react";
-
 export type Frequency = "monthly" | "yearly";
 
 export const PAYMENT_FREQUENCIES: Frequency[] = ["monthly", "yearly"];
