@@ -128,13 +128,11 @@ function ExternalPdfSelector({
   const canSelectSubject = !!selectedClass && !isLocked;
   const canSelectChapters = !!selectedSubjectName && !isLocked;
   const canEnterMarks = selectedChapterPaths.length > 0 && !isLocked;
-  const canEnterInstitute = totalMarks != null && !isLocked;
   const canGenerate =
     !!selectedClass &&
     !!selectedSubjectName &&
     selectedChapterPaths.length > 0 &&
     totalMarks != null &&
-    instituteName.trim().length > 0 &&
     !loading &&
     !isMerging &&
     !isLocked;
