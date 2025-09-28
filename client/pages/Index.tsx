@@ -1037,7 +1037,7 @@ export default function Index() {
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
                 <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
-                  Test Paper Generater
+                  Exam Generater
                 </h1>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Fast, accurate question generation tailored to your query.
