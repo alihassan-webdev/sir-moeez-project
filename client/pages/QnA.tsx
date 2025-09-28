@@ -158,14 +158,7 @@ export default function QnA() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-              <div className="mt-5 border-t pt-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">Chapters</div>
-                    <div className="text-lg font-extrabold">{entries.length}</div>
-                  </div>
-                </div>
-              </div>
+              <SidebarStats />
             </div>
           </aside>
 
