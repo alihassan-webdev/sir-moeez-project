@@ -631,9 +631,7 @@ function ExternalPdfSelector({
             setSelectedChapterPaths([]);
             setTotalMarks(null);
             setPromptText("");
-            setInstituteName("");
             setIsLocked(false);
-            onSetInstitute("");
             onLoadFile(null);
             onSetPrompt("");
             onReset();
