@@ -112,17 +112,99 @@ export default function QnA() {
   }, [selectedSubject, selectedClass]);
 
   const handleSelectChapter = async (path: string) => {
-    setSelectedChapterPath(path);
-    const found = entries.find((e) => e.path === path);
-    if (!found) return;
-    try {
-      const res = await fetch(found.url);
-      const blob = await res.blob();
-      const f = new File([blob], found.name, { type: "application/pdf" });
-      setFile(f);
-    } catch (err) {
-      toast({ title: "Load failed", description: "Could not load PDF." });
-    }
+    // no-op (multi-select in use)
+  };
+
+  const mergeSelected = React.useCallback(
+    async (paths: string[]) => {
+      setIsMerging(true);
+      try {
+        if (!paths.length) {
+          setFile(null);
+          return;
+        }
+        const { PDFDocument } = await import("pdf-lib");
+        const mergedPdf = await PDFDocument.create();
+        const ordered = chapterOptions
+          .filter((c) => paths.includes(c.path))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((c) => c.path);
+
+        await Promise.all(
+          ordered.map(async (p) => {
+            if (pdfBytesCache.current.has(p)) return;
+            const found = entries.find((e) => e.path === p);
+            if (!found) return;
+            const res = await fetch(found.url);
+            const bytes = await res.arrayBuffer();
+            pdfBytesCache.current.set(p, bytes);
+          }),
+        );
+
+        let pageCount = 0;
+        for (const p of ordered) {
+          const bytes = pdfBytesCache.current.get(p);
+          if (!bytes) continue;
+          const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+          const copied = await mergedPdf.copyPages(src, src.getPageIndices());
+          copied.forEach((pg) => mergedPdf.addPage(pg));
+          pageCount += copied.length;
+        }
+        if (pageCount === 0) throw new Error("No pages to merge");
+
+        const mergedBytes = await mergedPdf.save();
+        const fname = `${(selectedSubject || "subject").replace(/[^\w\s-]/g, "").replace(/\s+/g, "_")}_${pageCount}_pages_${new Date().toISOString().slice(0, 10)}.pdf`;
+        const mergedFile = new File([mergedBytes], fname, {
+          type: "application/pdf",
+          lastModified: Date.now(),
+        });
+        if (mergedFile.size > 15 * 1024 * 1024) {
+          toast({
+            title: "PDF too large",
+            description: "Merged chapters exceed 15MB. Select fewer chapters.",
+            variant: "destructive",
+          });
+          setFile(null);
+          return;
+        }
+        setFile(mergedFile);
+      } catch (err) {
+        toast({ title: "Merge failed", description: "Could not merge PDFs." });
+        setFile(null);
+      } finally {
+        setIsMerging(false);
+      }
+    },
+    [chapterOptions, entries, selectedSubject],
+  );
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await Promise.all(
+          chapterOptions.map(async (c) => {
+            if (pdfBytesCache.current.has(c.path)) return;
+            const res = await fetch(c.url);
+            const bytes = await res.arrayBuffer();
+            pdfBytesCache.current.set(c.path, bytes);
+          }),
+        );
+      } catch {}
+    })();
+  }, [chapterOptions]);
+
+  const handleToggleAll = async (checked: boolean) => {
+    const next = checked ? allChapterPaths : [];
+    setSelectedChapterPaths(next);
+    await mergeSelected(next);
+  };
+  const handleToggleChapter = async (path: string, checked: boolean) => {
+    const set = new Set(selectedChapterPaths);
+    if (checked) set.add(path);
+    else set.delete(path);
+    const next = Array.from(set);
+    setSelectedChapterPaths(next);
+    await mergeSelected(next);
   };
 
   const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T> => {
