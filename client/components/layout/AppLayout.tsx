@@ -75,9 +75,11 @@ export function AppLayout({ children }: PropsWithChildren) {
 
       <main className={cn("container mx-auto px-4 py-6 flex-1")}>{children}</main>
 
-      <footer className="border-t bg-background/50">
-        <div className="container mx-auto px-4 py-6" />
-      </footer>
+      {path !== "/login" && (
+        <footer className="border-t bg-background/50">
+          <div className="container mx-auto px-4 py-6" />
+        </footer>
+      )}
     </div>
   );
 }
