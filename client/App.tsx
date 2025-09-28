@@ -57,6 +57,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 function AnimatedRoutes() {
   const location = useLocation();
   const isLanding = location.pathname === "/";
+  const isLogin = location.pathname === "/login";
   if (isLanding) {
     return (
       <Routes location={location}>
@@ -76,6 +77,15 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+      </Routes>
+    );
+  }
+
+  if (isLogin) {
+    return (
+      <Routes location={location}>
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     );
   }
