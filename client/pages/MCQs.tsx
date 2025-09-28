@@ -67,7 +67,7 @@ export default function MCQs() {
   const pdfBytesCache = useRef<Map<string, ArrayBuffer>>(new Map());
   const mergeToken = useRef(0);
   const [file, setFile] = useState<File | null>(null);
-  const [mcqCount, setMcqCount] = useState<number | null>(20);
+  const [mcqCount, setMcqCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
@@ -550,7 +550,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                         setSelectedChapterPath("");
                         setSelectedChapterPaths([]);
                         setFile(null);
-                        setMcqCount(20);
+                        setMcqCount(null);
                         setResult(null);
                       }}
                     >
