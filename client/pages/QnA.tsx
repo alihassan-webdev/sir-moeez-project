@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
-import { ListChecks, ChevronDown } from "lucide-react";
+import { ListChecks, ChevronDown, Download } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatResultHtml } from "@/lib/format";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -522,13 +523,60 @@ export default function QnA() {
                   <div className="order-1 mt-0 w-full max-w-4xl mx-auto">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          aria-label="Download PDF"
+                          variant="secondary"
+                          size="icon"
+                          className="rounded-full"
+                          disabled={!result || !!loading}
+                          onClick={async () => {
+                            if (!result) return;
+                            try {
+                              const { jsPDF } = await import("jspdf");
+                              const doc = new jsPDF({ unit: "pt", format: "a4" });
+                              const margin = 64;
+                              const pageW = doc.internal.pageSize.getWidth();
+                              const pageH = doc.internal.pageSize.getHeight();
+                              let y = margin;
+                              doc.setFont("times", "bold");
+                              doc.setFontSize(22);
+                              doc.text("Q&A", pageW / 2, y, { align: "center" });
+                              y += 30;
+                              doc.setFont("times", "normal");
+                              doc.setFontSize(12);
+                              const paragraphs = (result || "").split(/\n\n+/);
+                              for (const para of paragraphs) {
+                                const lines = doc.splitTextToSize(para.replace(/\n/g, " "), pageW - margin * 2);
+                                for (const line of lines) {
+                                  if (y > pageH - margin) {
+                                    doc.addPage();
+                                    y = margin;
+                                  }
+                                  doc.text(line, margin, y);
+                                  y += 16;
+                                }
+                                y += 10;
+                              }
+                              const filename = `qna_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
+                              doc.save(filename);
+                            } catch (err) {
+                              console.error(err);
+                              toast({ title: "Download failed", description: "Could not generate PDF." });
+                            }
+                          }}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
                       <div className="paper-view">
-                        <div className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words">
-                          <pre className="whitespace-pre-wrap">{result}</pre>
-                        </div>
+                        <div
+                          className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
+                          dangerouslySetInnerHTML={{ __html: formatResultHtml(result || "") }}
+                        />
                       </div>
                     </div>
                   </div>
