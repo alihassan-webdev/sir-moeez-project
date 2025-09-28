@@ -10,6 +10,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
+import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
   const { pathname } = useLocation();
@@ -193,9 +194,43 @@ export default function GetStarted() {
                 </Link>
               </div>
             </div>
+
+            {/* My account */}
+            <div className="mt-6">
+              <h2 className="text-xl sm:text-2xl font-bold">My account</h2>
+              <MyAccountCards />
+            </div>
           </div>
         </div>
       </Container>
+    </div>
+  );
+}
+
+function MyAccountCards() {
+  const sub = React.useMemo(() => getSubscription(), []);
+  const renewal = React.useMemo(() => nextRenewalDate(sub).toLocaleDateString(), [sub]);
+  return (
+    <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+      <Link
+        to="/subscription"
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between">
+            <div className="text-base font-semibold">Manage subscription</div>
+            <span className="text-xs rounded-full border border-input px-2 py-0.5 capitalize bg-primary/10 text-primary">
+              {sub.frequency}
+            </span>
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Current plan: <span className="capitalize font-medium">{sub.planId}</span>
+          </div>
+          <div className="mt-auto pt-3 text-xs text-muted-foreground">
+            Next renewal: {renewal}
+          </div>
+        </div>
+      </Link>
     </div>
   );
 }
