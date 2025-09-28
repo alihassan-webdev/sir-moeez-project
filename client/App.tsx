@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
+import MCQs from "./pages/MCQs";
 
 const queryClient = new QueryClient();
 
