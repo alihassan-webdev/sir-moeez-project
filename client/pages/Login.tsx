@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -46,16 +48,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 to-transparent flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="mb-4 flex items-center justify-center gap-2 text-xl font-extrabold tracking-tight text-black">
-          <span className="inline-flex h-10 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">PG</span>
-          <span>PaperGen</span>
+      <div className="w-full max-w-md space-y-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Log in</h1>
+          <p className="text-sm text-muted-foreground">Continue with your email and password</p>
         </div>
         <div className="rounded-xl bg-white p-6 sm:p-8 card-yellow-shadow">
-          <div className="mb-5 text-center">
-            <h1 className="text-2xl font-bold">Log in</h1>
-            <p className="text-sm text-muted-foreground">Continue with your email and password</p>
-          </div>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -71,15 +69,25 @@ export default function Login() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                className="bg-white text-foreground placeholder:text-muted-foreground"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPw ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  className="bg-white text-foreground placeholder:text-muted-foreground pr-10"
+                />
+                <button
+                  type="button"
+                  aria-label={showPw ? "Hide password" : "Show password"}
+                  onClick={() => setShowPw((v) => !v)}
+                  className="absolute inset-y-0 right-0 px-3 inline-flex items-center text-muted-foreground hover:text-foreground"
+                >
+                  {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
             <Button type="submit" className="w-full" variant="secondary" disabled={loading}>
               {loading ? "Logging in..." : "Log in"}
