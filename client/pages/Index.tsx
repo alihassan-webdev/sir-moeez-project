@@ -852,8 +852,10 @@ export default function Index() {
       // If direct request failed (network/CORS) or returned non-OK, try internal proxies
       if (!res || !res.ok) {
         const proxies = [
-          "/.netlify/functions/proxy", // Netlify serverless proxy (primary)
-          "/api/generate-questions", // Netlify redirect path -> functions/proxy
+          "/api/generate-questions", // Express backend proxy (local/production)
+          "/api/proxy",
+          "/proxy",
+          "/.netlify/functions/proxy", // Netlify serverless fallback
         ];
         for (const proxyPath of proxies) {
           try {
