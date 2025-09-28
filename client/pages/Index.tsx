@@ -348,7 +348,6 @@ function ExternalPdfSelector({
     setSelectedSubjectPath("");
     setSelectedChapterPaths([]);
     setTotalMarks(null);
-    setInstituteName("");
     onLoadFile(null);
   }, [selectedClass]);
 
