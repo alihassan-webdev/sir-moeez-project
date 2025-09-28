@@ -500,6 +500,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                         setSelectedClass("");
                         setSelectedSubject("");
                         setSelectedChapterPath("");
+                        setSelectedChapterPaths([]);
                         setFile(null);
                         setMcqCount(20);
                         setResult(null);
