@@ -624,7 +624,7 @@ export default function AnimatedAIChat({
                           // First page heading: Test Paper Generator
                           doc.setFont("times", "bold");
                           doc.setFontSize(18);
-                          doc.text("Test Paper Generater", pageWidth / 2, y, {
+                          doc.text("Exam Generater", pageWidth / 2, y, {
                             align: "center",
                           });
                           y += 30;
