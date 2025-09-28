@@ -521,8 +521,17 @@ export default function QnA() {
                       disabled={!file || !qaCount || loading}
                       onClick={runSubmit}
                       className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
->
-                      {loading ? "Generating..." : "Generate Questions"}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="opacity-0">Generating...</span>
+                          <div className="loader">
+                            <div className="jimu-primary-loading"></div>
+                          </div>
+                        </>
+                      ) : (
+                        "Generate"
+                      )}
                     </Button>
 
                     <Button
