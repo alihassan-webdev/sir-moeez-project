@@ -93,6 +93,31 @@ export default function Login() {
             <Button type="submit" className="w-full" variant="secondary" disabled={loading}>
               {loading ? "Logging in..." : "Log in"}
             </Button>
+            <Button
+              type="button"
+              className="w-full bg-primary/10 border-primary/60 text-primary"
+              variant="outline"
+              disabled={resetting}
+              onClick={async () => {
+                const em = email.trim();
+                if (!em) {
+                  toast({ title: "Enter email first", description: "Type your email above to receive a reset link." });
+                  return;
+                }
+                try {
+                  setResetting(true);
+                  await sendPasswordResetEmail(auth, em);
+                  toast({ title: "Reset email sent", description: `Check ${em} for the reset link.` });
+                } catch (err: any) {
+                  const msg = err?.code ? String(err.code).replace("auth/", "").replace(/-/g, " ") : "Could not send reset email";
+                  toast({ title: "Reset error", description: msg });
+                } finally {
+                  setResetting(false);
+                }
+              }}
+            >
+              {resetting ? "Sending..." : "Forgot password?"}
+            </Button>
           </form>
         </div>
       </div>
