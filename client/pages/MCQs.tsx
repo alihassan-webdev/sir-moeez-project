@@ -59,6 +59,9 @@ export default function MCQs() {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [chapterOptions, setChapterOptions] = useState<Entry[]>([]);
   const [selectedChapterPath, setSelectedChapterPath] = useState<string>("");
+  const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>([]);
+  const [isMerging, setIsMerging] = useState(false);
+  const pdfBytesCache = useRef<Map<string, ArrayBuffer>>(new Map());
   const [file, setFile] = useState<File | null>(null);
   const [mcqCount, setMcqCount] = useState<number | null>(20);
   const [loading, setLoading] = useState(false);
