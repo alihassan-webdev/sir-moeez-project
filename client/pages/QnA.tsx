@@ -246,7 +246,7 @@ export default function QnA() {
   };
 
   const buildQaPrompt = (n: number) => {
-    return `Generate exactly ${n} question–answer pairs strictly from the attached PDF chapter. Use the following format and rules:\n\nQ1. <question>\nAnswer: <concise, correct answer>\n\nQ2. <question>\nAnswer: <concise, correct answer>\n\n- Do NOT include options or MCQs\n- Keep answers brief (one or two sentences)\n- Number sequentially starting at Q1.`;
+    return `Generate exactly ${n} QUESTIONS strictly from the attached PDF chapter.\n\nRules:\n- Output QUESTIONS ONLY (no answers, solutions, hints, or explanations).\n- Number sequentially starting at Q1., Q2., ...\n- Use clear, exam-style wording; each question 1–2 sentences.\n- Do NOT include MCQ options.\n\nFormat:\nQ1. <question>\nQ2. <question>\n...`;
   };
 
   const runSubmit = async () => {
@@ -299,13 +299,16 @@ export default function QnA() {
         throw new Error(t || `HTTP ${res.status}`);
       }
       const contentType = res.headers.get("content-type") || "";
+      const stripAnswers = (s: string) => s
+        .replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "")
+        .replace(/\n{3,}/g, "\n\n");
       if (contentType.includes("application/json")) {
         const json = await res.json().catch(async () => await res.text());
         const text = typeof json === "string" ? json : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
-        setResult(String(text));
+        setResult(stripAnswers(String(text)));
       } else {
         const text = await res.text();
-        setResult(text);
+        setResult(stripAnswers(text));
       }
     } catch (err: any) {
       const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
@@ -332,10 +335,10 @@ export default function QnA() {
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
                 <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
-                  Q&A Generator
+                  Questions Generator
                 </h1>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Generate concise question–answer pairs for quick revision.
+                  Generate concise questions for quick revision.
                 </p>
               </div>
             </section>
@@ -466,7 +469,7 @@ export default function QnA() {
                       className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}
                     >
                       <label className="text-sm font-medium text-muted-foreground">
-                        Number of Q&A pairs
+                        Number of Questions
                       </label>
                       <div className="flex gap-2 items-center flex-wrap">
                         <input
@@ -518,8 +521,8 @@ export default function QnA() {
                       disabled={!file || !qaCount || loading}
                       onClick={runSubmit}
                       className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
-                    >
-                      {loading ? "Generating..." : "Generate Q&A"}
+>
+                      {loading ? "Generating..." : "Generate Questions"}
                     </Button>
 
                     <Button
@@ -562,7 +565,7 @@ export default function QnA() {
                               let y = margin;
                               doc.setFont("times", "bold");
                               doc.setFontSize(22);
-                              doc.text("Q&A", pageW / 2, y, { align: "center" });
+                              doc.text("Questions", pageW / 2, y, { align: "center" });
                               y += 30;
                               doc.setFont("times", "normal");
                               doc.setFontSize(12);
@@ -579,7 +582,7 @@ export default function QnA() {
                                 }
                                 y += 10;
                               }
-                              const filename = `qna_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
+                              const filename = `questions_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
                               doc.save(filename);
                             } catch (err) {
                               console.error(err);
