@@ -1,20 +1,12 @@
 import { PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Menu } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet";
-import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
-import SidebarStats from "@/components/layout/SidebarStats";
 import MobileSheet from "@/components/layout/MobileSheet";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -23,10 +15,6 @@ export function AppLayout({ children }: PropsWithChildren) {
   const navigate = useNavigate();
   const isGetStarted = path === "/get-started";
   const isToolRoute = ["/get-started", "/app", "/mcqs"].includes(path);
-
-  useSwipeNavigation(() => {
-    if (window.history.length > 1) navigate(-1);
-  });
 
   useEffect(() => {
     setRouteLoading(true);
@@ -52,11 +40,11 @@ export function AppLayout({ children }: PropsWithChildren) {
               <Button
                 variant="outline"
                 className="inline-flex bg-primary/10 border-primary/60"
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    localStorage.clear();
+                    await signOut(auth);
                   } catch {}
-                  navigate("/");
+                  navigate("/login");
                 }}
               >
                 Logout
@@ -80,9 +68,7 @@ export function AppLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <main className={cn("container mx-auto px-4 py-6 flex-1")}>
-        {children}
-      </main>
+      <main className={cn("container mx-auto px-4 py-6 flex-1")}>{children}</main>
 
       <footer className="border-t bg-background/50">
         <div className="container mx-auto px-4 py-6" />
