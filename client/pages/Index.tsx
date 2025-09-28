@@ -596,13 +596,6 @@ function ExternalPdfSelector({
                 description: "Please enter a value between 20 and 100.",
               });
             }
-            if (!instituteName.trim()) {
-              return toast({
-                title: "Enter institute name",
-                description: "Institute name is required.",
-              });
-            }
-
             const subjectName = selectedSubjectName || "";
             const marks = Math.min(100, Math.max(20, Number(totalMarks)));
             if (marks !== totalMarks) setTotalMarks(marks);
