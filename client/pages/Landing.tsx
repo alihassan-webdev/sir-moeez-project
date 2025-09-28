@@ -104,7 +104,7 @@ export default function Landing() {
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
-                <Link to="/get-started">Get started</Link>
+                <Link to="/login">Get started</Link>
               </Button>
               <Button
                 asChild

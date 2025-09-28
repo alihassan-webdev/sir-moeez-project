@@ -1,20 +1,13 @@
 import { PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Menu } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet";
-import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
-import SidebarStats from "@/components/layout/SidebarStats";
 import MobileSheet from "@/components/layout/MobileSheet";
+import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -52,9 +45,9 @@ export function AppLayout({ children }: PropsWithChildren) {
               <Button
                 variant="outline"
                 className="inline-flex bg-primary/10 border-primary/60"
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    localStorage.clear();
+                    await signOut(auth);
                   } catch {}
                   navigate("/");
                 }}
@@ -65,7 +58,9 @@ export function AppLayout({ children }: PropsWithChildren) {
               <Button
                 variant="outline"
                 className="hidden md:inline-flex items-center gap-2 bg-primary/10 border-primary/60"
-                onClick={() => navigate("/get-started")}
+                onClick={() =>
+                  navigate(path === "/login" ? "/" : "/get-started")
+                }
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
@@ -80,13 +75,13 @@ export function AppLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <main className={cn("container mx-auto px-4 py-6 flex-1")}>
-        {children}
-      </main>
+      <main className={cn("flex-1")}>{children}</main>
 
-      <footer className="border-t bg-background/50">
-        <div className="container mx-auto px-4 py-6" />
-      </footer>
+      {path !== "/login" && (
+        <footer className="border-t bg-background/50">
+          <div className="container mx-auto px-4 py-6" />
+        </footer>
+      )}
     </div>
   );
 }
