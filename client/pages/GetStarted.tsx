@@ -136,7 +136,7 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
-                      <svg className="h-7 w-7 sm:h-8 sm:w-8" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7h10M7 12h10M7 17h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <ListChecks className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
                     </div>
                     <div className="text-base font-semibold">Generate MCQs</div>
                     <div className="text-xs text-muted-foreground mt-1">
