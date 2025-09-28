@@ -17,7 +17,9 @@ type Entry = { path: string; url: string; name: string };
 
 // API endpoint selection: same fallback as Index
 const API_URL = (() => {
-  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as string | undefined;
+  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
+    | string
+    | undefined;
   return env && env.trim() ? env : "/.netlify/functions/proxy";
 })();
 
@@ -56,10 +58,14 @@ export default function MCQs() {
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
     setChapterOptions(arr);
-    const subs = Array.from(new Set(arr.map((e) => {
-      const m = e.path.replace(/^\/?datafiles\//, "");
-      return (m.split("/")[1] || "General");
-    }))).sort();
+    const subs = Array.from(
+      new Set(
+        arr.map((e) => {
+          const m = e.path.replace(/^\/?datafiles\//, "");
+          return m.split("/")[1] || "General";
+        }),
+      ),
+    ).sort();
     setSubjects(subs);
     setSelectedSubject("");
     setSelectedChapterPath("");
@@ -124,7 +130,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
     setLoading(true);
     try {
       if (!file) {
-        toast({ title: "Attach a PDF", description: "Please select or upload a PDF chapter." });
+        toast({
+          title: "Attach a PDF",
+          description: "Please select or upload a PDF chapter.",
+        });
         setLoading(false);
         return;
       }
@@ -158,14 +167,23 @@ Use concise, exam-style wording suitable for classroom tests.`;
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json();
-        const text = typeof json === "string" ? json : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+        const text =
+          typeof json === "string"
+            ? json
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         setResult(String(text));
       } else {
         const text = await res.text();
         setResult(text);
       }
     } catch (err: any) {
-      const msg = err?.message === "timeout" ? "Request timed out." : err?.message || "Request failed";
+      const msg =
+        err?.message === "timeout"
+          ? "Request timed out."
+          : err?.message || "Request failed";
       toast({ title: "Request failed", description: msg });
       setResult(null);
     } finally {
@@ -188,8 +206,12 @@ Use concise, exam-style wording suitable for classroom tests.`;
             <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 -mt-5">
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
-                <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">MCQ Generator</h1>
-                <p className="mt-3 text-sm text-muted-foreground">Create multiple-choice questions from a selected chapter.</p>
+                <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
+                  MCQ Generator
+                </h1>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Create multiple-choice questions from a selected chapter.
+                </p>
               </div>
             </section>
 
@@ -198,82 +220,158 @@ Use concise, exam-style wording suitable for classroom tests.`;
                 <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Class</label>
-                      <Select value={selectedClass} onValueChange={(v) => setSelectedClass(v)}>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Class
+                      </label>
+                      <Select
+                        value={selectedClass}
+                        onValueChange={(v) => setSelectedClass(v)}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select class" />
                         </SelectTrigger>
                         <SelectContent>
                           {classOptions.map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                            <SelectItem key={c} value={c}>
+                              {c}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Subject</label>
-                      <Select value={selectedSubject} onValueChange={(v) => setSelectedSubject(v)}>
-                        <SelectTrigger className="w-full" disabled={!selectedClass}>
-                          <SelectValue placeholder={selectedClass ? "Select subject" : "Select class first"} />
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Subject
+                      </label>
+                      <Select
+                        value={selectedSubject}
+                        onValueChange={(v) => setSelectedSubject(v)}
+                      >
+                        <SelectTrigger
+                          className="w-full"
+                          disabled={!selectedClass}
+                        >
+                          <SelectValue
+                            placeholder={
+                              selectedClass
+                                ? "Select subject"
+                                : "Select class first"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {subjects.map((s) => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Chapter (PDF)</label>
-                      <Select value={selectedChapterPath} onValueChange={(v) => { setSelectedChapterPath(v); handleSelectChapter(v); }}>
-                        <SelectTrigger className="w-full" disabled={!selectedSubject && !selectedClass}>
-                          <SelectValue placeholder={selectedClass ? "Select chapter" : "Select class first"} />
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Chapter (PDF)
+                      </label>
+                      <Select
+                        value={selectedChapterPath}
+                        onValueChange={(v) => {
+                          setSelectedChapterPath(v);
+                          handleSelectChapter(v);
+                        }}
+                      >
+                        <SelectTrigger
+                          className="w-full"
+                          disabled={!selectedSubject && !selectedClass}
+                        >
+                          <SelectValue
+                            placeholder={
+                              selectedClass
+                                ? "Select chapter"
+                                : "Select class first"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {chapterOptions.map((c) => (
-                            <SelectItem key={c.path} value={c.path}>{c.name.replace(/\.pdf$/i, "")}</SelectItem>
+                            <SelectItem key={c.path} value={c.path}>
+                              {c.name.replace(/\.pdf$/i, "")}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Number of MCQs</label>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Number of MCQs
+                      </label>
                       <div className="flex gap-2 items-center flex-wrap">
                         <input
                           type="number"
                           min={5}
                           max={100}
                           value={mcqCount ?? ""}
-                          onChange={(e) => setMcqCount(e.currentTarget.value === "" ? null : Number(e.currentTarget.value))}
+                          onChange={(e) =>
+                            setMcqCount(
+                              e.currentTarget.value === ""
+                                ? null
+                                : Number(e.currentTarget.value),
+                            )
+                          }
                           className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                           placeholder="Enter count"
                         />
-                        <button type="button" onClick={() => setMcqCount(10)} className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}>10</button>
-                        <button type="button" onClick={() => setMcqCount(20)} className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}>20</button>
-                        <button type="button" onClick={() => setMcqCount(30)} className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}>30</button>
+                        <button
+                          type="button"
+                          onClick={() => setMcqCount(10)}
+                          className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                        >
+                          10
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMcqCount(20)}
+                          className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                        >
+                          20
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMcqCount(30)}
+                          className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                        >
+                          30
+                        </button>
                       </div>
                     </div>
-
                   </div>
 
                   <div className="mt-4 flex gap-3">
-                    <Button disabled={!file || !mcqCount || loading} onClick={runSubmit} className="relative flex items-center gap-3 !shadow-none hover:!shadow-none">
+                    <Button
+                      disabled={!file || !mcqCount || loading}
+                      onClick={runSubmit}
+                      className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
+                    >
                       {loading ? "Generating..." : "Generate MCQs"}
                     </Button>
 
-                    <Button className="bg-primary/10 border-primary/60 text-blue-600" disabled={!file} onClick={() => {
-                      setSelectedClass("");
-                      setSelectedSubject("");
-                      setSelectedChapterPath("");
-                      setFile(null);
-                      setMcqCount(20);
-                      setResult(null);
-                    }}>Reset</Button>
+                    <Button
+                      className="bg-primary/10 border-primary/60 text-blue-600"
+                      disabled={!file}
+                      onClick={() => {
+                        setSelectedClass("");
+                        setSelectedSubject("");
+                        setSelectedChapterPath("");
+                        setFile(null);
+                        setMcqCount(20);
+                        setResult(null);
+                      }}
+                    >
+                      Reset
+                    </Button>
                   </div>
-
                 </div>
 
                 {result && (
@@ -281,35 +379,59 @@ Use concise, exam-style wording suitable for classroom tests.`;
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
                       <div className="flex items-center gap-2">
-                        <Button aria-label="Download PDF" variant="secondary" size="icon" className="rounded-full" disabled={!result || !!loading} onClick={async () => {
-                          if (!result) return;
-                          try {
-                            const { jsPDF } = await import("jspdf");
-                            const doc = new jsPDF({ unit: "pt", format: "a4" });
-                            const margin = 64;
-                            const pageW = doc.internal.pageSize.getWidth();
-                            let y = margin;
-                            doc.setFont("times", "bold");
-                            doc.setFontSize(22);
-                            const heading = "MCQs";
-                            doc.text(heading, pageW / 2, y, { align: "center" });
-                            y += 30;
-                            doc.setFont("times", "normal");
-                            doc.setFontSize(12);
-                            const paragraphs = (result || "").split(/\n\n+/);
-                            for (const para of paragraphs) {
-                              const lines = doc.splitTextToSize(para.replace(/\n/g, " "), pageW - margin * 2);
-                              doc.text(lines, margin, y);
-                              y += lines.length * 16 + 10;
-                              if (y > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); y = margin; }
+                        <Button
+                          aria-label="Download PDF"
+                          variant="secondary"
+                          size="icon"
+                          className="rounded-full"
+                          disabled={!result || !!loading}
+                          onClick={async () => {
+                            if (!result) return;
+                            try {
+                              const { jsPDF } = await import("jspdf");
+                              const doc = new jsPDF({
+                                unit: "pt",
+                                format: "a4",
+                              });
+                              const margin = 64;
+                              const pageW = doc.internal.pageSize.getWidth();
+                              let y = margin;
+                              doc.setFont("times", "bold");
+                              doc.setFontSize(22);
+                              const heading = "MCQs";
+                              doc.text(heading, pageW / 2, y, {
+                                align: "center",
+                              });
+                              y += 30;
+                              doc.setFont("times", "normal");
+                              doc.setFontSize(12);
+                              const paragraphs = (result || "").split(/\n\n+/);
+                              for (const para of paragraphs) {
+                                const lines = doc.splitTextToSize(
+                                  para.replace(/\n/g, " "),
+                                  pageW - margin * 2,
+                                );
+                                doc.text(lines, margin, y);
+                                y += lines.length * 16 + 10;
+                                if (
+                                  y >
+                                  doc.internal.pageSize.getHeight() - margin
+                                ) {
+                                  doc.addPage();
+                                  y = margin;
+                                }
+                              }
+                              const filename = `mcqs_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
+                              doc.save(filename);
+                            } catch (err) {
+                              console.error(err);
+                              toast({
+                                title: "Download failed",
+                                description: "Could not generate PDF.",
+                              });
                             }
-                            const filename = `mcqs_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
-                            doc.save(filename);
-                          } catch (err) {
-                            console.error(err);
-                            toast({ title: "Download failed", description: "Could not generate PDF." });
-                          }
-                        }}>
+                          }}
+                        >
                           Download
                         </Button>
                       </div>
@@ -324,7 +446,6 @@ Use concise, exam-style wording suitable for classroom tests.`;
                     </div>
                   </div>
                 )}
-
               </div>
             </section>
           </div>

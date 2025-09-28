@@ -16,13 +16,22 @@ import SidebarStats from "@/components/layout/SidebarStats";
 type Entry = { path: string; url: string; name: string };
 
 const API_URL = (() => {
-  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as string | undefined;
+  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
+    | string
+    | undefined;
   return env && env.trim() ? env : "/.netlify/functions/proxy";
 })();
 
 export default function QnA() {
-  const pdfModules = import.meta.glob("/datafiles/**/*.pdf", { as: "url", eager: true }) as Record<string, string>;
-  const entries: Entry[] = Object.entries(pdfModules).map(([path, url]) => ({ path, url, name: path.split("/").pop() || "file.pdf" }));
+  const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
+    as: "url",
+    eager: true,
+  }) as Record<string, string>;
+  const entries: Entry[] = Object.entries(pdfModules).map(([path, url]) => ({
+    path,
+    url,
+    name: path.split("/").pop() || "file.pdf",
+  }));
 
   const byClass = entries.reduce<Record<string, Entry[]>>((acc, cur) => {
     const m = cur.path.replace(/^\/?datafiles\//, "");
@@ -47,10 +56,14 @@ export default function QnA() {
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
     setChapterOptions(arr);
-    const subs = Array.from(new Set(arr.map((e) => {
-      const m = e.path.replace(/^\/?datafiles\//, "");
-      return (m.split("/")[1] || "General");
-    }))).sort();
+    const subs = Array.from(
+      new Set(
+        arr.map((e) => {
+          const m = e.path.replace(/^\/?datafiles\//, "");
+          return m.split("/")[1] || "General";
+        }),
+      ),
+    ).sort();
     setSubjects(subs);
     setSelectedSubject("");
     setSelectedChapterPath("");
@@ -107,12 +120,18 @@ export default function QnA() {
     setLoading(true);
     try {
       if (!file) {
-        toast({ title: "Attach a PDF", description: "Please select a chapter." });
+        toast({
+          title: "Attach a PDF",
+          description: "Please select a chapter.",
+        });
         setLoading(false);
         return;
       }
       if (!qaCount || qaCount < 1 || qaCount > 200) {
-        toast({ title: "Invalid count", description: "Enter 1–200 Q&A pairs." });
+        toast({
+          title: "Invalid count",
+          description: "Enter 1–200 Q&A pairs.",
+        });
         setLoading(false);
         return;
       }
@@ -124,7 +143,11 @@ export default function QnA() {
       form.append("file", file);
 
       const res = await withTimeout(
-        fetch(API_URL, { method: "POST", body: form, headers: { Accept: "application/json" } }),
+        fetch(API_URL, {
+          method: "POST",
+          body: form,
+          headers: { Accept: "application/json" },
+        }),
         25000,
       );
 
@@ -136,14 +159,23 @@ export default function QnA() {
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json();
-        const text = typeof json === "string" ? json : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+        const text =
+          typeof json === "string"
+            ? json
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         setResult(String(text));
       } else {
         const text = await res.text();
         setResult(text);
       }
     } catch (err: any) {
-      const msg = err?.message === "timeout" ? "Request timed out." : err?.message || "Request failed";
+      const msg =
+        err?.message === "timeout"
+          ? "Request timed out."
+          : err?.message || "Request failed";
       toast({ title: "Request failed", description: msg });
       setResult(null);
     } finally {
@@ -166,8 +198,12 @@ export default function QnA() {
             <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 -mt-5">
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
-                <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">Q&A Generator</h1>
-                <p className="mt-3 text-sm text-muted-foreground">Generate concise question–answer pairs for quick revision.</p>
+                <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
+                  Q&A Generator
+                </h1>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Generate concise question–answer pairs for quick revision.
+                </p>
               </div>
             </section>
 
@@ -176,83 +212,158 @@ export default function QnA() {
                 <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Class</label>
-                      <Select value={selectedClass} onValueChange={(v) => setSelectedClass(v)}>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Class
+                      </label>
+                      <Select
+                        value={selectedClass}
+                        onValueChange={(v) => setSelectedClass(v)}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select class" />
                         </SelectTrigger>
                         <SelectContent>
                           {classOptions.map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                            <SelectItem key={c} value={c}>
+                              {c}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Subject</label>
-                      <Select value={selectedSubject} onValueChange={(v) => setSelectedSubject(v)}>
-                        <SelectTrigger className="w-full" disabled={!selectedClass}>
-                          <SelectValue placeholder={selectedClass ? "Select subject" : "Select class first"} />
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Subject
+                      </label>
+                      <Select
+                        value={selectedSubject}
+                        onValueChange={(v) => setSelectedSubject(v)}
+                      >
+                        <SelectTrigger
+                          className="w-full"
+                          disabled={!selectedClass}
+                        >
+                          <SelectValue
+                            placeholder={
+                              selectedClass
+                                ? "Select subject"
+                                : "Select class first"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {subjects.map((s) => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Chapter (PDF)</label>
-                      <Select value={selectedChapterPath} onValueChange={(v) => { setSelectedChapterPath(v); handleSelectChapter(v); }}>
-                        <SelectTrigger className="w-full" disabled={!selectedSubject && !selectedClass}>
-                          <SelectValue placeholder={selectedClass ? "Select chapter" : "Select class first"} />
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Chapter (PDF)
+                      </label>
+                      <Select
+                        value={selectedChapterPath}
+                        onValueChange={(v) => {
+                          setSelectedChapterPath(v);
+                          handleSelectChapter(v);
+                        }}
+                      >
+                        <SelectTrigger
+                          className="w-full"
+                          disabled={!selectedSubject && !selectedClass}
+                        >
+                          <SelectValue
+                            placeholder={
+                              selectedClass
+                                ? "Select chapter"
+                                : "Select class first"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {chapterOptions.map((c) => (
-                            <SelectItem key={c.path} value={c.path}>{c.name.replace(/\.pdf$/i, "")}</SelectItem>
+                            <SelectItem key={c.path} value={c.path}>
+                              {c.name.replace(/\.pdf$/i, "")}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Number of Q&A pairs</label>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Number of Q&A pairs
+                      </label>
                       <div className="flex gap-2 items-center flex-wrap">
                         <input
                           type="number"
                           min={1}
                           max={200}
                           value={qaCount ?? ""}
-                          onChange={(e) => setQaCount(e.currentTarget.value === "" ? null : Number(e.currentTarget.value))}
+                          onChange={(e) =>
+                            setQaCount(
+                              e.currentTarget.value === ""
+                                ? null
+                                : Number(e.currentTarget.value),
+                            )
+                          }
                           className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                           placeholder="Enter count"
                         />
-                        <button type="button" onClick={() => setQaCount(5)} className={`rounded-md px-3 py-2 text-sm border ${qaCount === 5 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}>5</button>
-                        <button type="button" onClick={() => setQaCount(10)} className={`rounded-md px-3 py-2 text-sm border ${qaCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}>10</button>
-                        <button type="button" onClick={() => setQaCount(20)} className={`rounded-md px-3 py-2 text-sm border ${qaCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}>20</button>
+                        <button
+                          type="button"
+                          onClick={() => setQaCount(5)}
+                          className={`rounded-md px-3 py-2 text-sm border ${qaCount === 5 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                        >
+                          5
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setQaCount(10)}
+                          className={`rounded-md px-3 py-2 text-sm border ${qaCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                        >
+                          10
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setQaCount(20)}
+                          className={`rounded-md px-3 py-2 text-sm border ${qaCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                        >
+                          20
+                        </button>
                       </div>
                     </div>
-
                   </div>
 
                   <div className="mt-4 flex gap-3">
-                    <Button disabled={!file || !qaCount || loading} onClick={runSubmit} className="relative flex items-center gap-3 !shadow-none hover:!shadow-none">
+                    <Button
+                      disabled={!file || !qaCount || loading}
+                      onClick={runSubmit}
+                      className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
+                    >
                       {loading ? "Generating..." : "Generate Q&A"}
                     </Button>
 
-                    <Button className="bg-primary/10 border-primary/60 text-blue-600" disabled={!file} onClick={() => {
-                      setSelectedClass("");
-                      setSelectedSubject("");
-                      setSelectedChapterPath("");
-                      setFile(null);
-                      setQaCount(10);
-                      setResult(null);
-                    }}>Reset</Button>
-
+                    <Button
+                      className="bg-primary/10 border-primary/60 text-blue-600"
+                      disabled={!file}
+                      onClick={() => {
+                        setSelectedClass("");
+                        setSelectedSubject("");
+                        setSelectedChapterPath("");
+                        setFile(null);
+                        setQaCount(10);
+                        setResult(null);
+                      }}
+                    >
+                      Reset
+                    </Button>
                   </div>
-
                 </div>
 
                 {result && (
@@ -270,7 +381,6 @@ export default function QnA() {
                     </div>
                   </div>
                 )}
-
               </div>
             </section>
           </div>

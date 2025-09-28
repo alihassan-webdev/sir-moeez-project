@@ -563,8 +563,7 @@ function ExternalPdfSelector({
             </button>
           </div>
         </div>
-
-            </div>
+      </div>
 
       {/* Actions */}
       <div className="mt-4 flex gap-3">

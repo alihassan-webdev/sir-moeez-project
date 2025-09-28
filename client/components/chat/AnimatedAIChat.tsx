@@ -848,12 +848,10 @@ export default function AnimatedAIChat({
                             doc.setFont("times", "bold");
                             doc.setFontSize(64);
                             doc.setTextColor(210);
-                            doc.text(
-                              "Exam Generator",
-                              pageW / 2,
-                              pageH / 2,
-                              { align: "center", angle: 45 },
-                            );
+                            doc.text("Exam Generator", pageW / 2, pageH / 2, {
+                              align: "center",
+                              angle: 45,
+                            });
                             // Footer page numbers
                             doc.setFont("times", "normal");
                             doc.setFontSize(10);

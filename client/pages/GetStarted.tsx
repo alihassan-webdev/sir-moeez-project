@@ -1,7 +1,14 @@
 import React from "react";
 import Container from "@/components/layout/Container";
 import { Link, useLocation } from "react-router-dom";
-import { FileText, Layers, BookOpen, Folder, ListChecks, MessageSquare } from "lucide-react";
+import {
+  FileText,
+  Layers,
+  BookOpen,
+  Folder,
+  ListChecks,
+  MessageSquare,
+} from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
 export default function GetStarted() {
@@ -119,10 +126,11 @@ export default function GetStarted() {
             <div className="mt-4 rounded-xl bg-white p-6 border border-input card-yellow-shadow">
               <h2 className="text-2xl font-bold">Welcome to PaperGen</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Generate exam papers and revision cards quickly from your uploaded
-                chapters. Choose a class, select a subject and chapters, then
-                customise the number of questions or marks — PaperGen will create
-                printable PDFs ready to use for tests or revision.
+                Generate exam papers and revision cards quickly from your
+                uploaded chapters. Choose a class, select a subject and
+                chapters, then customise the number of questions or marks —
+                PaperGen will create printable PDFs ready to use for tests or
+                revision.
               </p>
             </div>
 
@@ -136,7 +144,10 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
-                      <ListChecks className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+                      <ListChecks
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="text-base font-semibold">Generate MCQs</div>
                     <div className="text-xs text-muted-foreground mt-1">
@@ -151,7 +162,10 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
-                      <MessageSquare className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+                      <MessageSquare
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="text-base font-semibold">Generate Q&A</div>
                     <div className="text-xs text-muted-foreground mt-1">
@@ -177,10 +191,8 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </Link>
-
               </div>
             </div>
-
           </div>
         </div>
       </Container>

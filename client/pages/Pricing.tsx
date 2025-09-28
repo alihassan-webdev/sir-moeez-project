@@ -63,7 +63,8 @@ const TIERS = [
       "Custom integrations (LMS/CSV)",
     ],
     cta: "Contact sales",
-  },] as const;
+  },
+] as const;
 
 type Tier = (typeof TIERS)[number];
 
