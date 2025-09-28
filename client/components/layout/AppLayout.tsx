@@ -17,6 +17,10 @@ export function AppLayout({ children }: PropsWithChildren) {
   const isGetStarted = path === "/get-started";
   const isToolRoute = ["/get-started", "/app", "/mcqs"].includes(path);
 
+  useSwipeNavigation(() => {
+    if (window.history.length > 1) navigate(-1);
+  });
+
   useEffect(() => {
     setRouteLoading(true);
     const t = setTimeout(() => setRouteLoading(false), 450);
