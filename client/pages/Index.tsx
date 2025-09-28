@@ -1147,7 +1147,7 @@ export default function Index() {
                               const headingTitle =
                                 institute && institute.trim()
                                   ? institute.trim()
-                                  : "Test Paper Generater";
+                                  : "Exam Generater";
                               const headerLines = doc.splitTextToSize(
                                 headingTitle,
                                 pageW - margin * 2,
