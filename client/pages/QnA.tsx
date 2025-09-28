@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
-import { ListChecks, ChevronDown } from "lucide-react";
+import { ListChecks, ChevronDown, Download } from "lucide-react";
+import { generateExamStylePdf } from "@/lib/pdf";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatResultHtml } from "@/lib/format";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -62,15 +64,16 @@ export default function QnA() {
   );
   const [isMerging, setIsMerging] = useState(false);
   const pdfBytesCache = React.useRef<Map<string, ArrayBuffer>>(new Map());
+  const mergeToken = React.useRef(0);
   const [file, setFile] = useState<File | null>(null);
-  const [qaCount, setQaCount] = useState<number | null>(10);
+  const [qaCount, setQaCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
-  const canEnterCount = selectedChapterPaths.length > 0;
+  const canEnterCount = !!file && !isMerging;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -119,10 +122,11 @@ export default function QnA() {
 
   const mergeSelected = React.useCallback(
     async (paths: string[]) => {
+      const token = ++mergeToken.current;
       setIsMerging(true);
       try {
         if (!paths.length) {
-          setFile(null);
+          if (mergeToken.current === token) setFile(null);
           return;
         }
         const { PDFDocument } = await import("pdf-lib");
@@ -132,22 +136,43 @@ export default function QnA() {
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((c) => c.path);
 
-        await Promise.all(
+        const fetchResults = await Promise.allSettled(
           ordered.map(async (p) => {
-            if (pdfBytesCache.current.has(p)) return;
+            if (pdfBytesCache.current.has(p)) return { path: p } as const;
             const found = entries.find((e) => e.path === p);
-            if (!found) return;
-            const res = await fetch(found.url);
-            const bytes = await res.arrayBuffer();
-            pdfBytesCache.current.set(p, bytes);
+            if (!found) return { path: p, error: "not found" } as const;
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 30000);
+            try {
+              const res = await fetch(found.url, { signal: controller.signal });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const bytes = await res.arrayBuffer();
+              if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+              const header = new Uint8Array(bytes, 0, 4);
+              const headerStr = Array.from(header)
+                .map((b) => String.fromCharCode(b))
+                .join("");
+              if (headerStr !== "%PDF") throw new Error("Invalid PDF");
+              pdfBytesCache.current.set(p, bytes);
+              return { path: p } as const;
+            } finally {
+              clearTimeout(timeout);
+            }
           }),
         );
+        const failed = fetchResults.filter((r) => r.status === "rejected");
+        if (failed.length) {
+          console.warn("Some PDFs failed to prefetch:", failed.length);
+        }
 
         let pageCount = 0;
         for (const p of ordered) {
           const bytes = pdfBytesCache.current.get(p);
           if (!bytes) continue;
-          const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+          const src = await PDFDocument.load(bytes, {
+            ignoreEncryption: true,
+            throwOnInvalidObject: true,
+          });
           const copied = await mergedPdf.copyPages(src, src.getPageIndices());
           copied.forEach((pg) => mergedPdf.addPage(pg));
           pageCount += copied.length;
@@ -166,15 +191,15 @@ export default function QnA() {
             description: "Merged chapters exceed 15MB. Select fewer chapters.",
             variant: "destructive",
           });
-          setFile(null);
+          if (mergeToken.current === token) setFile(null);
           return;
         }
-        setFile(mergedFile);
+        if (mergeToken.current === token) setFile(mergedFile);
       } catch (err) {
         toast({ title: "Merge failed", description: "Could not merge PDFs." });
-        setFile(null);
+        if (mergeToken.current === token) setFile(null);
       } finally {
-        setIsMerging(false);
+        if (mergeToken.current === token) setIsMerging(false);
       }
     },
     [chapterOptions, entries, selectedSubject],
@@ -183,12 +208,20 @@ export default function QnA() {
   useEffect(() => {
     (async () => {
       try {
-        await Promise.all(
+        await Promise.allSettled(
           chapterOptions.map(async (c) => {
             if (pdfBytesCache.current.has(c.path)) return;
-            const res = await fetch(c.url);
-            const bytes = await res.arrayBuffer();
-            pdfBytesCache.current.set(c.path, bytes);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
+            try {
+              const res = await fetch(c.url, { signal: controller.signal });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const bytes = await res.arrayBuffer();
+              if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+              pdfBytesCache.current.set(c.path, bytes);
+            } finally {
+              clearTimeout(timeout);
+            }
           }),
         );
       } catch {}
@@ -223,7 +256,7 @@ export default function QnA() {
   };
 
   const buildQaPrompt = (n: number) => {
-    return `Generate exactly ${n} question–answer pairs strictly from the attached PDF chapter. Use the following format and rules:\n\nQ1. <question>\nAnswer: <concise, correct answer>\n\nQ2. <question>\nAnswer: <concise, correct answer>\n\n- Do NOT include options or MCQs\n- Keep answers brief (one or two sentences)\n- Number sequentially starting at Q1.`;
+    return `Generate exactly ${n} QUESTIONS strictly from the attached PDF chapter.\n\nRules:\n- Output QUESTIONS ONLY (no answers, solutions, hints, or explanations).\n- Number sequentially starting at Q1., Q2., ...\n- Use clear, exam-style wording; each question 1–2 sentences.\n- Do NOT include MCQ options.\n\nFormat:\nQ1. <question>\nQ2. <question>\n...`;
   };
 
   const runSubmit = async () => {
@@ -253,23 +286,53 @@ export default function QnA() {
       form.append("query", q);
       form.append("file", file);
 
-      const res = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        25000,
-      );
+      const initialTimeoutMs = 45000;
+      const retryTimeoutMs = 65000;
+      const sendTo = async (urlStr: string, timeoutMs: number) => {
+        try {
+          const res = await withTimeout(
+            fetch(urlStr, {
+              method: "POST",
+              body: form,
+              headers: { Accept: "application/json" },
+            }),
+            timeoutMs,
+          );
+          return res;
+        } catch {
+          return null;
+        }
+      };
 
+      let res: Response | null = null;
+      if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
+      if (!res || !res.ok) {
+        const proxies = [
+          "/api/generate-questions",
+          "/api/proxy",
+          "/proxy",
+          "/.netlify/functions/proxy",
+        ];
+        for (const p of proxies) {
+          const attempt = await sendTo(p, retryTimeoutMs);
+          if (attempt && attempt.ok) {
+            res = attempt;
+            break;
+          }
+        }
+      }
+      if (!res) throw new Error("Network error. Please try again.");
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         throw new Error(t || `HTTP ${res.status}`);
       }
-
       const contentType = res.headers.get("content-type") || "";
+      const stripAnswers = (s: string) =>
+        s
+          .replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "")
+          .replace(/\n{3,}/g, "\n\n");
       if (contentType.includes("application/json")) {
-        const json = await res.json();
+        const json = await res.json().catch(async () => await res.text());
         const text =
           typeof json === "string"
             ? json
@@ -277,15 +340,15 @@ export default function QnA() {
               json?.result ??
               json?.message ??
               JSON.stringify(json));
-        setResult(String(text));
+        setResult(stripAnswers(String(text)));
       } else {
         const text = await res.text();
-        setResult(text);
+        setResult(stripAnswers(text));
       }
     } catch (err: any) {
       const msg =
         err?.message === "timeout"
-          ? "Request timed out."
+          ? "Request timed out. Please try again."
           : err?.message || "Request failed";
       toast({ title: "Request failed", description: msg });
       setResult(null);
@@ -310,17 +373,17 @@ export default function QnA() {
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
                 <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
-                  Q&A Generator
+                  Questions Generator
                 </h1>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Generate concise question–answer pairs for quick revision.
+                  Generate concise questions for quick revision.
                 </p>
               </div>
             </section>
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
               <div className="flex flex-col gap-4">
-                <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
+                <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
@@ -444,7 +507,7 @@ export default function QnA() {
                       className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}
                     >
                       <label className="text-sm font-medium text-muted-foreground">
-                        Number of Q&A pairs
+                        Number of Questions
                       </label>
                       <div className="flex gap-2 items-center flex-wrap">
                         <input
@@ -493,22 +556,32 @@ export default function QnA() {
 
                   <div className="mt-4 flex gap-3">
                     <Button
-                      disabled={!file || !qaCount || loading}
+                      disabled={!file || !qaCount || loading || isMerging}
                       onClick={runSubmit}
                       className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                     >
-                      {loading ? "Generating..." : "Generate Q&A"}
+                      {loading ? (
+                        <>
+                          <span className="opacity-0">Generating...</span>
+                          <div className="loader">
+                            <div className="jimu-primary-loading"></div>
+                          </div>
+                        </>
+                      ) : (
+                        "Generate"
+                      )}
                     </Button>
 
                     <Button
-                      className="bg-primary/10 border-primary/60 text-blue-600"
+                      className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+                      disabled={!result}
                       onClick={() => {
                         setSelectedClass("");
                         setSelectedSubject("");
                         setSelectedChapterPath("");
                         setSelectedChapterPaths([]);
                         setFile(null);
-                        setQaCount(10);
+                        setQaCount(null);
                         setResult(null);
                       }}
                     >
@@ -521,13 +594,43 @@ export default function QnA() {
                   <div className="order-1 mt-0 w-full max-w-4xl mx-auto">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          aria-label="Download PDF"
+                          variant="secondary"
+                          size="icon"
+                          className="rounded-full"
+                          disabled={!result || !!loading}
+                          onClick={async () => {
+                            if (!result) return;
+                            try {
+                              await generateExamStylePdf({
+                                title: "Questions",
+                                body: result,
+                                filenameBase: "questions",
+                              });
+                            } catch (err) {
+                              console.error(err);
+                              toast({
+                                title: "Download failed",
+                                description: "Could not generate PDF.",
+                              });
+                            }
+                          }}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
                       <div className="paper-view">
-                        <div className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words">
-                          <pre className="whitespace-pre-wrap">{result}</pre>
-                        </div>
+                        <div
+                          className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
+                          dangerouslySetInnerHTML={{
+                            __html: formatResultHtml(result || ""),
+                          }}
+                        />
                       </div>
                     </div>
                   </div>

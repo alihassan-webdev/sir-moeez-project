@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
-import { ListChecks, ChevronDown } from "lucide-react";
+import { ListChecks, ChevronDown, Download } from "lucide-react";
+import { generateExamStylePdf } from "@/lib/pdf";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatResultHtml } from "@/lib/format";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -64,15 +66,16 @@ export default function MCQs() {
   );
   const [isMerging, setIsMerging] = useState(false);
   const pdfBytesCache = useRef<Map<string, ArrayBuffer>>(new Map());
+  const mergeToken = useRef(0);
   const [file, setFile] = useState<File | null>(null);
-  const [mcqCount, setMcqCount] = useState<number | null>(20);
+  const [mcqCount, setMcqCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
-  const canEnterCount = selectedChapterPaths.length > 0;
+  const canEnterCount = !!file && !isMerging;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -121,10 +124,11 @@ export default function MCQs() {
 
   const mergeSelected = React.useCallback(
     async (paths: string[]) => {
+      const token = ++mergeToken.current;
       setIsMerging(true);
       try {
         if (!paths.length) {
-          setFile(null);
+          if (mergeToken.current === token) setFile(null);
           return;
         }
         const { PDFDocument } = await import("pdf-lib");
@@ -134,22 +138,43 @@ export default function MCQs() {
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((c) => c.path);
 
-        await Promise.all(
+        const fetchResults = await Promise.allSettled(
           ordered.map(async (p) => {
-            if (pdfBytesCache.current.has(p)) return;
+            if (pdfBytesCache.current.has(p)) return { path: p } as const;
             const found = entries.find((e) => e.path === p);
-            if (!found) return;
-            const res = await fetch(found.url);
-            const bytes = await res.arrayBuffer();
-            pdfBytesCache.current.set(p, bytes);
+            if (!found) return { path: p, error: "not found" } as const;
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 30000);
+            try {
+              const res = await fetch(found.url, { signal: controller.signal });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const bytes = await res.arrayBuffer();
+              if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+              const header = new Uint8Array(bytes, 0, 4);
+              const headerStr = Array.from(header)
+                .map((b) => String.fromCharCode(b))
+                .join("");
+              if (headerStr !== "%PDF") throw new Error("Invalid PDF");
+              pdfBytesCache.current.set(p, bytes);
+              return { path: p } as const;
+            } finally {
+              clearTimeout(timeout);
+            }
           }),
         );
+        const failed = fetchResults.filter((r) => r.status === "rejected");
+        if (failed.length) {
+          console.warn("Some PDFs failed to prefetch:", failed.length);
+        }
 
         let pageCount = 0;
         for (const p of ordered) {
           const bytes = pdfBytesCache.current.get(p);
           if (!bytes) continue;
-          const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+          const src = await PDFDocument.load(bytes, {
+            ignoreEncryption: true,
+            throwOnInvalidObject: true,
+          });
           const copied = await mergedPdf.copyPages(src, src.getPageIndices());
           copied.forEach((pg) => mergedPdf.addPage(pg));
           pageCount += copied.length;
@@ -168,15 +193,15 @@ export default function MCQs() {
             description: "Merged chapters exceed 15MB. Select fewer chapters.",
             variant: "destructive",
           });
-          setFile(null);
+          if (mergeToken.current === token) setFile(null);
           return;
         }
-        setFile(mergedFile);
+        if (mergeToken.current === token) setFile(mergedFile);
       } catch (err) {
         toast({ title: "Merge failed", description: "Could not merge PDFs." });
-        setFile(null);
+        if (mergeToken.current === token) setFile(null);
       } finally {
-        setIsMerging(false);
+        if (mergeToken.current === token) setIsMerging(false);
       }
     },
     [chapterOptions, entries, selectedSubject],
@@ -185,12 +210,20 @@ export default function MCQs() {
   useEffect(() => {
     (async () => {
       try {
-        await Promise.all(
+        await Promise.allSettled(
           chapterOptions.map(async (c) => {
             if (pdfBytesCache.current.has(c.path)) return;
-            const res = await fetch(c.url);
-            const bytes = await res.arrayBuffer();
-            pdfBytesCache.current.set(c.path, bytes);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
+            try {
+              const res = await fetch(c.url, { signal: controller.signal });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const bytes = await res.arrayBuffer();
+              if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+              pdfBytesCache.current.set(c.path, bytes);
+            } finally {
+              clearTimeout(timeout);
+            }
           }),
         );
       } catch {}
@@ -255,29 +288,54 @@ Use concise, exam-style wording suitable for classroom tests.`;
       }
 
       const q = buildMcqPrompt(mcqCount);
-
       const form = new FormData();
       form.append("pdf", file);
       form.append("query", q);
       form.append("file", file);
 
-      const res = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        25000,
-      );
+      const initialTimeoutMs = 45000;
+      const retryTimeoutMs = 65000;
+      const sendTo = async (urlStr: string, timeoutMs: number) => {
+        try {
+          const res = await withTimeout(
+            fetch(urlStr, {
+              method: "POST",
+              body: form,
+              headers: { Accept: "application/json" },
+            }),
+            timeoutMs,
+          );
+          return res;
+        } catch {
+          return null;
+        }
+      };
 
+      let res: Response | null = null;
+      if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
+      if (!res || !res.ok) {
+        const proxies = [
+          "/api/generate-questions",
+          "/api/proxy",
+          "/proxy",
+          "/.netlify/functions/proxy",
+        ];
+        for (const p of proxies) {
+          const attempt = await sendTo(p, retryTimeoutMs);
+          if (attempt && attempt.ok) {
+            res = attempt;
+            break;
+          }
+        }
+      }
+      if (!res) throw new Error("Network error. Please try again.");
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         throw new Error(t || `HTTP ${res.status}`);
       }
-
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
-        const json = await res.json();
+        const json = await res.json().catch(async () => await res.text());
         const text =
           typeof json === "string"
             ? json
@@ -293,7 +351,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
     } catch (err: any) {
       const msg =
         err?.message === "timeout"
-          ? "Request timed out."
+          ? "Request timed out. Please try again."
           : err?.message || "Request failed";
       toast({ title: "Request failed", description: msg });
       setResult(null);
@@ -328,7 +386,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
               <div className="flex flex-col gap-4">
-                <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
+                <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
@@ -501,22 +559,32 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                   <div className="mt-4 flex gap-3">
                     <Button
-                      disabled={!file || !mcqCount || loading}
+                      disabled={!file || !mcqCount || loading || isMerging}
                       onClick={runSubmit}
                       className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                     >
-                      {loading ? "Generating..." : "Generate MCQs"}
+                      {loading ? (
+                        <>
+                          <span className="opacity-0">Generating...</span>
+                          <div className="loader">
+                            <div className="jimu-primary-loading"></div>
+                          </div>
+                        </>
+                      ) : (
+                        "Generate"
+                      )}
                     </Button>
 
                     <Button
-                      className="bg-primary/10 border-primary/60 text-blue-600"
+                      className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+                      disabled={!result}
                       onClick={() => {
                         setSelectedClass("");
                         setSelectedSubject("");
                         setSelectedChapterPath("");
                         setSelectedChapterPaths([]);
                         setFile(null);
-                        setMcqCount(20);
+                        setMcqCount(null);
                         setResult(null);
                       }}
                     >
@@ -539,41 +607,11 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              const { jsPDF } = await import("jspdf");
-                              const doc = new jsPDF({
-                                unit: "pt",
-                                format: "a4",
+                              await generateExamStylePdf({
+                                title: "MCQs",
+                                body: result,
+                                filenameBase: "mcqs",
                               });
-                              const margin = 64;
-                              const pageW = doc.internal.pageSize.getWidth();
-                              let y = margin;
-                              doc.setFont("times", "bold");
-                              doc.setFontSize(22);
-                              const heading = "MCQs";
-                              doc.text(heading, pageW / 2, y, {
-                                align: "center",
-                              });
-                              y += 30;
-                              doc.setFont("times", "normal");
-                              doc.setFontSize(12);
-                              const paragraphs = (result || "").split(/\n\n+/);
-                              for (const para of paragraphs) {
-                                const lines = doc.splitTextToSize(
-                                  para.replace(/\n/g, " "),
-                                  pageW - margin * 2,
-                                );
-                                doc.text(lines, margin, y);
-                                y += lines.length * 16 + 10;
-                                if (
-                                  y >
-                                  doc.internal.pageSize.getHeight() - margin
-                                ) {
-                                  doc.addPage();
-                                  y = margin;
-                                }
-                              }
-                              const filename = `mcqs_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
-                              doc.save(filename);
                             } catch (err) {
                               console.error(err);
                               toast({
@@ -583,16 +621,19 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             }
                           }}
                         >
-                          Download
+                          <Download className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
 
                     <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
                       <div className="paper-view">
-                        <div className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words">
-                          <pre className="whitespace-pre-wrap">{result}</pre>
-                        </div>
+                        <div
+                          className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
+                          dangerouslySetInnerHTML={{
+                            __html: formatResultHtml(result || ""),
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
