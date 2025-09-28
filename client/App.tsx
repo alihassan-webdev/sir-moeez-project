@@ -81,15 +81,6 @@ function AnimatedRoutes() {
     );
   }
 
-  if (isLogin) {
-    return (
-      <Routes location={location}>
-        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
-      </Routes>
-    );
-  }
-
   return (
     <AppLayout>
       <Routes location={location}>
