@@ -60,6 +60,12 @@ export default function SidebarPanelInner() {
           label="Generate Exam"
           active={pathname === "/app"}
         />
+        <NavItem
+          to="/subscription"
+          icon={LayoutGrid}
+          label="Manage Subscription"
+          active={pathname === "/subscription"}
+        />
       </nav>
     </>
   );
