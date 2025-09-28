@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MobileSheet from "@/components/layout/MobileSheet";
+import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 
