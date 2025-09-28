@@ -92,6 +92,7 @@ export default function MCQs() {
     setSubjects(subs);
     setSelectedSubject("");
     setSelectedChapterPath("");
+    setSelectedChapterPaths([]);
     setFile(null);
   }, [selectedClass]);
 
