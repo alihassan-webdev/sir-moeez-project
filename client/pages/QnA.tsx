@@ -12,6 +12,15 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
+import { ListChecks, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -19,7 +28,7 @@ const API_URL = (() => {
   const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
     | string
     | undefined;
-  return env && env.trim() ? env : "/.netlify/functions/proxy";
+  return env && env.trim() ? env : "/api/generate-questions";
 })();
 
 export default function QnA() {
@@ -48,10 +57,26 @@ export default function QnA() {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [chapterOptions, setChapterOptions] = useState<Entry[]>([]);
   const [selectedChapterPath, setSelectedChapterPath] = useState<string>("");
+  const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>(
+    [],
+  );
+  const [isMerging, setIsMerging] = useState(false);
+  const pdfBytesCache = React.useRef<Map<string, ArrayBuffer>>(new Map());
   const [file, setFile] = useState<File | null>(null);
   const [qaCount, setQaCount] = useState<number | null>(10);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+
+  // Progressive unlocking flags
+  const canSelectSubject = !!selectedClass;
+  const canSelectChapter = !!selectedSubject;
+  const canEnterCount = selectedChapterPaths.length > 0;
+
+  const allChapterPaths = chapterOptions.map((c) => c.path);
+  const isAllSelected =
+    selectedChapterPaths.length > 0 &&
+    selectedChapterPaths.length === allChapterPaths.length;
+  const selectedCount = selectedChapterPaths.length;
 
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
@@ -67,12 +92,15 @@ export default function QnA() {
     setSubjects(subs);
     setSelectedSubject("");
     setSelectedChapterPath("");
+    setSelectedChapterPaths([]);
     setFile(null);
   }, [selectedClass]);
 
   useEffect(() => {
     if (!selectedSubject) {
       setChapterOptions(selectedClass ? byClass[selectedClass] || [] : []);
+      setSelectedChapterPaths([]);
+      setFile(null);
       return;
     }
     const arr = (byClass[selectedClass] || []).filter((e) => {
@@ -81,21 +109,104 @@ export default function QnA() {
     });
     setChapterOptions(arr);
     setSelectedChapterPath("");
+    setSelectedChapterPaths([]);
     setFile(null);
   }, [selectedSubject, selectedClass]);
 
   const handleSelectChapter = async (path: string) => {
-    setSelectedChapterPath(path);
-    const found = entries.find((e) => e.path === path);
-    if (!found) return;
-    try {
-      const res = await fetch(found.url);
-      const blob = await res.blob();
-      const f = new File([blob], found.name, { type: "application/pdf" });
-      setFile(f);
-    } catch (err) {
-      toast({ title: "Load failed", description: "Could not load PDF." });
-    }
+    // no-op (multi-select in use)
+  };
+
+  const mergeSelected = React.useCallback(
+    async (paths: string[]) => {
+      setIsMerging(true);
+      try {
+        if (!paths.length) {
+          setFile(null);
+          return;
+        }
+        const { PDFDocument } = await import("pdf-lib");
+        const mergedPdf = await PDFDocument.create();
+        const ordered = chapterOptions
+          .filter((c) => paths.includes(c.path))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((c) => c.path);
+
+        await Promise.all(
+          ordered.map(async (p) => {
+            if (pdfBytesCache.current.has(p)) return;
+            const found = entries.find((e) => e.path === p);
+            if (!found) return;
+            const res = await fetch(found.url);
+            const bytes = await res.arrayBuffer();
+            pdfBytesCache.current.set(p, bytes);
+          }),
+        );
+
+        let pageCount = 0;
+        for (const p of ordered) {
+          const bytes = pdfBytesCache.current.get(p);
+          if (!bytes) continue;
+          const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+          const copied = await mergedPdf.copyPages(src, src.getPageIndices());
+          copied.forEach((pg) => mergedPdf.addPage(pg));
+          pageCount += copied.length;
+        }
+        if (pageCount === 0) throw new Error("No pages to merge");
+
+        const mergedBytes = await mergedPdf.save();
+        const fname = `${(selectedSubject || "subject").replace(/[^\w\s-]/g, "").replace(/\s+/g, "_")}_${pageCount}_pages_${new Date().toISOString().slice(0, 10)}.pdf`;
+        const mergedFile = new File([mergedBytes], fname, {
+          type: "application/pdf",
+          lastModified: Date.now(),
+        });
+        if (mergedFile.size > 15 * 1024 * 1024) {
+          toast({
+            title: "PDF too large",
+            description: "Merged chapters exceed 15MB. Select fewer chapters.",
+            variant: "destructive",
+          });
+          setFile(null);
+          return;
+        }
+        setFile(mergedFile);
+      } catch (err) {
+        toast({ title: "Merge failed", description: "Could not merge PDFs." });
+        setFile(null);
+      } finally {
+        setIsMerging(false);
+      }
+    },
+    [chapterOptions, entries, selectedSubject],
+  );
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await Promise.all(
+          chapterOptions.map(async (c) => {
+            if (pdfBytesCache.current.has(c.path)) return;
+            const res = await fetch(c.url);
+            const bytes = await res.arrayBuffer();
+            pdfBytesCache.current.set(c.path, bytes);
+          }),
+        );
+      } catch {}
+    })();
+  }, [chapterOptions]);
+
+  const handleToggleAll = async (checked: boolean) => {
+    const next = checked ? allChapterPaths : [];
+    setSelectedChapterPaths(next);
+    await mergeSelected(next);
+  };
+  const handleToggleChapter = async (path: string, checked: boolean) => {
+    const set = new Set(selectedChapterPaths);
+    if (checked) set.add(path);
+    else set.delete(path);
+    const next = Array.from(set);
+    setSelectedChapterPaths(next);
+    await mergeSelected(next);
   };
 
   const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T> => {
@@ -232,7 +343,9 @@ export default function QnA() {
                       </Select>
                     </div>
 
-                    <div>
+                    <div
+                      className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                    >
                       <label className="text-sm font-medium text-muted-foreground">
                         Subject
                       </label>
@@ -242,11 +355,11 @@ export default function QnA() {
                       >
                         <SelectTrigger
                           className="w-full"
-                          disabled={!selectedClass}
+                          disabled={!canSelectSubject}
                         >
                           <SelectValue
                             placeholder={
-                              selectedClass
+                              canSelectSubject
                                 ? "Select subject"
                                 : "Select class first"
                             }
@@ -262,40 +375,74 @@ export default function QnA() {
                       </Select>
                     </div>
 
-                    <div>
+                    <div
+                      className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                    >
                       <label className="text-sm font-medium text-muted-foreground">
-                        Chapter (PDF)
+                        Chapters
                       </label>
-                      <Select
-                        value={selectedChapterPath}
-                        onValueChange={(v) => {
-                          setSelectedChapterPath(v);
-                          handleSelectChapter(v);
-                        }}
-                      >
-                        <SelectTrigger
-                          className="w-full"
-                          disabled={!selectedSubject && !selectedClass}
-                        >
-                          <SelectValue
-                            placeholder={
-                              selectedClass
-                                ? "Select chapter"
-                                : "Select class first"
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {chapterOptions.map((c) => (
-                            <SelectItem key={c.path} value={c.path}>
-                              {c.name.replace(/\.pdf$/i, "")}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-between rounded-md border border-primary/60 px-3 py-2 text-base hover:border-primary hover:bg-primary/10 hover:text-black focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                            disabled={!canSelectChapter || isMerging}
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <ListChecks className="h-4 w-4 opacity-80" />
+                              {isMerging
+                                ? "Merging..."
+                                : selectedCount === 0
+                                  ? canSelectChapter
+                                    ? "Select chapters"
+                                    : "Select subject first"
+                                  : isAllSelected
+                                    ? `All chapters selected (${selectedCount})`
+                                    : `${selectedCount} chapter${selectedCount > 1 ? "s" : ""} selected`}
+                            </span>
+                            <ChevronDown className="h-4 w-4 opacity-80" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
+                          <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
+                            <span>Chapters</span>
+                            <span className="text-xs">
+                              {selectedCount}/{allChapterPaths.length} selected
+                            </span>
+                          </DropdownMenuLabel>
+                          <DropdownMenuCheckboxItem
+                            checked={isAllSelected}
+                            onCheckedChange={(c) => handleToggleAll(Boolean(c))}
+                            className="font-semibold hover:bg-primary/10 hover:text-black focus:bg-primary/20 focus:text-black"
+                          >
+                            All chapters
+                          </DropdownMenuCheckboxItem>
+                          <DropdownMenuSeparator />
+                          <div className="max-h-60 overflow-y-auto scrollbar-yellow pr-1">
+                            <div className="py-1">
+                              {chapterOptions.map((c) => (
+                                <DropdownMenuCheckboxItem
+                                  key={c.path}
+                                  checked={selectedChapterPaths.includes(
+                                    c.path,
+                                  )}
+                                  onCheckedChange={(check) =>
+                                    handleToggleChapter(c.path, Boolean(check))
+                                  }
+                                  className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
+                                >
+                                  {c.name.replace(/\.pdf$/i, "")}
+                                </DropdownMenuCheckboxItem>
+                              ))}
+                            </div>
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
-                    <div>
+                    <div
+                      className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                    >
                       <label className="text-sm font-medium text-muted-foreground">
                         Number of Q&A pairs
                       </label>
@@ -312,12 +459,14 @@ export default function QnA() {
                                 : Number(e.currentTarget.value),
                             )
                           }
+                          disabled={!canEnterCount}
                           className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                           placeholder="Enter count"
                         />
                         <button
                           type="button"
                           onClick={() => setQaCount(5)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${qaCount === 5 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           5
@@ -325,6 +474,7 @@ export default function QnA() {
                         <button
                           type="button"
                           onClick={() => setQaCount(10)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${qaCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           10
@@ -332,6 +482,7 @@ export default function QnA() {
                         <button
                           type="button"
                           onClick={() => setQaCount(20)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${qaCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           20
@@ -351,11 +502,11 @@ export default function QnA() {
 
                     <Button
                       className="bg-primary/10 border-primary/60 text-blue-600"
-                      disabled={!file}
                       onClick={() => {
                         setSelectedClass("");
                         setSelectedSubject("");
                         setSelectedChapterPath("");
+                        setSelectedChapterPaths([]);
                         setFile(null);
                         setQaCount(10);
                         setResult(null);
