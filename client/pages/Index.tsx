@@ -96,7 +96,6 @@ function ExternalPdfSelector({
   const [selectedSubjectPath, setSelectedSubjectPath] = useState<string>("");
   const [totalMarks, setTotalMarks] = useState<number | null>(null);
   const [promptText, setPromptText] = useState("");
-  const [instituteName, setInstituteName] = useState("");
 
   const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>(
     [],
