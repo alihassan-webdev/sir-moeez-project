@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { login } from "@/lib/auth";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,18 +20,18 @@ export default function Login() {
     const em = email.trim();
     const pw = password;
     if (!em || !pw) {
-      toast({
-        title: "Missing fields",
-        description: "Enter email and password.",
-      });
+      toast({ title: "Missing fields", description: "Enter email and password." });
       return;
     }
 
     setLoading(true);
     try {
-      login(em);
-      toast({ title: "Welcome", description: "Logged in (demo)." });
+      await signInWithEmailAndPassword(auth, em, pw);
+      toast({ title: "Welcome", description: "Logged in successfully." });
       navigate("/get-started", { replace: true });
+    } catch (err: any) {
+      const msg = err?.code ? String(err.code).replace("auth/", "").replace(/-/g, " ") : "Login failed";
+      toast({ title: "Login error", description: msg });
     } finally {
       setLoading(false);
     }
@@ -41,9 +42,7 @@ export default function Login() {
       <div className="w-full max-w-lg rounded-xl border bg-card p-8 sm:p-10 card-surface">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-secondary">Log in</h1>
-          <p className="text-sm text-muted-foreground">
-            Demo login: enter any email and password
-          </p>
+          <p className="text-sm text-muted-foreground">Sign in with email and password</p>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid gap-2">
@@ -51,7 +50,7 @@ export default function Login() {
             <Input
               id="email"
               type="email"
-              placeholder="demo@demo.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
@@ -63,22 +62,20 @@ export default function Login() {
             <Input
               id="password"
               type="password"
-              placeholder="demo123"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               className="input-black bg-black text-white placeholder:text-white/60 focus:bg-black focus-visible:bg-black focus-visible:ring-secondary focus-visible:border-secondary focus:border-secondary"
             />
           </div>
-          <Button
-            type="submit"
-            className="w-full"
-            variant="secondary"
-            disabled={loading}
-          >
+          <Button type="submit" className="w-full" variant="secondary" disabled={loading}>
             {loading ? "Logging in..." : "Log in"}
           </Button>
         </form>
+        <div className="text-xs text-muted-foreground mt-4 text-center">
+          No signup here. Create users in Firebase Authentication and log in.
+        </div>
       </div>
     </div>
   );
