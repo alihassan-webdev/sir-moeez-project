@@ -43,6 +43,12 @@ export default function SidebarPanelInner() {
           active={pathname === "/get-started"}
         />
         <NavItem
+          to="/mcqs"
+          icon={ListChecks}
+          label="Generate MCQs"
+          active={pathname === "/mcqs"}
+        />
+        <NavItem
           to="/app"
           icon={FileText}
           label="Generate Exam"
