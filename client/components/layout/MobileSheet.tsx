@@ -40,6 +40,9 @@ export default function MobileSheet() {
             </Link>
           </SheetClose>
 
+          <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+            Quick create
+          </div>
           <SheetClose asChild>
             <Link
               to="/mcqs"
@@ -70,6 +73,9 @@ export default function MobileSheet() {
             </Link>
           </SheetClose>
 
+          <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+            My account
+          </div>
           <SheetClose asChild>
             <Link
               to="/subscription"
