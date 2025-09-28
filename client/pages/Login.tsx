@@ -50,8 +50,8 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-primary/10 to-transparent flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Log in</h1>
-          <p className="text-sm text-muted-foreground">Continue with your email and password</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold">Log in</h1>
+          <p className="text-base sm:text-lg text-muted-foreground">Continue with your email and password</p>
         </div>
         <div className="rounded-xl bg-white p-6 sm:p-8 card-yellow-shadow">
           <form onSubmit={onSubmit} className="space-y-4">
