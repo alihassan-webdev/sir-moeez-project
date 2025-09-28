@@ -13,6 +13,7 @@ import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
+import { generateExamStylePdf } from "@/lib/pdf";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -573,47 +574,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              const { jsPDF } = await import("jspdf");
-                              const doc = new jsPDF({
-                                unit: "pt",
-                                format: "a4",
-                              });
-                              const margin = 64;
-                              const pageW = doc.internal.pageSize.getWidth();
-                              let y = margin;
-                              doc.setFont("times", "bold");
-                              doc.setFontSize(22);
-                              const heading = "MCQs";
-                              doc.text(heading, pageW / 2, y, {
-                                align: "center",
-                              });
-                              y += 30;
-                              doc.setFont("times", "normal");
-                              doc.setFontSize(12);
-                              const paragraphs = (result || "").split(/\n\n+/);
-                              for (const para of paragraphs) {
-                                const lines = doc.splitTextToSize(
-                                  para.replace(/\n/g, " "),
-                                  pageW - margin * 2,
-                                );
-                                doc.text(lines, margin, y);
-                                y += lines.length * 16 + 10;
-                                if (
-                                  y >
-                                  doc.internal.pageSize.getHeight() - margin
-                                ) {
-                                  doc.addPage();
-                                  y = margin;
-                                }
-                              }
-                              const filename = `mcqs_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
-                              doc.save(filename);
+                              await generateExamStylePdf({ title: "MCQs", body: result, filenameBase: "mcqs" });
                             } catch (err) {
                               console.error(err);
-                              toast({
-                                title: "Download failed",
-                                description: "Could not generate PDF.",
-                              });
+                              toast({ title: "Download failed", description: "Could not generate PDF." });
                             }
                           }}
                         >
