@@ -278,10 +278,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       setFile(null);
                       setMcqCount(20);
                       setResult(null);
-                      const el = fileInputRef.current; if (el) el.value = "";
                     }}>Reset</Button>
-
-                    <input ref={fileInputRef} type="file" accept="application/pdf" onChange={(e) => { const f = e.target.files?.[0]; if (f) { setFile(f); } }} className="ml-auto" />
                   </div>
 
                 </div>
