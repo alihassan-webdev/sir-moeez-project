@@ -53,6 +53,11 @@ export default function QnA() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
+  // Progressive unlocking flags
+  const canSelectSubject = !!selectedClass;
+  const canSelectChapter = !!selectedSubject;
+  const canEnterCount = !!selectedChapterPath;
+
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
     setChapterOptions(arr);
@@ -232,7 +237,7 @@ export default function QnA() {
                       </Select>
                     </div>
 
-                    <div>
+                    <div className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
                         Subject
                       </label>
@@ -242,11 +247,11 @@ export default function QnA() {
                       >
                         <SelectTrigger
                           className="w-full"
-                          disabled={!selectedClass}
+                          disabled={!canSelectSubject}
                         >
                           <SelectValue
                             placeholder={
-                              selectedClass
+                              canSelectSubject
                                 ? "Select subject"
                                 : "Select class first"
                             }
@@ -262,7 +267,7 @@ export default function QnA() {
                       </Select>
                     </div>
 
-                    <div>
+                    <div className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
                         Chapter (PDF)
                       </label>
@@ -275,13 +280,13 @@ export default function QnA() {
                       >
                         <SelectTrigger
                           className="w-full"
-                          disabled={!selectedSubject && !selectedClass}
+                          disabled={!canSelectChapter}
                         >
                           <SelectValue
                             placeholder={
-                              selectedClass
+                              canSelectChapter
                                 ? "Select chapter"
-                                : "Select class first"
+                                : "Select subject first"
                             }
                           />
                         </SelectTrigger>
@@ -295,7 +300,7 @@ export default function QnA() {
                       </Select>
                     </div>
 
-                    <div>
+                    <div className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
                         Number of Q&A pairs
                       </label>
@@ -312,12 +317,14 @@ export default function QnA() {
                                 : Number(e.currentTarget.value),
                             )
                           }
+                          disabled={!canEnterCount}
                           className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                           placeholder="Enter count"
                         />
                         <button
                           type="button"
                           onClick={() => setQaCount(5)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${qaCount === 5 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           5
@@ -325,6 +332,7 @@ export default function QnA() {
                         <button
                           type="button"
                           onClick={() => setQaCount(10)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${qaCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           10
@@ -332,6 +340,7 @@ export default function QnA() {
                         <button
                           type="button"
                           onClick={() => setQaCount(20)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${qaCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           20
@@ -351,7 +360,6 @@ export default function QnA() {
 
                     <Button
                       className="bg-primary/10 border-primary/60 text-blue-600"
-                      disabled={!file}
                       onClick={() => {
                         setSelectedClass("");
                         setSelectedSubject("");
