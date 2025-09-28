@@ -381,35 +381,59 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                     <div className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Chapter (PDF)
+                        Chapters
                       </label>
-                      <Select
-                        value={selectedChapterPath}
-                        onValueChange={(v) => {
-                          setSelectedChapterPath(v);
-                          handleSelectChapter(v);
-                        }}
-                      >
-                        <SelectTrigger
-                          className="w-full"
-                          disabled={!canSelectChapter}
-                        >
-                          <SelectValue
-                            placeholder={
-                              canSelectChapter
-                                ? "Select chapter"
-                                : "Select subject first"
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {chapterOptions.map((c) => (
-                            <SelectItem key={c.path} value={c.path}>
-                              {c.name.replace(/\.pdf$/i, "")}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-between rounded-md border border-primary/60 px-3 py-2 text-base hover:border-primary hover:bg-primary/10 hover:text-black focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                            disabled={!canSelectChapter || isMerging}
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <ListChecks className="h-4 w-4 opacity-80" />
+                              {isMerging
+                                ? "Merging..."
+                                : selectedCount === 0
+                                  ? canSelectChapter
+                                    ? "Select chapters"
+                                    : "Select subject first"
+                                  : isAllSelected
+                                    ? `All chapters selected (${selectedCount})`
+                                    : `${selectedCount} chapter${selectedCount > 1 ? "s" : ""} selected`}
+                            </span>
+                            <ChevronDown className="h-4 w-4 opacity-80" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
+                          <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
+                            <span>Chapters</span>
+                            <span className="text-xs">{selectedCount}/{allChapterPaths.length} selected</span>
+                          </DropdownMenuLabel>
+                          <DropdownMenuCheckboxItem
+                            checked={isAllSelected}
+                            onCheckedChange={(c) => handleToggleAll(Boolean(c))}
+                            className="font-semibold hover:bg-primary/10 hover:text-black focus:bg-primary/20 focus:text-black"
+                          >
+                            All chapters
+                          </DropdownMenuCheckboxItem>
+                          <DropdownMenuSeparator />
+                          <div className="max-h-60 overflow-y-auto scrollbar-yellow pr-1">
+                            <div className="py-1">
+                              {chapterOptions.map((c) => (
+                                <DropdownMenuCheckboxItem
+                                  key={c.path}
+                                  checked={selectedChapterPaths.includes(c.path)}
+                                  onCheckedChange={(check) => handleToggleChapter(c.path, Boolean(check))}
+                                  className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
+                                >
+                                  {c.name.replace(/\.pdf$/i, "")}
+                                </DropdownMenuCheckboxItem>
+                              ))}
+                            </div>
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     <div className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
