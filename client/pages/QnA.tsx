@@ -263,7 +263,9 @@ export default function QnA() {
 
                     <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
                       <div className="paper-view">
-                        <pre className="rounded-md bg-background p-4 text-sm whitespace-pre-wrap break-words">{result}</pre>
+                        <div className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words">
+                          <pre className="whitespace-pre-wrap">{result}</pre>
+                        </div>
                       </div>
                     </div>
                   </div>
