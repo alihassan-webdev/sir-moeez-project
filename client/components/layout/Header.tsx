@@ -54,7 +54,7 @@ export default function Header() {
             FAQ
           </a>
           <Button asChild>
-            <Link to="/get-started">Login</Link>
+            <Link to="/login">Login</Link>
           </Button>
         </nav>
 
