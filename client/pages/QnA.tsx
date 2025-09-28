@@ -13,6 +13,7 @@ import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
+import { generateExamStylePdf } from "@/lib/pdf";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -566,33 +567,7 @@ export default function QnA() {
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              const { jsPDF } = await import("jspdf");
-                              const doc = new jsPDF({ unit: "pt", format: "a4" });
-                              const margin = 64;
-                              const pageW = doc.internal.pageSize.getWidth();
-                              const pageH = doc.internal.pageSize.getHeight();
-                              let y = margin;
-                              doc.setFont("times", "bold");
-                              doc.setFontSize(22);
-                              doc.text("Questions", pageW / 2, y, { align: "center" });
-                              y += 30;
-                              doc.setFont("times", "normal");
-                              doc.setFontSize(12);
-                              const paragraphs = (result || "").split(/\n\n+/);
-                              for (const para of paragraphs) {
-                                const lines = doc.splitTextToSize(para.replace(/\n/g, " "), pageW - margin * 2);
-                                for (const line of lines) {
-                                  if (y > pageH - margin) {
-                                    doc.addPage();
-                                    y = margin;
-                                  }
-                                  doc.text(line, margin, y);
-                                  y += 16;
-                                }
-                                y += 10;
-                              }
-                              const filename = `questions_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
-                              doc.save(filename);
+                              await generateExamStylePdf({ title: "Questions", body: result, filenameBase: "questions" });
                             } catch (err) {
                               console.error(err);
                               toast({ title: "Download failed", description: "Could not generate PDF." });
