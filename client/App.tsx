@@ -17,6 +17,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
 import MCQs from "./pages/MCQs";
+import QnA from "./pages/QnA";
 
 const queryClient = new QueryClient();
 
