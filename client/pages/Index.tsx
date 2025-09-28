@@ -58,14 +58,12 @@ function ExternalPdfSelector({
   onGenerate,
   onReset,
   loading,
-  onSetInstitute,
 }: {
   onLoadFile: (f: File | null) => void;
   onSetPrompt: (p: string) => void;
   onGenerate: (prompt?: string) => Promise<void> | void;
   onReset: () => void;
   loading?: boolean;
-  onSetInstitute: (name: string) => void;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
