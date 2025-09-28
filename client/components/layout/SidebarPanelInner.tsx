@@ -49,6 +49,12 @@ export default function SidebarPanelInner() {
           active={pathname === "/mcqs"}
         />
         <NavItem
+          to="/qna"
+          icon={MessageSquare}
+          label="Generate Q&A"
+          active={pathname === "/qna"}
+        />
+        <NavItem
           to="/app"
           icon={FileText}
           label="Generate Exam"
