@@ -509,7 +509,8 @@ Use concise, exam-style wording suitable for classroom tests.`;
                     </Button>
 
                     <Button
-                      className="bg-primary/10 border-primary/60 text-blue-600"
+                      className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+                      disabled={!result}
                       onClick={() => {
                         setSelectedClass("");
                         setSelectedSubject("");
