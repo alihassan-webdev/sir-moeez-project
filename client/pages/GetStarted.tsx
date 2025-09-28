@@ -151,32 +151,6 @@ export default function GetStarted() {
               </div>
             </div>
 
-            {/* Browse by class */}
-            <div className="mt-8">
-              <h2 className="text-xl sm:text-2xl font-bold">Browse by class</h2>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {classes.map((cls) => {
-                  const total = (byClass[cls] || []).length;
-                  const subjSet = new Set<string>();
-                  for (const e of byClass[cls] || []) {
-                    const m = e.path.replace(/^\/?datafiles\//, "");
-                    subjSet.add((m.split("/")[1] || "General").trim());
-                  }
-                  return (
-                    <Link
-                      to="/app"
-                      key={cls}
-                      className="rounded-xl bg-white border border-input p-5 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 transition"
-                    >
-                      <div className="text-base font-semibold">{cls}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {subjSet.size} subjects • {total} chapters
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </div>
       </Container>
