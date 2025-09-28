@@ -74,7 +74,7 @@ export default function MCQs() {
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
-  const canEnterCount = selectedChapterPaths.length > 0;
+  const canEnterCount = !!file && !isMerging;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -525,7 +525,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                   <div className="mt-4 flex gap-3">
                     <Button
-                      disabled={!file || !mcqCount || loading}
+                      disabled={!file || !mcqCount || loading || isMerging}
                       onClick={runSubmit}
                       className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                     >
