@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
-import { ListChecks, ChevronDown } from "lucide-react";
+import { ListChecks, ChevronDown, Download } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatResultHtml } from "@/lib/format";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -584,16 +585,17 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             }
                           }}
                         >
-                          Download
+                          <Download className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
 
                     <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
                       <div className="paper-view">
-                        <div className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words">
-                          <pre className="whitespace-pre-wrap">{result}</pre>
-                        </div>
+                        <div
+                          className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
+                          dangerouslySetInnerHTML={{ __html: formatResultHtml(result || "") }}
+                        />
                       </div>
                     </div>
                   </div>
