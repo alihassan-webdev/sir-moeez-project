@@ -19,6 +19,10 @@ import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
 import MCQs from "./pages/MCQs";
 import QnA from "./pages/QnA";
+import Subscription from "./pages/Subscription";
+import Profile from "./pages/Profile";
+import RegisterInstitute from "./pages/RegisterInstitute";
+import Support from "./pages/Support";
 import Login from "./pages/Login";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
@@ -128,6 +132,46 @@ function AnimatedRoutes() {
             <RequireAuth>
               <PageWrapper>
                 <QnA />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/subscription"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Subscription />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Profile />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/institute"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <RegisterInstitute />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Support />
               </PageWrapper>
             </RequireAuth>
           }

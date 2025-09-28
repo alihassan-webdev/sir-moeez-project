@@ -1,6 +1,14 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutGrid, FileText, ListChecks, MessageSquare } from "lucide-react";
+import {
+  LayoutGrid,
+  FileText,
+  ListChecks,
+  MessageSquare,
+  User,
+  Building2,
+  LifeBuoy,
+} from "lucide-react";
 
 function NavItem({
   to,
@@ -42,6 +50,10 @@ export default function SidebarPanelInner() {
           label="Dashboard"
           active={pathname === "/get-started"}
         />
+
+        <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+          Quick create
+        </div>
         <NavItem
           to="/mcqs"
           icon={ListChecks}
@@ -59,6 +71,34 @@ export default function SidebarPanelInner() {
           icon={FileText}
           label="Generate Exam"
           active={pathname === "/app"}
+        />
+
+        <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+          My account
+        </div>
+        <NavItem
+          to="/subscription"
+          icon={LayoutGrid}
+          label="Manage Subscription"
+          active={pathname === "/subscription"}
+        />
+        <NavItem
+          to="/profile"
+          icon={User}
+          label="My Profile"
+          active={pathname === "/profile"}
+        />
+        <NavItem
+          to="/institute"
+          icon={Building2}
+          label="Register Institute"
+          active={pathname === "/institute"}
+        />
+        <NavItem
+          to="/support"
+          icon={LifeBuoy}
+          label="Support"
+          active={pathname === "/support"}
         />
       </nav>
     </>

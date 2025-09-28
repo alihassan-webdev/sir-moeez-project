@@ -15,7 +15,16 @@ export function AppLayout({ children }: PropsWithChildren) {
   const [routeLoading, setRouteLoading] = useState(false);
   const navigate = useNavigate();
   const isGetStarted = path === "/get-started";
-  const isToolRoute = ["/get-started", "/app", "/mcqs"].includes(path);
+  const isToolRoute = [
+    "/get-started",
+    "/app",
+    "/mcqs",
+    "/qna",
+    "/subscription",
+    "/profile",
+    "/institute",
+    "/support",
+  ].includes(path);
 
   useSwipeNavigation(() => {
     if (window.history.length > 1) navigate(-1);
