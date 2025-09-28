@@ -63,6 +63,7 @@ export default function QnA() {
   );
   const [isMerging, setIsMerging] = useState(false);
   const pdfBytesCache = React.useRef<Map<string, ArrayBuffer>>(new Map());
+  const mergeToken = React.useRef(0);
   const [file, setFile] = useState<File | null>(null);
   const [qaCount, setQaCount] = useState<number | null>(10);
   const [loading, setLoading] = useState(false);
@@ -120,10 +121,11 @@ export default function QnA() {
 
   const mergeSelected = React.useCallback(
     async (paths: string[]) => {
+      const token = ++mergeToken.current;
       setIsMerging(true);
       try {
         if (!paths.length) {
-          setFile(null);
+          if (mergeToken.current === token) setFile(null);
           return;
         }
         const { PDFDocument } = await import("pdf-lib");
@@ -133,22 +135,38 @@ export default function QnA() {
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((c) => c.path);
 
-        await Promise.all(
+        const fetchResults = await Promise.allSettled(
           ordered.map(async (p) => {
-            if (pdfBytesCache.current.has(p)) return;
+            if (pdfBytesCache.current.has(p)) return { path: p } as const;
             const found = entries.find((e) => e.path === p);
-            if (!found) return;
-            const res = await fetch(found.url);
-            const bytes = await res.arrayBuffer();
-            pdfBytesCache.current.set(p, bytes);
+            if (!found) return { path: p, error: "not found" } as const;
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 30000);
+            try {
+              const res = await fetch(found.url, { signal: controller.signal });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const bytes = await res.arrayBuffer();
+              if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+              const header = new Uint8Array(bytes, 0, 4);
+              const headerStr = Array.from(header).map((b) => String.fromCharCode(b)).join("");
+              if (headerStr !== "%PDF") throw new Error("Invalid PDF");
+              pdfBytesCache.current.set(p, bytes);
+              return { path: p } as const;
+            } finally {
+              clearTimeout(timeout);
+            }
           }),
         );
+        const failed = fetchResults.filter((r) => r.status === "rejected");
+        if (failed.length) {
+          console.warn("Some PDFs failed to prefetch:", failed.length);
+        }
 
         let pageCount = 0;
         for (const p of ordered) {
           const bytes = pdfBytesCache.current.get(p);
           if (!bytes) continue;
-          const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+          const src = await PDFDocument.load(bytes, { ignoreEncryption: true, throwOnInvalidObject: true });
           const copied = await mergedPdf.copyPages(src, src.getPageIndices());
           copied.forEach((pg) => mergedPdf.addPage(pg));
           pageCount += copied.length;
@@ -162,20 +180,16 @@ export default function QnA() {
           lastModified: Date.now(),
         });
         if (mergedFile.size > 15 * 1024 * 1024) {
-          toast({
-            title: "PDF too large",
-            description: "Merged chapters exceed 15MB. Select fewer chapters.",
-            variant: "destructive",
-          });
-          setFile(null);
+          toast({ title: "PDF too large", description: "Merged chapters exceed 15MB. Select fewer chapters.", variant: "destructive" });
+          if (mergeToken.current === token) setFile(null);
           return;
         }
-        setFile(mergedFile);
+        if (mergeToken.current === token) setFile(mergedFile);
       } catch (err) {
         toast({ title: "Merge failed", description: "Could not merge PDFs." });
-        setFile(null);
+        if (mergeToken.current === token) setFile(null);
       } finally {
-        setIsMerging(false);
+        if (mergeToken.current === token) setIsMerging(false);
       }
     },
     [chapterOptions, entries, selectedSubject],
@@ -184,12 +198,20 @@ export default function QnA() {
   useEffect(() => {
     (async () => {
       try {
-        await Promise.all(
+        await Promise.allSettled(
           chapterOptions.map(async (c) => {
             if (pdfBytesCache.current.has(c.path)) return;
-            const res = await fetch(c.url);
-            const bytes = await res.arrayBuffer();
-            pdfBytesCache.current.set(c.path, bytes);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
+            try {
+              const res = await fetch(c.url, { signal: controller.signal });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const bytes = await res.arrayBuffer();
+              if (bytes.byteLength === 0) throw new Error("Empty PDF file");
+              pdfBytesCache.current.set(c.path, bytes);
+            } finally {
+              clearTimeout(timeout);
+            }
           }),
         );
       } catch {}
@@ -232,18 +254,12 @@ export default function QnA() {
     setLoading(true);
     try {
       if (!file) {
-        toast({
-          title: "Attach a PDF",
-          description: "Please select a chapter.",
-        });
+        toast({ title: "Attach a PDF", description: "Please select a chapter." });
         setLoading(false);
         return;
       }
       if (!qaCount || qaCount < 1 || qaCount > 200) {
-        toast({
-          title: "Invalid count",
-          description: "Enter 1–200 Q&A pairs.",
-        });
+        toast({ title: "Invalid count", description: "Enter 1–200 Q&A pairs." });
         setLoading(false);
         return;
       }
@@ -254,40 +270,45 @@ export default function QnA() {
       form.append("query", q);
       form.append("file", file);
 
-      const res = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        25000,
-      );
+      const initialTimeoutMs = 45000;
+      const retryTimeoutMs = 65000;
+      const sendTo = async (urlStr: string, timeoutMs: number) => {
+        try {
+          const res = await withTimeout(
+            fetch(urlStr, { method: "POST", body: form, headers: { Accept: "application/json" } }),
+            timeoutMs,
+          );
+          return res;
+        } catch {
+          return null;
+        }
+      };
 
+      let res: Response | null = null;
+      if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
+      if (!res || !res.ok) {
+        const proxies = ["/api/generate-questions", "/api/proxy", "/proxy", "/.netlify/functions/proxy"];
+        for (const p of proxies) {
+          const attempt = await sendTo(p, retryTimeoutMs);
+          if (attempt && attempt.ok) { res = attempt; break; }
+        }
+      }
+      if (!res) throw new Error("Network error. Please try again.");
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         throw new Error(t || `HTTP ${res.status}`);
       }
-
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
-        const json = await res.json();
-        const text =
-          typeof json === "string"
-            ? json
-            : (json?.questions ??
-              json?.result ??
-              json?.message ??
-              JSON.stringify(json));
+        const json = await res.json().catch(async () => await res.text());
+        const text = typeof json === "string" ? json : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
         setResult(String(text));
       } else {
         const text = await res.text();
         setResult(text);
       }
     } catch (err: any) {
-      const msg =
-        err?.message === "timeout"
-          ? "Request timed out."
-          : err?.message || "Request failed";
+      const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
       toast({ title: "Request failed", description: msg });
       setResult(null);
     } finally {
