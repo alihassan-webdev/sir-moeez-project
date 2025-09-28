@@ -20,7 +20,7 @@ const API_URL = (() => {
   const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
     | string
     | undefined;
-  return env && env.trim() ? env : "/.netlify/functions/proxy";
+  return env && env.trim() ? env : "/api/generate-questions";
 })();
 
 export default function MCQs() {
