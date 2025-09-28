@@ -151,7 +151,9 @@ export default function MCQs() {
               const bytes = await res.arrayBuffer();
               if (bytes.byteLength === 0) throw new Error("Empty PDF file");
               const header = new Uint8Array(bytes, 0, 4);
-              const headerStr = Array.from(header).map((b) => String.fromCharCode(b)).join("");
+              const headerStr = Array.from(header)
+                .map((b) => String.fromCharCode(b))
+                .join("");
               if (headerStr !== "%PDF") throw new Error("Invalid PDF");
               pdfBytesCache.current.set(p, bytes);
               return { path: p } as const;
@@ -169,7 +171,10 @@ export default function MCQs() {
         for (const p of ordered) {
           const bytes = pdfBytesCache.current.get(p);
           if (!bytes) continue;
-          const src = await PDFDocument.load(bytes, { ignoreEncryption: true, throwOnInvalidObject: true });
+          const src = await PDFDocument.load(bytes, {
+            ignoreEncryption: true,
+            throwOnInvalidObject: true,
+          });
           const copied = await mergedPdf.copyPages(src, src.getPageIndices());
           copied.forEach((pg) => mergedPdf.addPage(pg));
           pageCount += copied.length;
@@ -183,7 +188,11 @@ export default function MCQs() {
           lastModified: Date.now(),
         });
         if (mergedFile.size > 15 * 1024 * 1024) {
-          toast({ title: "PDF too large", description: "Merged chapters exceed 15MB. Select fewer chapters.", variant: "destructive" });
+          toast({
+            title: "PDF too large",
+            description: "Merged chapters exceed 15MB. Select fewer chapters.",
+            variant: "destructive",
+          });
           if (mergeToken.current === token) setFile(null);
           return;
         }
@@ -265,7 +274,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
     setLoading(true);
     try {
       if (!file) {
-        toast({ title: "Attach a PDF", description: "Please select or upload a PDF chapter." });
+        toast({
+          title: "Attach a PDF",
+          description: "Please select or upload a PDF chapter.",
+        });
         setLoading(false);
         return;
       }
@@ -286,7 +298,11 @@ Use concise, exam-style wording suitable for classroom tests.`;
       const sendTo = async (urlStr: string, timeoutMs: number) => {
         try {
           const res = await withTimeout(
-            fetch(urlStr, { method: "POST", body: form, headers: { Accept: "application/json" } }),
+            fetch(urlStr, {
+              method: "POST",
+              body: form,
+              headers: { Accept: "application/json" },
+            }),
             timeoutMs,
           );
           return res;
@@ -298,10 +314,18 @@ Use concise, exam-style wording suitable for classroom tests.`;
       let res: Response | null = null;
       if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
       if (!res || !res.ok) {
-        const proxies = ["/api/generate-questions", "/api/proxy", "/proxy", "/.netlify/functions/proxy"];
+        const proxies = [
+          "/api/generate-questions",
+          "/api/proxy",
+          "/proxy",
+          "/.netlify/functions/proxy",
+        ];
         for (const p of proxies) {
           const attempt = await sendTo(p, retryTimeoutMs);
-          if (attempt && attempt.ok) { res = attempt; break; }
+          if (attempt && attempt.ok) {
+            res = attempt;
+            break;
+          }
         }
       }
       if (!res) throw new Error("Network error. Please try again.");
@@ -312,14 +336,23 @@ Use concise, exam-style wording suitable for classroom tests.`;
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json().catch(async () => await res.text());
-        const text = typeof json === "string" ? json : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+        const text =
+          typeof json === "string"
+            ? json
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         setResult(String(text));
       } else {
         const text = await res.text();
         setResult(text);
       }
     } catch (err: any) {
-      const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
+      const msg =
+        err?.message === "timeout"
+          ? "Request timed out. Please try again."
+          : err?.message || "Request failed";
       toast({ title: "Request failed", description: msg });
       setResult(null);
     } finally {
@@ -574,10 +607,17 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              await generateExamStylePdf({ title: "MCQs", body: result, filenameBase: "mcqs" });
+                              await generateExamStylePdf({
+                                title: "MCQs",
+                                body: result,
+                                filenameBase: "mcqs",
+                              });
                             } catch (err) {
                               console.error(err);
-                              toast({ title: "Download failed", description: "Could not generate PDF." });
+                              toast({
+                                title: "Download failed",
+                                description: "Could not generate PDF.",
+                              });
                             }
                           }}
                         >
@@ -590,7 +630,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       <div className="paper-view">
                         <div
                           className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
-                          dangerouslySetInnerHTML={{ __html: formatResultHtml(result || "") }}
+                          dangerouslySetInnerHTML={{
+                            __html: formatResultHtml(result || ""),
+                          }}
                         />
                       </div>
                     </div>

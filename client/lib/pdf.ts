@@ -1,7 +1,12 @@
 import { jsPDF } from "jspdf";
 
 function sanitizeFilenameBase(s: string) {
-  const out = s.trim().slice(0, 60).toLowerCase().replace(/[^a-z0-9\s_-]/g, "").replace(/\s+/g, "_");
+  const out = s
+    .trim()
+    .slice(0, 60)
+    .toLowerCase()
+    .replace(/[^a-z0-9\s_-]/g, "")
+    .replace(/\s+/g, "_");
   return out || "document";
 }
 
@@ -31,7 +36,10 @@ export async function generateExamStylePdf(params: {
   const headerLines = doc.splitTextToSize(headingTitle, pageW - margin * 2);
   doc.text(headerLines, pageW / 2, y, { align: "center" });
   const headerLineHeight = Math.round(headerFontSize * 0.8);
-  y += Math.max(headerLineHeight + 6, headerLines.length * headerLineHeight + 10);
+  y += Math.max(
+    headerLineHeight + 6,
+    headerLines.length * headerLineHeight + 10,
+  );
   doc.setDrawColor(190);
   doc.setLineWidth(1);
   doc.line(margin, y, pageW - margin, y);
@@ -50,7 +58,9 @@ export async function generateExamStylePdf(params: {
   const boxRight = pageW - margin;
 
   // Clean and normalize text
-  const rawText = (body || "").replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n");
+  const rawText = (body || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n");
 
   // Renumber within sections: reset at each Section ...
   const renumbered = (() => {
@@ -120,11 +130,20 @@ export async function generateExamStylePdf(params: {
   };
 
   // Draw a line that supports **bold** segments
-  const drawStyledLine = (raw: string, baseBold: boolean, x: number, maxW: number) => {
+  const drawStyledLine = (
+    raw: string,
+    baseBold: boolean,
+    x: number,
+    maxW: number,
+  ) => {
     const parts = raw
       .split(/(\*\*[^*]+\*\*)/g)
       .filter(Boolean)
-      .map((seg) => (/(^\*\*[^*]+\*\*$)/.test(seg) ? { text: seg.slice(2, -2), bold: true } : { text: seg, bold: baseBold }));
+      .map((seg) =>
+        /(^\*\*[^*]+\*\*$)/.test(seg)
+          ? { text: seg.slice(2, -2), bold: true }
+          : { text: seg, bold: baseBold },
+      );
 
     const tokens: { text: string; bold: boolean }[] = [];
     for (const p of parts) {
@@ -172,7 +191,8 @@ export async function generateExamStylePdf(params: {
     }
 
     const isSection = /^\s*(Section\s+[A-Z0-9\-–].*)$/i.test(text);
-    const isQuestion = /^\s*(?:\d+)\.\s+/.test(text) || /^\s*Q\.?\s*\d+\./i.test(text);
+    const isQuestion =
+      /^\s*(?:\d+)\.\s+/.test(text) || /^\s*Q\.?\s*\d+\./i.test(text);
 
     if (isSection) {
       doc.setFont("times", "bold");
