@@ -1,0 +1,230 @@
+import { jsPDF } from "jspdf";
+
+function sanitizeFilenameBase(s: string) {
+  const out = s.trim().slice(0, 60).toLowerCase().replace(/[^a-z0-9\s_-]/g, "").replace(/\s+/g, "_");
+  return out || "document";
+}
+
+export async function generateExamStylePdf(params: {
+  title: string;
+  body: string;
+  filenameBase?: string;
+}) {
+  const { title, body, filenameBase } = params;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+  const margin = 64;
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const contentW = pageW - margin * 2;
+  const BORDER_PAD_X = 18;
+  const BORDER_PAD_Y_TOP = 14;
+  const BORDER_PAD_Y_BOTTOM = 22;
+  let y = margin;
+
+  const headingTitle = title || "Exam";
+
+  // Header
+  doc.setFont("times", "bold");
+  const headerFontSize = 33;
+  doc.setFontSize(headerFontSize);
+  const headerLines = doc.splitTextToSize(headingTitle, pageW - margin * 2);
+  doc.text(headerLines, pageW / 2, y, { align: "center" });
+  const headerLineHeight = Math.round(headerFontSize * 0.8);
+  y += Math.max(headerLineHeight + 6, headerLines.length * headerLineHeight + 10);
+  doc.setDrawColor(190);
+  doc.setLineWidth(1);
+  doc.line(margin, y, pageW - margin, y);
+  y += 16;
+
+  // Date line (no marks for MCQs/QnA)
+  doc.setFont("times", "normal");
+  doc.setFontSize(12);
+  const dateStr = new Date().toLocaleDateString();
+  doc.text(`Generated: ${dateStr}`, pageW - margin, y, { align: "right" });
+  y += 18;
+
+  // Content bordered box
+  let boxTop = y;
+  const boxLeft = margin;
+  const boxRight = pageW - margin;
+
+  // Clean and normalize text
+  const rawText = (body || "").replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n");
+
+  // Renumber within sections: reset at each Section ...
+  const renumbered = (() => {
+    const lines = rawText.split(/\r?\n/);
+    let count = 0;
+    const headingRe = /^\s*Section\s+[A-Z0-9\-–].*$/i;
+    const qRe = /^\s*(?:Q\.?\s*)?\d+\.\s*/i;
+    const optionRe = /^\s*(?:[A-Da-d][\).]|\([A-Da-d]\))\s+/;
+    const out: string[] = [];
+    for (const line of lines) {
+      if (headingRe.test(line)) {
+        count = 0;
+        out.push(line);
+        continue;
+      }
+      if (optionRe.test(line)) {
+        out.push(line);
+        continue;
+      }
+      if (qRe.test(line)) {
+        count += 1;
+        const rest = line.replace(qRe, "");
+        out.push(`${count}. ${rest}`);
+      } else {
+        out.push(line);
+      }
+    }
+    return out.join("\n");
+  })();
+
+  const paragraphs = renumbered.split(/\n\s*\n/);
+  const lineHeight = 18;
+  const paraGap = 10;
+
+  function ensurePageSpace(linesNeeded = 1) {
+    if (y + lineHeight * linesNeeded > pageH - margin) {
+      // close current box
+      doc.setDrawColor(140);
+      doc.setLineWidth(1.2);
+      doc.roundedRect(
+        boxLeft - BORDER_PAD_X,
+        boxTop - BORDER_PAD_Y_TOP,
+        boxRight - boxLeft + BORDER_PAD_X * 2,
+        y - boxTop + BORDER_PAD_Y_TOP + BORDER_PAD_Y_BOTTOM,
+        6,
+        6,
+      );
+      // new page
+      doc.addPage();
+      y = margin;
+      // running header
+      doc.setFont("times", "bold");
+      doc.setFontSize(12);
+      doc.text(headingTitle, margin, y);
+      doc.setDrawColor(220);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y + 6, pageW - margin, y + 6);
+      y += 16;
+      boxTop = y;
+    }
+  }
+
+  // Measure text with optional bold
+  const measure = (t: string, bold: boolean) => {
+    doc.setFont("times", bold ? "bold" : "normal");
+    return doc.getTextWidth(t);
+  };
+
+  // Draw a line that supports **bold** segments
+  const drawStyledLine = (raw: string, baseBold: boolean, x: number, maxW: number) => {
+    const parts = raw
+      .split(/(\*\*[^*]+\*\*)/g)
+      .filter(Boolean)
+      .map((seg) => (/(^\*\*[^*]+\*\*$)/.test(seg) ? { text: seg.slice(2, -2), bold: true } : { text: seg, bold: baseBold }));
+
+    const tokens: { text: string; bold: boolean }[] = [];
+    for (const p of parts) {
+      const pieces = p.text.split(/(\s+)/);
+      for (const piece of pieces) {
+        if (piece === "") continue;
+        tokens.push({ text: piece, bold: p.bold });
+      }
+    }
+
+    let line: { text: string; bold: boolean }[] = [];
+    let lineW = 0;
+    let cursorX = x;
+
+    const flush = () => {
+      if (!line.length) return;
+      ensurePageSpace(1);
+      cursorX = x;
+      for (const seg of line) {
+        doc.setFont("times", seg.bold ? "bold" : "normal");
+        doc.text(seg.text, cursorX, y);
+        cursorX += measure(seg.text, seg.bold);
+      }
+      y += lineHeight;
+      line = [];
+      lineW = 0;
+    };
+
+    for (const tk of tokens) {
+      const w = measure(tk.text, tk.bold);
+      if (lineW + w > maxW && tk.text.trim() !== "") {
+        flush();
+      }
+      line.push(tk);
+      lineW += w;
+    }
+    flush();
+  };
+
+  for (const para of paragraphs) {
+    const text = para.trim();
+    if (!text) {
+      y += paraGap;
+      continue;
+    }
+
+    const isSection = /^\s*(Section\s+[A-Z0-9\-–].*)$/i.test(text);
+    const isQuestion = /^\s*(?:\d+)\.\s+/.test(text) || /^\s*Q\.?\s*\d+\./i.test(text);
+
+    if (isSection) {
+      doc.setFont("times", "bold");
+      doc.setFontSize(15);
+      ensurePageSpace(2);
+      doc.text(text.replace(/\*\*/g, ""), margin, y);
+      y += 8;
+      doc.setDrawColor(210);
+      doc.setLineWidth(0.6);
+      doc.line(margin, y, pageW - margin, y);
+      y += 10;
+      continue;
+    }
+
+    const lines = text.split(/\n/);
+    for (let i = 0; i < lines.length; i++) {
+      let l = lines[i];
+      const isOption = /^\s*(?:[A-Da-d][\).]|\([A-Da-d]\))\s+/.test(l);
+      const indent = isOption ? 18 : 0;
+      l = l.replace(/^(\s*)(?:Q\.?\s*)?(\d+)\./i, "$1$2.");
+      const baseBold = isQuestion || /^\s*Q\.?\s*\d+\./i.test(l);
+      doc.setFontSize(baseBold ? 13 : 12);
+      drawStyledLine(l, baseBold, margin + indent, contentW - indent);
+      if (isOption) y -= 3;
+    }
+    y += paraGap;
+  }
+
+  // Close last box
+  doc.setDrawColor(140);
+  doc.setLineWidth(1.2);
+  doc.roundedRect(
+    boxLeft - BORDER_PAD_X,
+    boxTop - BORDER_PAD_Y_TOP,
+    boxRight - boxLeft + BORDER_PAD_X * 2,
+    y - boxTop + BORDER_PAD_Y_TOP + BORDER_PAD_Y_BOTTOM,
+    6,
+    6,
+  );
+
+  // Watermark footer
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont("times", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(200);
+    doc.text(headingTitle, pageW / 2, pageH - 28, { align: "center" });
+    doc.setTextColor(0);
+  }
+
+  const base = sanitizeFilenameBase(filenameBase || headingTitle);
+  const filename = `${base}_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
+  doc.save(filename);
+}
