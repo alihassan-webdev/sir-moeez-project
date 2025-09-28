@@ -65,7 +65,7 @@ export default function QnA() {
   const pdfBytesCache = React.useRef<Map<string, ArrayBuffer>>(new Map());
   const mergeToken = React.useRef(0);
   const [file, setFile] = useState<File | null>(null);
-  const [qaCount, setQaCount] = useState<number | null>(10);
+  const [qaCount, setQaCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
@@ -543,7 +543,7 @@ export default function QnA() {
                         setSelectedChapterPath("");
                         setSelectedChapterPaths([]);
                         setFile(null);
-                        setQaCount(10);
+                        setQaCount(null);
                         setResult(null);
                       }}
                     >
