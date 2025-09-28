@@ -1030,7 +1030,6 @@ export default function Index() {
                     }
                     onReset={onReset}
                     loading={loading}
-                    onSetInstitute={(name) => setInstitute(name)}
                   />
                 </div>
 
