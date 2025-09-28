@@ -55,6 +55,11 @@ export default function MCQs() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
+  // Progressive unlocking flags
+  const canSelectSubject = !!selectedClass;
+  const canSelectChapter = !!selectedSubject;
+  const canEnterCount = !!selectedChapterPath;
+
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
     setChapterOptions(arr);
@@ -240,7 +245,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       </Select>
                     </div>
 
-                    <div>
+                    <div className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
                         Subject
                       </label>
@@ -250,11 +255,11 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       >
                         <SelectTrigger
                           className="w-full"
-                          disabled={!selectedClass}
+                          disabled={!canSelectSubject}
                         >
                           <SelectValue
                             placeholder={
-                              selectedClass
+                              canSelectSubject
                                 ? "Select subject"
                                 : "Select class first"
                             }
@@ -270,7 +275,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       </Select>
                     </div>
 
-                    <div>
+                    <div className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
                         Chapter (PDF)
                       </label>
@@ -283,13 +288,13 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       >
                         <SelectTrigger
                           className="w-full"
-                          disabled={!selectedSubject && !selectedClass}
+                          disabled={!canSelectChapter}
                         >
                           <SelectValue
                             placeholder={
-                              selectedClass
+                              canSelectChapter
                                 ? "Select chapter"
-                                : "Select class first"
+                                : "Select subject first"
                             }
                           />
                         </SelectTrigger>
@@ -303,7 +308,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                       </Select>
                     </div>
 
-                    <div>
+                    <div className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <label className="text-sm font-medium text-muted-foreground">
                         Number of MCQs
                       </label>
@@ -320,12 +325,14 @@ Use concise, exam-style wording suitable for classroom tests.`;
                                 : Number(e.currentTarget.value),
                             )
                           }
+                          disabled={!canEnterCount}
                           className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                           placeholder="Enter count"
                         />
                         <button
                           type="button"
                           onClick={() => setMcqCount(10)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           10
@@ -333,6 +340,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                         <button
                           type="button"
                           onClick={() => setMcqCount(20)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           20
@@ -340,6 +348,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                         <button
                           type="button"
                           onClick={() => setMcqCount(30)}
+                          disabled={!canEnterCount}
                           className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
                         >
                           30
@@ -359,7 +368,6 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                     <Button
                       className="bg-primary/10 border-primary/60 text-blue-600"
-                      disabled={!file}
                       onClick={() => {
                         setSelectedClass("");
                         setSelectedSubject("");
