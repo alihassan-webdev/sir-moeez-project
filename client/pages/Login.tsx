@@ -48,8 +48,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-transparent flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-4">
+    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-transparent flex items-start justify-center px-4 pt-6 sm:pt-10">
+      <div className="w-full max-w-md space-y-3">
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold">Log in</h1>
           <p className="text-base sm:text-lg text-muted-foreground">Continue with your email and password</p>
