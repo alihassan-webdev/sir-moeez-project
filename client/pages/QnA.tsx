@@ -72,7 +72,7 @@ export default function QnA() {
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
-  const canEnterCount = selectedChapterPaths.length > 0;
+  const canEnterCount = !!file && !isMerging;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -518,7 +518,7 @@ export default function QnA() {
 
                   <div className="mt-4 flex gap-3">
                     <Button
-                      disabled={!file || !qaCount || loading}
+                      disabled={!file || !qaCount || loading || isMerging}
                       onClick={runSubmit}
                       className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                     >
