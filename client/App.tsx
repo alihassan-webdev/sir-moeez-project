@@ -22,6 +22,7 @@ import QnA from "./pages/QnA";
 import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
 import RegisterInstitute from "./pages/RegisterInstitute";
+import Support from "./pages/Support";
 import Login from "./pages/Login";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
@@ -161,6 +162,16 @@ function AnimatedRoutes() {
             <RequireAuth>
               <PageWrapper>
                 <RegisterInstitute />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Support />
               </PageWrapper>
             </RequireAuth>
           }

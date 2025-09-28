@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutGrid, FileText, ListChecks, MessageSquare, User, Building2 } from "lucide-react";
+import { LayoutGrid, FileText, ListChecks, MessageSquare, User, Building2, LifeBuoy } from "lucide-react";
 
 function NavItem({
   to,
@@ -85,6 +85,12 @@ export default function SidebarPanelInner() {
           icon={Building2}
           label="Register Institute"
           active={pathname === "/institute"}
+        />
+        <NavItem
+          to="/support"
+          icon={LifeBuoy}
+          label="Support"
+          active={pathname === "/support"}
         />
       </nav>
     </>
