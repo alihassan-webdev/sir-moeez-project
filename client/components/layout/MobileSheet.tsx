@@ -85,6 +85,24 @@ export default function MobileSheet() {
               Manage Subscription
             </Link>
           </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/profile"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/profile" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              My Profile
+            </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/institute"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/institute" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Register Institute
+            </Link>
+          </SheetClose>
         </div>
 
         <div className="mt-4 p-2">
