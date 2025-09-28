@@ -173,7 +173,7 @@ export default function QnA() {
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
               <div className="flex flex-col gap-4">
-                <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border p-6 bg-white">
+                <div className="w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Class</label>
