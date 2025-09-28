@@ -11,8 +11,6 @@ import {
 } from "@/lib/subscription";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 
 export default function SubscriptionPage() {
