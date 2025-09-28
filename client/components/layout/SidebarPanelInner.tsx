@@ -42,6 +42,10 @@ export default function SidebarPanelInner() {
           label="Dashboard"
           active={pathname === "/get-started"}
         />
+
+        <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+          Quick create
+        </div>
         <NavItem
           to="/mcqs"
           icon={ListChecks}
@@ -60,6 +64,10 @@ export default function SidebarPanelInner() {
           label="Generate Exam"
           active={pathname === "/app"}
         />
+
+        <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+          My account
+        </div>
         <NavItem
           to="/subscription"
           icon={LayoutGrid}
