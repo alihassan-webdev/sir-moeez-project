@@ -12,6 +12,15 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
+import { ListChecks, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Entry = { path: string; url: string; name: string };
 
