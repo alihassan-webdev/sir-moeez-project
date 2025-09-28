@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "@/components/layout/Container";
 import { Link, useLocation } from "react-router-dom";
-import { FileText, Layers, BookOpen, Folder } from "lucide-react";
+import { FileText, Layers, BookOpen, Folder, ListChecks } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
 export default function GetStarted() {
