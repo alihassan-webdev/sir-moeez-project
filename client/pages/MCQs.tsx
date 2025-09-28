@@ -99,6 +99,8 @@ export default function MCQs() {
   useEffect(() => {
     if (!selectedSubject) {
       setChapterOptions(selectedClass ? byClass[selectedClass] || [] : []);
+      setSelectedChapterPaths([]);
+      setFile(null);
       return;
     }
     const arr = (byClass[selectedClass] || []).filter((e) => {
@@ -107,6 +109,7 @@ export default function MCQs() {
     });
     setChapterOptions(arr);
     setSelectedChapterPath("");
+    setSelectedChapterPaths([]);
     setFile(null);
   }, [selectedSubject, selectedClass]);
 
