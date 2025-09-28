@@ -959,7 +959,7 @@ export default function Index() {
 
     // 4) Headings: lines starting with Section or Section A/B/C -> styled h3 in theme color
     out = out.replace(
-      /^\s*(Section\s+[A-Z0-9\-–].*)$/gim,
+      /^\s*(Section\s+[A-Z0-9\-���].*)$/gim,
       '<h3 class="text-xl font-extrabold text-secondary mb-3">$1</h3>',
     );
 
@@ -1107,10 +1107,7 @@ export default function Index() {
                               doc.setFont("times", "bold");
                               const headerFontSize = 33; // 50% larger than previous 22
                               doc.setFontSize(headerFontSize);
-                              const headingTitle =
-                                institute && institute.trim()
-                                  ? institute.trim()
-                                  : "Exam Generator";
+                              const headingTitle = "Exam Generator";
                               const headerLines = doc.splitTextToSize(
                                 headingTitle,
                                 pageW - margin * 2,
