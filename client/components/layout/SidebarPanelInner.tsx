@@ -1,6 +1,14 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutGrid, FileText, ListChecks, MessageSquare, User, Building2, LifeBuoy } from "lucide-react";
+import {
+  LayoutGrid,
+  FileText,
+  ListChecks,
+  MessageSquare,
+  User,
+  Building2,
+  LifeBuoy,
+} from "lucide-react";
 
 function NavItem({
   to,

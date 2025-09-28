@@ -209,7 +209,10 @@ export default function GetStarted() {
 
 function MyAccountCards() {
   const sub = React.useMemo(() => getSubscription(), []);
-  const renewal = React.useMemo(() => nextRenewalDate(sub).toLocaleDateString(), [sub]);
+  const renewal = React.useMemo(
+    () => nextRenewalDate(sub).toLocaleDateString(),
+    [sub],
+  );
   return (
     <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
       <Link
@@ -224,7 +227,8 @@ function MyAccountCards() {
             </span>
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            Current plan: <span className="capitalize font-medium">{sub.planId}</span>
+            Current plan:{" "}
+            <span className="capitalize font-medium">{sub.planId}</span>
           </div>
           <div className="mt-auto pt-3 text-xs text-muted-foreground">
             Next renewal: {renewal}
@@ -238,8 +242,12 @@ function MyAccountCards() {
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">My profile</div>
-          <div className="mt-1 text-xs text-muted-foreground">Update your name, phone and role.</div>
-          <div className="mt-auto pt-3 text-xs text-muted-foreground">Email linked to your login.</div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            Update your name, phone and role.
+          </div>
+          <div className="mt-auto pt-3 text-xs text-muted-foreground">
+            Email linked to your login.
+          </div>
         </div>
       </Link>
 
@@ -249,8 +257,12 @@ function MyAccountCards() {
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">Register institute</div>
-          <div className="mt-1 text-xs text-muted-foreground">Add institute details for licensing.</div>
-          <div className="mt-auto pt-3 text-xs text-muted-foreground">Edit later anytime.</div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            Add institute details for licensing.
+          </div>
+          <div className="mt-auto pt-3 text-xs text-muted-foreground">
+            Edit later anytime.
+          </div>
         </div>
       </Link>
 
@@ -260,8 +272,12 @@ function MyAccountCards() {
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">Support</div>
-          <div className="mt-1 text-xs text-muted-foreground">Create a ticket for help or billing queries.</div>
-          <div className="mt-auto pt-3 text-xs text-muted-foreground">Response via email.</div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            Create a ticket for help or billing queries.
+          </div>
+          <div className="mt-auto pt-3 text-xs text-muted-foreground">
+            Response via email.
+          </div>
         </div>
       </Link>
     </div>

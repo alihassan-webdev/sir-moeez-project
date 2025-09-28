@@ -22,7 +22,10 @@ export default function ProfilePage() {
     };
     saveProfile(updated);
     setProfile(updated);
-    toast({ title: "Profile saved", description: "Your profile has been updated." });
+    toast({
+      title: "Profile saved",
+      description: "Your profile has been updated.",
+    });
   };
 
   return (
@@ -39,7 +42,9 @@ export default function ProfilePage() {
           <div>
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow">
               <h2 className="text-2xl font-bold">My Profile</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Update your personal details.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Update your personal details.
+              </p>
 
               <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-xl">
                 <div className="grid gap-2">
@@ -47,20 +52,29 @@ export default function ProfilePage() {
                   <Input
                     id="name"
                     value={profile.name}
-                    onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, name: e.target.value }))
+                    }
                     placeholder="Your name"
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" value={emailFromAuth} readOnly className="bg-muted/30" />
+                  <Input
+                    id="email"
+                    value={emailFromAuth}
+                    readOnly
+                    className="bg-muted/30"
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     value={profile.phone || ""}
-                    onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, phone: e.target.value }))
+                    }
                     placeholder="03XX-XXXXXXX"
                   />
                 </div>
@@ -69,7 +83,9 @@ export default function ProfilePage() {
                   <Input
                     id="role"
                     value={profile.role || ""}
-                    onChange={(e) => setProfile((p) => ({ ...p, role: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, role: e.target.value }))
+                    }
                     placeholder="Teacher / HOD"
                   />
                 </div>

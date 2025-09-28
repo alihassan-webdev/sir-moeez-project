@@ -2,7 +2,12 @@ import React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import SidebarStats from "@/components/layout/SidebarStats";
-import { PAYMENT_FREQUENCIES, TIERS, type Frequency, formatPKR } from "@/lib/pricing";
+import {
+  PAYMENT_FREQUENCIES,
+  TIERS,
+  type Frequency,
+  formatPKR,
+} from "@/lib/pricing";
 import {
   cancelAtEndOfPeriod,
   getSubscription,
@@ -22,7 +27,10 @@ export default function SubscriptionPage() {
   const onChangePlan = (planId: (typeof TIERS)[number]["id"]) => {
     const updated = setPlan(planId, frequency);
     setSub(updated);
-    toast({ title: "Subscription updated", description: `Plan set to ${planId} (${frequency}).` });
+    toast({
+      title: "Subscription updated",
+      description: `Plan set to ${planId} (${frequency}).`,
+    });
   };
 
   const onFrequencyChange = (f: Frequency) => {
@@ -35,13 +43,19 @@ export default function SubscriptionPage() {
   const onCancel = () => {
     const updated = cancelAtEndOfPeriod();
     setSub(updated);
-    toast({ title: "Cancellation scheduled", description: "Your subscription will end at period end." });
+    toast({
+      title: "Cancellation scheduled",
+      description: "Your subscription will end at period end.",
+    });
   };
 
   const onResume = () => {
     const updated = resumeSubscription();
     setSub(updated);
-    toast({ title: "Subscription resumed", description: "Auto-renew is back on." });
+    toast({
+      title: "Subscription resumed",
+      description: "Auto-renew is back on.",
+    });
   };
 
   return (
@@ -54,21 +68,41 @@ export default function SubscriptionPage() {
               <SidebarStats />
 
               <div className="mt-5">
-                <div className="mb-2 text-sm font-semibold text-muted-foreground">Current plan</div>
+                <div className="mb-2 text-sm font-semibold text-muted-foreground">
+                  Current plan
+                </div>
                 <div className="text-lg font-extrabold flex items-center gap-2">
                   <span className="capitalize">{sub.planId}</span>
-                  <Badge variant="outline" className="capitalize">{sub.frequency}</Badge>
+                  <Badge variant="outline" className="capitalize">
+                    {sub.frequency}
+                  </Badge>
                 </div>
-                <div className="mt-2 text-xs text-muted-foreground">Next renewal: {nextRenewalDate(sub).toLocaleDateString()}</div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Next renewal: {nextRenewalDate(sub).toLocaleDateString()}
+                </div>
                 {sub.cancelAtPeriodEnd && (
-                  <div className="mt-2 text-xs text-destructive">Cancels at end of period</div>
+                  <div className="mt-2 text-xs text-destructive">
+                    Cancels at end of period
+                  </div>
                 )}
                 <div className="mt-4 flex gap-2">
                   {sub.cancelAtPeriodEnd ? (
-                    <Button variant="outline" onClick={onResume} className="w-full">Resume</Button>
+                    <Button
+                      variant="outline"
+                      onClick={onResume}
+                      className="w-full"
+                    >
+                      Resume
+                    </Button>
                   ) : (
                     !isFreePlan(sub) && (
-                      <Button variant="destructive" onClick={onCancel} className="w-full">Cancel</Button>
+                      <Button
+                        variant="destructive"
+                        onClick={onCancel}
+                        className="w-full"
+                      >
+                        Cancel
+                      </Button>
                     )
                   )}
                 </div>
@@ -79,7 +113,10 @@ export default function SubscriptionPage() {
           <div>
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow">
               <h2 className="text-2xl font-bold">Manage Subscription</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Choose a plan and billing period. Changes apply immediately and renew at the next cycle.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Choose a plan and billing period. Changes apply immediately and
+                renew at the next cycle.
+              </p>
 
               <div className="mt-4">
                 <div className="inline-flex items-center gap-2 rounded-full border border-input bg-white p-1">
@@ -101,16 +138,25 @@ export default function SubscriptionPage() {
                 const price = tier.price[frequency];
                 const isCurrent = sub.planId === tier.id;
                 return (
-                  <div key={tier.id} className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl border px-6 py-6 bg-white card-yellow-shadow ${isCurrent ? "border-primary/60" : "border-input"}`}>
+                  <div
+                    key={tier.id}
+                    className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl border px-6 py-6 bg-white card-yellow-shadow ${isCurrent ? "border-primary/60" : "border-input"}`}
+                  >
                     <h3 className="text-xl font-semibold">{tier.name}</h3>
                     <div className="h-12">
                       {typeof price === "number" ? (
                         <>
-                          <div className="text-3xl font-extrabold text-primary">{formatPKR(price)}</div>
-                          <p className="-mt-1 text-xs font-medium text-muted-foreground">Per user/month</p>
+                          <div className="text-3xl font-extrabold text-primary">
+                            {formatPKR(price)}
+                          </div>
+                          <p className="-mt-1 text-xs font-medium text-muted-foreground">
+                            Per user/month
+                          </p>
                         </>
                       ) : (
-                        <h4 className="text-3xl font-extrabold text-primary">{price}</h4>
+                        <h4 className="text-3xl font-extrabold text-primary">
+                          {price}
+                        </h4>
                       )}
                     </div>
                     <ul className="space-y-2 text-sm text-foreground">
@@ -127,7 +173,10 @@ export default function SubscriptionPage() {
                           Current plan
                         </Button>
                       ) : (
-                        <Button className="w-full" onClick={() => onChangePlan(tier.id)}>
+                        <Button
+                          className="w-full"
+                          onClick={() => onChangePlan(tier.id)}
+                        >
                           Select
                         </Button>
                       )}
@@ -139,9 +188,14 @@ export default function SubscriptionPage() {
 
             {!isFreePlan(sub) && (
               <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow">
-                <h3 className="text-lg font-semibold text-primary">Billing details</h3>
+                <h3 className="text-lg font-semibold text-primary">
+                  Billing details
+                </h3>
                 <div className="mt-2 text-sm text-muted-foreground">
-                  Your subscription renews on <strong>{nextRenewalDate(sub).toLocaleDateString()}</strong> via auto-renew. You can cancel anytime; access remains until the period ends.
+                  Your subscription renews on{" "}
+                  <strong>{nextRenewalDate(sub).toLocaleDateString()}</strong>{" "}
+                  via auto-renew. You can cancel anytime; access remains until
+                  the period ends.
                 </div>
               </div>
             )}

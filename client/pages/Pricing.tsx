@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { BadgeCheck } from "lucide-react";
 import Container from "@/components/layout/Container";
 import { motion, useMotionValue, animate } from "framer-motion";
-import { PAYMENT_FREQUENCIES, TIERS, type Tier, type Frequency, formatPKR } from "@/lib/pricing";
-
-
-
-
-
+import {
+  PAYMENT_FREQUENCIES,
+  TIERS,
+  type Tier,
+  type Frequency,
+  formatPKR,
+} from "@/lib/pricing";
 
 const HighlightedBackground = () => (
   <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--primary)/0.12)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--primary)/0.12)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-[size:45px_45px] opacity-100" />
