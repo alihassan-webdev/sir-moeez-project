@@ -58,14 +58,12 @@ function ExternalPdfSelector({
   onGenerate,
   onReset,
   loading,
-  onSetInstitute,
 }: {
   onLoadFile: (f: File | null) => void;
   onSetPrompt: (p: string) => void;
   onGenerate: (prompt?: string) => Promise<void> | void;
   onReset: () => void;
   loading?: boolean;
-  onSetInstitute: (name: string) => void;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -98,7 +96,6 @@ function ExternalPdfSelector({
   const [selectedSubjectPath, setSelectedSubjectPath] = useState<string>("");
   const [totalMarks, setTotalMarks] = useState<number | null>(null);
   const [promptText, setPromptText] = useState("");
-  const [instituteName, setInstituteName] = useState("");
 
   const [selectedChapterPaths, setSelectedChapterPaths] = useState<string[]>(
     [],
@@ -131,13 +128,11 @@ function ExternalPdfSelector({
   const canSelectSubject = !!selectedClass && !isLocked;
   const canSelectChapters = !!selectedSubjectName && !isLocked;
   const canEnterMarks = selectedChapterPaths.length > 0 && !isLocked;
-  const canEnterInstitute = totalMarks != null && !isLocked;
   const canGenerate =
     !!selectedClass &&
     !!selectedSubjectName &&
     selectedChapterPaths.length > 0 &&
     totalMarks != null &&
-    instituteName.trim().length > 0 &&
     !loading &&
     !isMerging &&
     !isLocked;
@@ -353,7 +348,6 @@ function ExternalPdfSelector({
     setSelectedSubjectPath("");
     setSelectedChapterPaths([]);
     setTotalMarks(null);
-    setInstituteName("");
     onLoadFile(null);
   }, [selectedClass]);
 
@@ -569,27 +563,6 @@ function ExternalPdfSelector({
             </button>
           </div>
         </div>
-
-        {/* Institute Name */}
-        <div
-          className={`transition-all duration-200 ease-out ${!canEnterInstitute ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-        >
-          <label className="text-sm font-medium text-muted-foreground">
-            Institute Name
-          </label>
-          <input
-            type="text"
-            value={instituteName}
-            onChange={(e) => {
-              const v = e.currentTarget.value;
-              setInstituteName(v);
-              onSetInstitute(v);
-            }}
-            disabled={!canEnterInstitute}
-            className="w-full rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
-            placeholder="Enter institute name"
-          />
-        </div>
       </div>
 
       {/* Actions */}
@@ -621,13 +594,6 @@ function ExternalPdfSelector({
                 description: "Please enter a value between 20 and 100.",
               });
             }
-            if (!instituteName.trim()) {
-              return toast({
-                title: "Enter institute name",
-                description: "Institute name is required.",
-              });
-            }
-
             const subjectName = selectedSubjectName || "";
             const marks = Math.min(100, Math.max(20, Number(totalMarks)));
             if (marks !== totalMarks) setTotalMarks(marks);
@@ -663,9 +629,7 @@ function ExternalPdfSelector({
             setSelectedChapterPaths([]);
             setTotalMarks(null);
             setPromptText("");
-            setInstituteName("");
             setIsLocked(false);
-            onSetInstitute("");
             onLoadFile(null);
             onSetPrompt("");
             onReset();
@@ -685,7 +649,6 @@ export default function Index() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const [institute, setInstitute] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -995,7 +958,7 @@ export default function Index() {
 
     // 4) Headings: lines starting with Section or Section A/B/C -> styled h3 in theme color
     out = out.replace(
-      /^\s*(Section\s+[A-Z0-9\-–].*)$/gim,
+      /^\s*(Section\s+[A-Z0-9\-���].*)$/gim,
       '<h3 class="text-xl font-extrabold text-secondary mb-3">$1</h3>',
     );
 
@@ -1037,7 +1000,7 @@ export default function Index() {
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
                 <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
-                  Test Paper Generater
+                  Exam Generator
                 </h1>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Fast, accurate question generation tailored to your query.
@@ -1063,7 +1026,6 @@ export default function Index() {
                     }
                     onReset={onReset}
                     loading={loading}
-                    onSetInstitute={(name) => setInstitute(name)}
                   />
                 </div>
 
@@ -1144,10 +1106,7 @@ export default function Index() {
                               doc.setFont("times", "bold");
                               const headerFontSize = 33; // 50% larger than previous 22
                               doc.setFontSize(headerFontSize);
-                              const headingTitle =
-                                institute && institute.trim()
-                                  ? institute.trim()
-                                  : "Test Paper Generater";
+                              const headingTitle = "Exam Generator";
                               const headerLines = doc.splitTextToSize(
                                 headingTitle,
                                 pageW - margin * 2,

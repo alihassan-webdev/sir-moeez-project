@@ -39,6 +39,7 @@ export default function MobileSheet() {
               Dashboard
             </Link>
           </SheetClose>
+
           <SheetClose asChild>
             <Link
               to="/mcqs"
@@ -48,6 +49,7 @@ export default function MobileSheet() {
               Generate MCQs
             </Link>
           </SheetClose>
+
           <SheetClose asChild>
             <Link
               to="/qna"
@@ -57,6 +59,7 @@ export default function MobileSheet() {
               Generate Q&A
             </Link>
           </SheetClose>
+
           <SheetClose asChild>
             <Link
               to="/app"

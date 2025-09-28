@@ -624,7 +624,7 @@ export default function AnimatedAIChat({
                           // First page heading: Test Paper Generator
                           doc.setFont("times", "bold");
                           doc.setFontSize(18);
-                          doc.text("Test Paper Generater", pageWidth / 2, y, {
+                          doc.text("Exam Generator", pageWidth / 2, y, {
                             align: "center",
                           });
                           y += 30;
@@ -848,12 +848,10 @@ export default function AnimatedAIChat({
                             doc.setFont("times", "bold");
                             doc.setFontSize(64);
                             doc.setTextColor(210);
-                            doc.text(
-                              "Test Paper Generater",
-                              pageW / 2,
-                              pageH / 2,
-                              { align: "center", angle: 45 },
-                            );
+                            doc.text("Exam Generator", pageW / 2, pageH / 2, {
+                              align: "center",
+                              angle: 45,
+                            });
                             // Footer page numbers
                             doc.setFont("times", "normal");
                             doc.setFontSize(10);

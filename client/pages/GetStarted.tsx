@@ -1,13 +1,13 @@
-import * as React from "react";
+import React from "react";
 import Container from "@/components/layout/Container";
 import { Link, useLocation } from "react-router-dom";
 import {
   FileText,
-  ListChecks,
-  MessageSquare,
   Layers,
   BookOpen,
   Folder,
+  ListChecks,
+  MessageSquare,
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
@@ -126,7 +126,7 @@ export default function GetStarted() {
             <div className="mt-4 rounded-xl bg-white p-6 border border-input card-yellow-shadow">
               <h2 className="text-2xl font-bold">Welcome to PaperGen</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Generate MCQs, Q&A cards and full exam papers quickly from your
+                Generate exam papers and revision cards quickly from your
                 uploaded chapters. Choose a class, select a subject and
                 chapters, then customise the number of questions or marks —
                 PaperGen will create printable PDFs ready to use for tests or
@@ -137,7 +137,7 @@ export default function GetStarted() {
             {/* Quick create */}
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Quick create</h2>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
+              <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
                 <Link
                   to="/mcqs"
                   className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
@@ -191,33 +191,6 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </Link>
-              </div>
-            </div>
-
-            {/* Browse by class */}
-            <div className="mt-8">
-              <h2 className="text-xl sm:text-2xl font-bold">Browse by class</h2>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {classes.map((cls) => {
-                  const total = (byClass[cls] || []).length;
-                  const subjSet = new Set<string>();
-                  for (const e of byClass[cls] || []) {
-                    const m = e.path.replace(/^\/?datafiles\//, "");
-                    subjSet.add((m.split("/")[1] || "General").trim());
-                  }
-                  return (
-                    <Link
-                      to="/app"
-                      key={cls}
-                      className="rounded-xl bg-white border border-input p-5 card-yellow-shadow hover:shadow-lg hover:-translate-y-0.5 transition"
-                    >
-                      <div className="text-base font-semibold">{cls}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {subjSet.size} subjects • {total} chapters
-                      </div>
-                    </Link>
-                  );
-                })}
               </div>
             </div>
           </div>

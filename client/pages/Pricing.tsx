@@ -21,7 +21,7 @@ const TIERS = [
     description:
       "Personal use for teachers: generate and export test papers quickly.",
     features: [
-      "AI-generated questions (MCQ & short-answer)",
+      "AI-generated questions",
       "Export to printable PDF with templates",
       "Customizable marking schemes",
       "Save & reuse templates",

@@ -63,18 +63,18 @@ function AnimatedRoutes() {
           }
         />
         <Route
-          path="/mcqs"
-          element={
-            <PageWrapper>
-              <MCQs />
-            </PageWrapper>
-          }
-        />
-        <Route
           path="/get-started"
           element={
             <PageWrapper>
               <GetStarted />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/mcqs"
+          element={
+            <PageWrapper>
+              <MCQs />
             </PageWrapper>
           }
         />
