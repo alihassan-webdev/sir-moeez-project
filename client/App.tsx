@@ -16,8 +16,6 @@ import NotFound from "./pages/NotFound";
 import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
-import MCQs from "./pages/MCQs";
-import QnA from "./pages/QnA";
 
 const queryClient = new QueryClient();
 
@@ -63,26 +61,10 @@ function AnimatedRoutes() {
           }
         />
         <Route
-          path="/mcqs"
-          element={
-            <PageWrapper>
-              <MCQs />
-            </PageWrapper>
-          }
-        />
-        <Route
           path="/get-started"
           element={
             <PageWrapper>
               <GetStarted />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/qna"
-          element={
-            <PageWrapper>
-              <QnA />
             </PageWrapper>
           }
         />

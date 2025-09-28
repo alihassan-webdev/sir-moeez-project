@@ -1,14 +1,6 @@
-import * as React from "react";
 import Container from "@/components/layout/Container";
 import { Link, useLocation } from "react-router-dom";
-import {
-  FileText,
-  ListChecks,
-  MessageSquare,
-  Layers,
-  BookOpen,
-  Folder,
-} from "lucide-react";
+import { FileText, Layers, BookOpen, Folder } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
 export default function GetStarted() {
@@ -126,54 +118,17 @@ export default function GetStarted() {
             <div className="mt-4 rounded-xl bg-white p-6 border border-input card-yellow-shadow">
               <h2 className="text-2xl font-bold">Welcome to PaperGen</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Generate MCQs, Q&A cards and full exam papers quickly from your
-                uploaded chapters. Choose a class, select a subject and
-                chapters, then customise the number of questions or marks —
-                PaperGen will create printable PDFs ready to use for tests or
-                revision.
+                Generate exam papers and revision cards quickly from your uploaded
+                chapters. Choose a class, select a subject and chapters, then
+                customise the number of questions or marks — PaperGen will create
+                printable PDFs ready to use for tests or revision.
               </p>
             </div>
 
             {/* Quick create */}
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Quick create</h2>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
-                <Link
-                  to="/mcqs"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
-                >
-                  <div className="flex flex-col items-center text-center h-full">
-                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
-                      <ListChecks
-                        className="h-7 w-7 sm:h-8 sm:w-8"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="text-base font-semibold">Generate MCQs</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Create multiple-choice questions from chapters
-                    </div>
-                  </div>
-                </Link>
-
-                <Link
-                  to="/qna"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
-                >
-                  <div className="flex flex-col items-center text-center h-full">
-                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
-                      <MessageSquare
-                        className="h-7 w-7 sm:h-8 sm:w-8"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="text-base font-semibold">Generate Q&A</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Generate question–answer cards for quick revision
-                    </div>
-                  </div>
-                </Link>
-
+              <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
                 <Link
                   to="/app"
                   className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
@@ -191,6 +146,7 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </Link>
+
               </div>
             </div>
 

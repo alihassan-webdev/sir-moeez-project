@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutGrid, ListChecks, MessageSquare, FileText } from "lucide-react";
+import { LayoutGrid, FileText } from "lucide-react";
 
 function NavItem({
   to,
@@ -41,18 +41,6 @@ export default function SidebarPanelInner() {
           icon={LayoutGrid}
           label="Dashboard"
           active={pathname === "/get-started"}
-        />
-        <NavItem
-          to="/mcqs"
-          icon={ListChecks}
-          label="Generate MCQs"
-          active={pathname === "/mcqs"}
-        />
-        <NavItem
-          to="/qna"
-          icon={MessageSquare}
-          label="Generate Q&A"
-          active={pathname === "/qna"}
         />
         <NavItem
           to="/app"
