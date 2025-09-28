@@ -84,7 +84,14 @@ function AnimatedRoutes() {
   return (
     <AppLayout>
       <Routes location={location}>
-        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route
+          path="/login"
+          element={
+            <PageWrapper>
+              <Login />
+            </PageWrapper>
+          }
+        />
         <Route
           path="/app"
           element={

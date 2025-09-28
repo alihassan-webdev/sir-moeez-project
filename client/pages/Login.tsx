@@ -5,7 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth } from "@/lib/firebase";
-import { onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
@@ -30,7 +34,10 @@ export default function Login() {
     const em = email.trim();
     const pw = password;
     if (!em || !pw) {
-      toast({ title: "Missing fields", description: "Enter email and password." });
+      toast({
+        title: "Missing fields",
+        description: "Enter email and password.",
+      });
       return;
     }
 
@@ -40,7 +47,9 @@ export default function Login() {
       toast({ title: "Welcome", description: "Logged in successfully." });
       navigate("/get-started", { replace: true });
     } catch (err: any) {
-      const msg = err?.code ? String(err.code).replace("auth/", "").replace(/-/g, " ") : "Login failed";
+      const msg = err?.code
+        ? String(err.code).replace("auth/", "").replace(/-/g, " ")
+        : "Login failed";
       toast({ title: "Login error", description: msg });
     } finally {
       setLoading(false);
@@ -52,7 +61,9 @@ export default function Login() {
       <div className="w-full max-w-md space-y-3">
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold">Log in</h1>
-          <p className="text-base sm:text-lg text-muted-foreground">Continue with your email and password</p>
+          <p className="text-base sm:text-lg text-muted-foreground">
+            Continue with your email and password
+          </p>
         </div>
         <div className="rounded-xl bg-white p-6 sm:p-8 card-yellow-shadow">
           <form onSubmit={onSubmit} className="space-y-4">
@@ -86,11 +97,20 @@ export default function Login() {
                   onClick={() => setShowPw((v) => !v)}
                   className="absolute inset-y-0 right-0 px-3 inline-flex items-center text-muted-foreground hover:text-foreground"
                 >
-                  {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPw ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" variant="secondary" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full"
+              variant="secondary"
+              disabled={loading}
+            >
               {loading ? "Logging in..." : "Log in"}
             </Button>
             <Button
@@ -101,15 +121,24 @@ export default function Login() {
               onClick={async () => {
                 const em = email.trim();
                 if (!em) {
-                  toast({ title: "Enter email first", description: "Type your email above to receive a reset link." });
+                  toast({
+                    title: "Enter email first",
+                    description:
+                      "Type your email above to receive a reset link.",
+                  });
                   return;
                 }
                 try {
                   setResetting(true);
                   await sendPasswordResetEmail(auth, em);
-                  toast({ title: "Reset email sent", description: `Check ${em} for the reset link.` });
+                  toast({
+                    title: "Reset email sent",
+                    description: `Check ${em} for the reset link.`,
+                  });
                 } catch (err: any) {
-                  const msg = err?.code ? String(err.code).replace("auth/", "").replace(/-/g, " ") : "Could not send reset email";
+                  const msg = err?.code
+                    ? String(err.code).replace("auth/", "").replace(/-/g, " ")
+                    : "Could not send reset email";
                   toast({ title: "Reset error", description: msg });
                 } finally {
                   setResetting(false);
