@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutGrid, FileText } from "lucide-react";
+import { LayoutGrid, FileText, ListChecks } from "lucide-react";
 
 function NavItem({
   to,
