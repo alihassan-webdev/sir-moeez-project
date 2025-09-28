@@ -49,7 +49,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                   try {
                     await signOut(auth);
                   } catch {}
-                  navigate("/login");
+                  navigate("/");
                 }}
               >
                 Logout
