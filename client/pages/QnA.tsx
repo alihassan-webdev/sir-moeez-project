@@ -90,6 +90,7 @@ export default function QnA() {
     setSubjects(subs);
     setSelectedSubject("");
     setSelectedChapterPath("");
+    setSelectedChapterPaths([]);
     setFile(null);
   }, [selectedClass]);
 
