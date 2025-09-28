@@ -565,27 +565,7 @@ function ExternalPdfSelector({
           </div>
         </div>
 
-        {/* Institute Name */}
-        <div
-          className={`transition-all duration-200 ease-out ${!canEnterInstitute ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-        >
-          <label className="text-sm font-medium text-muted-foreground">
-            Institute Name
-          </label>
-          <input
-            type="text"
-            value={instituteName}
-            onChange={(e) => {
-              const v = e.currentTarget.value;
-              setInstituteName(v);
-              onSetInstitute(v);
-            }}
-            disabled={!canEnterInstitute}
-            className="w-full rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
-            placeholder="Enter institute name"
-          />
-        </div>
-      </div>
+            </div>
 
       {/* Actions */}
       <div className="mt-4 flex gap-3">
