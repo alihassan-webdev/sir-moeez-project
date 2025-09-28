@@ -492,6 +492,7 @@ export default function QnA() {
                         setSelectedClass("");
                         setSelectedSubject("");
                         setSelectedChapterPath("");
+                        setSelectedChapterPaths([]);
                         setFile(null);
                         setQaCount(10);
                         setResult(null);
