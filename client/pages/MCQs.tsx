@@ -52,7 +52,6 @@ export default function MCQs() {
   const [mcqCount, setMcqCount] = useState<number | null>(20);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const arr = selectedClass ? byClass[selectedClass] || [] : [];
