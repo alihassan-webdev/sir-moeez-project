@@ -13,7 +13,7 @@ import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
   const [exists, setExists] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(true);
+  const [isEditing, setIsEditing] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
 
   const [form, setForm] = React.useState({
@@ -28,6 +28,14 @@ export default function Profile() {
     instituteName: "",
   });
   const unsubRef = React.useRef<null | (() => void)>(null);
+
+  const isFormValid = React.useMemo(
+    () =>
+      form.name.trim().length > 0 &&
+      form.phone.trim().length > 0 &&
+      form.instituteName.trim().length > 0,
+    [form],
+  );
 
   React.useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
@@ -51,7 +59,7 @@ export default function Profile() {
               };
               lastSavedRef.current = next;
               setExists(true);
-              if (!isEditing) setForm(next);
+              setForm(next);
               setIsEditing(false);
             } else {
               setExists(false);
@@ -62,7 +70,7 @@ export default function Profile() {
               };
               lastSavedRef.current = empty;
               setForm(empty);
-              setIsEditing(true);
+              setIsEditing(false);
             }
           },
           (err) => {
@@ -80,7 +88,7 @@ export default function Profile() {
       unsubAuth();
       if (unsubRef.current) unsubRef.current();
     };
-  }, [isEditing]);
+  }, []);
 
   const onSave = async () => {
     if (!user?.uid) {
@@ -91,12 +99,25 @@ export default function Profile() {
       });
       return;
     }
+    const name = form.name.trim();
+    const phone = form.phone.trim();
+    const instituteName = form.instituteName.trim();
+
+    if (!name || !phone || !instituteName) {
+      toast({
+        title: "Missing information",
+        description: "Name, phone, and institute name are required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
-        name: form.name || "",
-        phone: form.phone || "",
-        instituteName: form.instituteName || "",
+        name,
+        phone,
+        instituteName,
         profileCompleted: true,
         updatedAt: Date.now(),
       } as const;
@@ -107,7 +128,7 @@ export default function Profile() {
       // Persist institute locally as well
       const existingInst: Institute | null = getInstitute();
       const instToSave: Institute = {
-        name: form.instituteName || "",
+        name,
         logo: existingInst?.logo,
         type: existingInst?.type,
         address: existingInst?.address,
@@ -121,14 +142,19 @@ export default function Profile() {
       saveInstitute(instToSave);
 
       lastSavedRef.current = {
-        name: payload.name,
-        phone: payload.phone,
-        instituteName: payload.instituteName,
+        name,
+        phone,
+        instituteName,
       };
+      setForm({
+        name,
+        phone,
+        instituteName,
+      });
       setIsEditing(false);
       setExists(true);
       toast({
-        title: "Profile saved successfully",
+        title: "Profile updated successfully",
         description: "Your profile is synced across devices.",
       });
     } catch (e: any) {
