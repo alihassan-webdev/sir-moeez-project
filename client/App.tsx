@@ -27,7 +27,6 @@ import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { loadProfile } from "@/lib/account";
 
 const queryClient = new QueryClient();
 
@@ -61,31 +60,6 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 function RequireProfileCompleted({ children }: { children: React.ReactNode }) {
-  const [checking, setChecking] = useState(true);
-  const [completed, setCompleted] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    loadProfile().then((p) => {
-      if (!mounted) return;
-      setCompleted(!!p.profileCompleted);
-      setChecking(false);
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (checking) {
-    return (
-      <PageWrapper>
-        <div className="flex items-center justify-center py-20 text-sm text-muted-foreground">
-          Loading...
-        </div>
-      </PageWrapper>
-    );
-  }
-  if (!completed) return <Navigate to="/profile" replace />;
   return <>{children}</>;
 }
 
