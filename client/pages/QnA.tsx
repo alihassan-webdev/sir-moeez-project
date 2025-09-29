@@ -13,7 +13,7 @@ import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
-import { getProfile } from "@/lib/account";
+import { getInstitute } from "@/lib/account";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -615,14 +615,14 @@ export default function QnA() {
                             onClick={async () => {
                               if (!result) return;
                               try {
-                                const prof = getProfile();
+                                const inst = getInstitute();
                                 await generateExamStylePdf({
                                   title: "Questions",
                                   body: result,
                                   filenameBase: "questions",
                                   instituteHeader: {
-                                    instituteName: String(prof?.instituteName || ""),
-                                    instituteLogo: prof?.instituteLogo,
+                                    instituteName: String(inst?.name || ""),
+                                    instituteLogo: inst?.logo,
                                   },
                                 });
                               } catch (err) {
