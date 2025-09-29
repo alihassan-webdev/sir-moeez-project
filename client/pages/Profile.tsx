@@ -221,7 +221,7 @@ export default function Profile() {
                     }
                     placeholder="Your name"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
+                    className={!isEditing ? "bg-muted/40 text-muted-foreground" : undefined}
                   />
                 </div>
 
@@ -235,7 +235,7 @@ export default function Profile() {
                     }
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
+                    className={!isEditing ? "bg-muted/40 text-muted-foreground" : undefined}
                   />
                 </div>
 
@@ -249,17 +249,22 @@ export default function Profile() {
                     }
                     placeholder="Your institute name"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
+                    className={!isEditing ? "bg-muted/40 text-muted-foreground" : undefined}
                   />
                 </div>
 
                 <div className="pt-2 flex gap-2">
                   {isEditing ? (
                     <>
-                      <Button type="button" onClick={onSave} disabled={saving}>
+                      <Button
+                        type="button"
+                        onClick={onSave}
+                        disabled={saving || !isFormValid}
+                        className="bg-emerald-600 text-white shadow-md hover:bg-emerald-700 focus-visible:ring-emerald-500 disabled:bg-emerald-600 disabled:text-white disabled:opacity-70"
+                      >
                         {saving ? (
                           <span className="inline-flex items-center gap-2">
-                            <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
                             Saving...
                           </span>
                         ) : (
@@ -276,7 +281,12 @@ export default function Profile() {
                       </Button>
                     </>
                   ) : (
-                    <Button type="button" variant="elevated" onClick={onEdit}>
+                    <Button
+                      type="button"
+                      variant="elevated"
+                      onClick={onEdit}
+                      className="bg-blue-600 text-white shadow-md hover:bg-blue-700 focus-visible:ring-blue-500"
+                    >
                       Edit
                     </Button>
                   )}
