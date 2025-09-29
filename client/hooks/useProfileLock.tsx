@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -9,9 +15,17 @@ export type ProfileLockState = {
   user: User | null;
 };
 
-const ProfileLockContext = createContext<ProfileLockState>({ locked: false, loading: true, user: null });
+const ProfileLockContext = createContext<ProfileLockState>({
+  locked: false,
+  loading: true,
+  user: null,
+});
 
-export function ProfileLockProvider({ children }: { children: React.ReactNode }) {
+export function ProfileLockProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<User | null>(auth.currentUser);
   const [locked, setLocked] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -54,9 +68,14 @@ export function ProfileLockProvider({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  const value = useMemo(() => ({ locked, loading, user }), [locked, loading, user]);
+  const value = useMemo(
+    () => ({ locked, loading, user }),
+    [locked, loading, user],
+  );
   return (
-    <ProfileLockContext.Provider value={value}>{children}</ProfileLockContext.Provider>
+    <ProfileLockContext.Provider value={value}>
+      {children}
+    </ProfileLockContext.Provider>
   );
 }
 

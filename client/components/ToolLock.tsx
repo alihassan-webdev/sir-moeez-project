@@ -5,7 +5,13 @@ import { useProfileLock } from "@/hooks/useProfileLock";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function ToolLock({ children, className }: { children: React.ReactNode; className?: string }) {
+export function ToolLock({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const { locked } = useProfileLock();
 
   return (
@@ -17,9 +23,15 @@ export function ToolLock({ children, className }: { children: React.ReactNode; c
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/20">
                 <Lock className="h-3.5 w-3.5" />
               </span>
-              <span>⚠️ Please complete your profile setup to unlock this tool.</span>
+              <span>
+                ⚠️ Please complete your profile setup to unlock this tool.
+              </span>
             </div>
-            <Button asChild size="sm" className="bg-white text-red-600 hover:bg-white/90 shadow-md">
+            <Button
+              asChild
+              size="sm"
+              className="bg-white text-red-600 hover:bg-white/90 shadow-md"
+            >
               <Link to="/my-profile">Go to Profile</Link>
             </Button>
           </div>
@@ -27,7 +39,13 @@ export function ToolLock({ children, className }: { children: React.ReactNode; c
       )}
 
       <div className="relative">
-        <div className={cn(locked ? "pointer-events-none select-none filter blur-[1px]" : undefined)}>
+        <div
+          className={cn(
+            locked
+              ? "pointer-events-none select-none filter blur-[1px]"
+              : undefined,
+          )}
+        >
           {children}
         </div>
         {locked && (

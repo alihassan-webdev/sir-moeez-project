@@ -379,263 +379,269 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
               <ToolLock>
-              <div className="flex flex-col gap-4">
-                <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Class
-                      </label>
-                      <Select
-                        value={selectedClass}
-                        onValueChange={(v) => setSelectedClass(v)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select class" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {classOptions.map((c) => (
-                            <SelectItem key={c} value={c}>
-                              {c}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div
-                      className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-                    >
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Subject
-                      </label>
-                      <Select
-                        value={selectedSubject}
-                        onValueChange={(v) => setSelectedSubject(v)}
-                      >
-                        <SelectTrigger
-                          className="w-full"
-                          disabled={!canSelectSubject}
+                <div className="flex flex-col gap-4">
+                  <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Class
+                        </label>
+                        <Select
+                          value={selectedClass}
+                          onValueChange={(v) => setSelectedClass(v)}
                         >
-                          <SelectValue
-                            placeholder={
-                              canSelectSubject
-                                ? "Select subject"
-                                : "Select class first"
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {subjects.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              {s}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select class" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {classOptions.map((c) => (
+                              <SelectItem key={c} value={c}>
+                                {c}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                    <div
-                      className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-                    >
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Chapters
-                      </label>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-between rounded-md border border-primary/60 px-3 py-2 text-base hover:border-primary hover:bg-primary/10 hover:text-black focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-                            disabled={!canSelectChapter || isMerging}
+                      <div
+                        className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                      >
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Subject
+                        </label>
+                        <Select
+                          value={selectedSubject}
+                          onValueChange={(v) => setSelectedSubject(v)}
+                        >
+                          <SelectTrigger
+                            className="w-full"
+                            disabled={!canSelectSubject}
                           >
-                            <span className="inline-flex items-center gap-2">
-                              <ListChecks className="h-4 w-4 opacity-80" />
-                              {isMerging
-                                ? "Merging..."
-                                : selectedCount === 0
-                                  ? canSelectChapter
-                                    ? "Select chapters"
-                                    : "Select subject first"
-                                  : isAllSelected
-                                    ? `All chapters selected (${selectedCount})`
-                                    : `${selectedCount} chapter${selectedCount > 1 ? "s" : ""} selected`}
-                            </span>
-                            <ChevronDown className="h-4 w-4 opacity-80" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
-                          <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
-                            <span>Chapters</span>
-                            <span className="text-xs">
-                              {selectedCount}/{allChapterPaths.length} selected
-                            </span>
-                          </DropdownMenuLabel>
-                          <DropdownMenuCheckboxItem
-                            checked={isAllSelected}
-                            onCheckedChange={(c) => handleToggleAll(Boolean(c))}
-                            className="font-semibold hover:bg-primary/10 hover:text-black focus:bg-primary/20 focus:text-black"
-                          >
-                            All chapters
-                          </DropdownMenuCheckboxItem>
-                          <DropdownMenuSeparator />
-                          <div className="max-h-60 overflow-y-auto scrollbar-yellow pr-1">
-                            <div className="py-1">
-                              {chapterOptions.map((c) => (
-                                <DropdownMenuCheckboxItem
-                                  key={c.path}
-                                  checked={selectedChapterPaths.includes(
-                                    c.path,
-                                  )}
-                                  onCheckedChange={(check) =>
-                                    handleToggleChapter(c.path, Boolean(check))
-                                  }
-                                  className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
-                                >
-                                  {c.name.replace(/\.pdf$/i, "")}
-                                </DropdownMenuCheckboxItem>
-                              ))}
+                            <SelectValue
+                              placeholder={
+                                canSelectSubject
+                                  ? "Select subject"
+                                  : "Select class first"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {subjects.map((s) => (
+                              <SelectItem key={s} value={s}>
+                                {s}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div
+                        className={`transition-all duration-200 ease-out ${!canSelectChapter ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                      >
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Chapters
+                        </label>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="w-full justify-between rounded-md border border-primary/60 px-3 py-2 text-base hover:border-primary hover:bg-primary/10 hover:text-black focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                              disabled={!canSelectChapter || isMerging}
+                            >
+                              <span className="inline-flex items-center gap-2">
+                                <ListChecks className="h-4 w-4 opacity-80" />
+                                {isMerging
+                                  ? "Merging..."
+                                  : selectedCount === 0
+                                    ? canSelectChapter
+                                      ? "Select chapters"
+                                      : "Select subject first"
+                                    : isAllSelected
+                                      ? `All chapters selected (${selectedCount})`
+                                      : `${selectedCount} chapter${selectedCount > 1 ? "s" : ""} selected`}
+                              </span>
+                              <ChevronDown className="h-4 w-4 opacity-80" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
+                            <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
+                              <span>Chapters</span>
+                              <span className="text-xs">
+                                {selectedCount}/{allChapterPaths.length}{" "}
+                                selected
+                              </span>
+                            </DropdownMenuLabel>
+                            <DropdownMenuCheckboxItem
+                              checked={isAllSelected}
+                              onCheckedChange={(c) =>
+                                handleToggleAll(Boolean(c))
+                              }
+                              className="font-semibold hover:bg-primary/10 hover:text-black focus:bg-primary/20 focus:text-black"
+                            >
+                              All chapters
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuSeparator />
+                            <div className="max-h-60 overflow-y-auto scrollbar-yellow pr-1">
+                              <div className="py-1">
+                                {chapterOptions.map((c) => (
+                                  <DropdownMenuCheckboxItem
+                                    key={c.path}
+                                    checked={selectedChapterPaths.includes(
+                                      c.path,
+                                    )}
+                                    onCheckedChange={(check) =>
+                                      handleToggleChapter(
+                                        c.path,
+                                        Boolean(check),
+                                      )
+                                    }
+                                    className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
+                                  >
+                                    {c.name.replace(/\.pdf$/i, "")}
+                                  </DropdownMenuCheckboxItem>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    <div
-                      className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-                    >
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Number of MCQs
-                      </label>
-                      <div className="flex gap-2 items-center flex-wrap">
-                        <input
-                          type="number"
-                          min={5}
-                          max={100}
-                          value={mcqCount ?? ""}
-                          onChange={(e) =>
-                            setMcqCount(
-                              e.currentTarget.value === ""
-                                ? null
-                                : Number(e.currentTarget.value),
-                            )
-                          }
-                          disabled={!canEnterCount}
-                          className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
-                          placeholder="Enter count"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setMcqCount(10)}
-                          disabled={!canEnterCount}
-                          className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-                        >
-                          10
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setMcqCount(20)}
-                          disabled={!canEnterCount}
-                          className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-                        >
-                          20
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setMcqCount(30)}
-                          disabled={!canEnterCount}
-                          className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-                        >
-                          30
-                        </button>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="mt-4 flex gap-3">
-                    <Button
-                      disabled={!file || !mcqCount || loading || isMerging}
-                      onClick={runSubmit}
-                      className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
-                    >
-                      {loading ? (
-                        <>
-                          <span className="opacity-0">Generating...</span>
-                          <div className="loader">
-                            <div className="jimu-primary-loading"></div>
-                          </div>
-                        </>
-                      ) : (
-                        "Generate"
-                      )}
-                    </Button>
-
-                    <Button
-                      className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
-                      disabled={!result}
-                      onClick={() => {
-                        setSelectedClass("");
-                        setSelectedSubject("");
-                        setSelectedChapterPath("");
-                        setSelectedChapterPaths([]);
-                        setFile(null);
-                        setMcqCount(null);
-                        setResult(null);
-                      }}
-                    >
-                      Reset
-                    </Button>
-                  </div>
-                </div>
-
-                {result && (
-                  <div className="order-3 mt-0 w-full max-w-4xl mx-auto">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold">Result</h3>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          aria-label="Download PDF"
-                          variant="secondary"
-                          size="icon"
-                          className="rounded-full"
-                          disabled={!result || !!loading}
-                          onClick={async () => {
-                            if (!result) return;
-                            try {
-                              const { generateExamStylePdf } = await import(
-                                "@/lib/pdf"
-                              );
-                              await generateExamStylePdf({
-                                title: "MCQs",
-                                body: result,
-                                filenameBase: "mcqs",
-                              });
-                            } catch (err) {
-                              console.error(err);
-                              toast({
-                                title: "Download failed",
-                                description: "Could not generate PDF.",
-                              });
+                      <div
+                        className={`transition-all duration-200 ease-out ${!canEnterCount ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                      >
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Number of MCQs
+                        </label>
+                        <div className="flex gap-2 items-center flex-wrap">
+                          <input
+                            type="number"
+                            min={5}
+                            max={100}
+                            value={mcqCount ?? ""}
+                            onChange={(e) =>
+                              setMcqCount(
+                                e.currentTarget.value === ""
+                                  ? null
+                                  : Number(e.currentTarget.value),
+                              )
                             }
-                          }}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
+                            disabled={!canEnterCount}
+                            className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
+                            placeholder="Enter count"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setMcqCount(10)}
+                            disabled={!canEnterCount}
+                            className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 10 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                          >
+                            10
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setMcqCount(20)}
+                            disabled={!canEnterCount}
+                            className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 20 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                          >
+                            20
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setMcqCount(30)}
+                            disabled={!canEnterCount}
+                            className={`rounded-md px-3 py-2 text-sm border ${mcqCount === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+                          >
+                            30
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
-                      <div className="paper-view">
-                        <div
-                          className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
-                          dangerouslySetInnerHTML={{
-                            __html: formatResultHtml(result || ""),
-                          }}
-                        />
-                      </div>
+                    <div className="mt-4 flex gap-3">
+                      <Button
+                        disabled={!file || !mcqCount || loading || isMerging}
+                        onClick={runSubmit}
+                        className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
+                      >
+                        {loading ? (
+                          <>
+                            <span className="opacity-0">Generating...</span>
+                            <div className="loader">
+                              <div className="jimu-primary-loading"></div>
+                            </div>
+                          </>
+                        ) : (
+                          "Generate"
+                        )}
+                      </Button>
+
+                      <Button
+                        className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+                        disabled={!result}
+                        onClick={() => {
+                          setSelectedClass("");
+                          setSelectedSubject("");
+                          setSelectedChapterPath("");
+                          setSelectedChapterPaths([]);
+                          setFile(null);
+                          setMcqCount(null);
+                          setResult(null);
+                        }}
+                      >
+                        Reset
+                      </Button>
                     </div>
                   </div>
-                )}
-              </div>
+
+                  {result && (
+                    <div className="order-3 mt-0 w-full max-w-4xl mx-auto">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold">Result</h3>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            aria-label="Download PDF"
+                            variant="secondary"
+                            size="icon"
+                            className="rounded-full"
+                            disabled={!result || !!loading}
+                            onClick={async () => {
+                              if (!result) return;
+                              try {
+                                const { generateExamStylePdf } = await import(
+                                  "@/lib/pdf"
+                                );
+                                await generateExamStylePdf({
+                                  title: "MCQs",
+                                  body: result,
+                                  filenameBase: "mcqs",
+                                });
+                              } catch (err) {
+                                console.error(err);
+                                toast({
+                                  title: "Download failed",
+                                  description: "Could not generate PDF.",
+                                });
+                              }
+                            }}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 rounded-xl bg-card/60 p-8 text-base overflow-hidden">
+                        <div className="paper-view">
+                          <div
+                            className="paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words"
+                            dangerouslySetInnerHTML={{
+                              __html: formatResultHtml(result || ""),
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </ToolLock>
             </section>
           </div>

@@ -181,13 +181,18 @@ export default function Profile() {
                 {exists ? "Your saved details." : "Set up your profile."}
               </p>
 
-              <form className="mt-4 space-y-4 max-w-xl" onSubmit={(e) => e.preventDefault()}>
+              <form
+                className="mt-4 space-y-4 max-w-xl"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 <div className="grid gap-2">
                   <Label htmlFor="name">Full name</Label>
                   <Input
                     id="name"
                     value={form.name}
-                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, name: e.target.value }))
+                    }
                     placeholder="Your name"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
@@ -199,7 +204,9 @@ export default function Profile() {
                   <Input
                     id="phone"
                     value={form.phone}
-                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, phone: e.target.value }))
+                    }
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
