@@ -911,7 +911,7 @@ export default function Index() {
           ? "Request timed out. Please try again."
           : err?.message || "Request failed";
       setError(msg);
-      toast({ title: "Request failed", description: msg });
+      // Silent: avoid user-facing toast; background fallbacks already tried
     } finally {
       setLoading(false);
     }
