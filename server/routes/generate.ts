@@ -9,10 +9,9 @@ const upload = multer({
   },
 });
 
-const EXTERNAL_API =
-  "https://api-va5v.onrender.com/generate-questions" as const;
+const DEFAULT_API = "https://api-va5v.onrender.com/generate-questions" as const;
 
-const CACHE_TTL_MS = 5 * 60_000;
+const CACHE_TTL_MS = 15 * 60_000;
 const cache = new Map<string, { ts: number; json?: any; text?: string }>();
 
 // Middleware stack: multer first to parse multipart with single PDF file named "pdf" (we also accept "file")
