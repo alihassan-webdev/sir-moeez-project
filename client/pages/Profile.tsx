@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = React.useState<UserProfile>(() => getProfile());
 
   const [saving, setSaving] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
 
   React.useEffect(() => {
     let mounted = true;
@@ -36,6 +37,7 @@ export default function ProfilePage() {
         title: "Profile saved",
         description: "Your profile has been updated across devices.",
       });
+      setIsEditing(false);
     } finally {
       setSaving(false);
     }
@@ -68,6 +70,7 @@ export default function ProfilePage() {
                       setProfile((p) => ({ ...p, name: e.target.value }))
                     }
                     placeholder="Your name"
+                    disabled={!isEditing}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -79,6 +82,7 @@ export default function ProfilePage() {
                       setProfile((p) => ({ ...p, email: e.target.value }))
                     }
                     placeholder="you@example.com"
+                    disabled={!isEditing}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -90,24 +94,37 @@ export default function ProfilePage() {
                       setProfile((p) => ({ ...p, phone: e.target.value }))
                     }
                     placeholder="03XX-XXXXXXX"
+                    disabled={!isEditing}
                   />
                 </div>
 
                 {/* Email notifications and password change removed as requested */}
 
                 <div className="pt-2 flex gap-2">
-                  <Button type="submit" disabled={saving}>
-                    {saving ? "Saving..." : "Save changes"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => {
-                      setProfile(getProfile());
-                    }}
-                  >
-                    Reset
-                  </Button>
+                  {isEditing ? (
+                    <>
+                      <Button type="submit" disabled={saving}>
+                        {saving ? "Saving..." : "Save"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => {
+                          setProfile(getProfile());
+                          setIsEditing(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </div>
               </form>
             </div>
