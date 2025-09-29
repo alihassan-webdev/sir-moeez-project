@@ -1,5 +1,5 @@
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteField } from "firebase/firestore";
 
 export type UserProfile = {
   name: string;
@@ -87,7 +87,11 @@ export async function persistProfile(profile: UserProfile): Promise<void> {
   const id = getUserId();
   if (!id || id === "anonymous") return;
   try {
-    await setDoc(doc(db, "users", id), profile, { merge: true });
+    await setDoc(
+      doc(db, "users", id),
+      { ...profile, education: deleteField(), city: deleteField() },
+      { merge: true },
+    );
   } catch {}
 }
 
