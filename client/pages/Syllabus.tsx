@@ -83,7 +83,7 @@ export default function Syllabus() {
           </aside>
 
           <div>
-            <div className="-mt-5">
+            <div className="mt-4">
               <h1 className="text-2xl font-bold">Syllabus</h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Select class and subject to browse chapters. Click a chapter to view or download.
