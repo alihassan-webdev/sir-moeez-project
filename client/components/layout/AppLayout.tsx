@@ -8,7 +8,6 @@ import MobileSheet from "@/components/layout/MobileSheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { useProfileLock } from "@/hooks/useProfileLock";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -38,30 +37,9 @@ export function AppLayout({ children }: PropsWithChildren) {
     return () => clearTimeout(t);
   }, [path]);
 
-  const { locked } = useProfileLock();
-  const lockActive = locked && path !== "/profile" && path !== "/my-profile";
 
   return (
     <div className="flex min-h-svh w-full flex-col">
-      {/* Incomplete profile banner */}
-      {locked && (
-        <>
-          <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white shadow-[0_6px_18px_rgba(16,24,40,0.16)] ring-1 ring-white/10">
-            <div className="mx-auto max-w-6xl px-6 py-2.5 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-[13px] sm:text-sm font-semibold tracking-tight">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/20">
-                  <Lock className="h-3.5 w-3.5" />
-                </span>
-                <span>⚠️ Please complete your profile setup to unlock all features.</span>
-              </div>
-              <Button asChild size="sm" className="bg-white text-red-700 hover:bg-white/90 shadow-md">
-                <Link to="/my-profile">Go to Profile</Link>
-              </Button>
-            </div>
-          </div>
-          <div aria-hidden className="h-11" />
-        </>
-      )}
 
       <header className="w-full sticky top-0 z-30 bg-white border-b border-input">
         <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
@@ -109,19 +87,7 @@ export function AppLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <div className={cn("relative flex-1", lockActive ? "pointer-events-none select-none" : undefined)}>
-        <main className={cn("flex-1", lockActive ? "filter blur-sm" : undefined)}>{children}</main>
-        {lockActive && (
-          <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-[1.5px]">
-            <div className="relative">
-              <span className="absolute inline-flex h-16 w-16 rounded-full bg-primary/30 opacity-75 animate-ping" />
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/25 shadow-xl">
-                <Lock className="h-7 w-7 text-white" />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <main className={cn("flex-1")}>{children}</main>
 
       {path !== "/login" && (
         <footer className="border-t bg-background/50">
