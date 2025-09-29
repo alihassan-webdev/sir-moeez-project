@@ -19,7 +19,7 @@ export function ToolLock({ children, className }: { children: React.ReactNode; c
               </span>
               <span>⚠️ Please complete your profile setup to unlock this tool.</span>
             </div>
-            <Button asChild size="sm" className="bg-white text-red-700 hover:bg-white/90 shadow-md">
+            <Button asChild size="sm" className="bg-red-600 text-white hover:bg-red-600 shadow-md">
               <Link to="/my-profile">Go to Profile</Link>
             </Button>
           </div>
@@ -27,17 +27,12 @@ export function ToolLock({ children, className }: { children: React.ReactNode; c
       )}
 
       <div className="relative">
-        <div className={cn(locked ? "pointer-events-none select-none filter blur-sm" : undefined)}>
+        <div className={cn(locked ? "pointer-events-none select-none filter blur-[1px]" : undefined)}>
           {children}
         </div>
         {locked && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/40 backdrop-blur-[1.5px]">
-            <div className="relative">
-              <span className="absolute inline-flex h-16 w-16 rounded-full bg-primary/30 opacity-75 animate-ping" />
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/25 shadow-xl">
-                <Lock className="h-7 w-7 text-white" />
-              </div>
-            </div>
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-[1px]">
+            <Lock className="h-7 w-7 text-white" />
           </div>
         )}
       </div>
