@@ -113,22 +113,6 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                {/* Email notifications and password change removed as requested */}
-
-                <div className="grid gap-2">
-                  <Label htmlFor="education">Education</Label>
-                  <Input
-                    id="education"
-                    value={profile.education || ""}
-                    onChange={(e) =>
-                      setProfile((p) => ({ ...p, education: e.target.value }))
-                    }
-                    placeholder="e.g., B.Ed, M.Sc Physics"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="address">Address</Label>
                   <Input
@@ -137,7 +121,7 @@ export default function ProfilePage() {
                     onChange={(e) =>
                       setProfile((p) => ({ ...p, address: e.target.value }))
                     }
-                    placeholder="City, Country"
+                    placeholder="Your address"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
                   />
