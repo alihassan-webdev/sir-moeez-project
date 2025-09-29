@@ -8,7 +8,6 @@ import {
   User,
   LifeBuoy,
   BookOpen,
-  BookOpen,
   History,
 } from "lucide-react";
 
