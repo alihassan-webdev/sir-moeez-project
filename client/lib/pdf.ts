@@ -17,7 +17,6 @@ export async function generateExamStylePdf(params: {
   const { title, body, filenameBase, instituteHeader } = params;
   const mod: any = await import("jspdf");
   const JsPDF = mod.jsPDF || mod.default;
-  try { await import("html2canvas"); } catch {}
   const doc = new JsPDF({ unit: "pt", format: "a4" });
 
   const margin = 64;
