@@ -8,6 +8,7 @@ import {
   Folder,
   ListChecks,
   MessageSquare,
+  History,
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
