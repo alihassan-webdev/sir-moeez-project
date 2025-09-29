@@ -6,12 +6,25 @@
   node_bundler = "esbuild"
   external_node_modules = ["express", "cors", "multer", "serverless-http", "dotenv"]
 
+# Specific: use our Express serverless API (with caching) for the main generator endpoint
+[[redirects]]
+  from = "/api/generate-questions"
+  to = "/.netlify/functions/api"
+  status = 200
+
+# Fallback: other /api/* routes go through the lightweight proxy function
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/proxy"
   status = 200
 
+# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Edge function for static caching
+[[edge_functions]]
+  function = "edge-cache"
+  path = "/*"
