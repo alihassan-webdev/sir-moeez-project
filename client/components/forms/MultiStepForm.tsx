@@ -209,8 +209,8 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
           name: fullName,
           email: String(updated.email || auth.currentUser?.email || ""),
           phone: String(updated.phone || ""),
-          role: "",
           updatedAt: Date.now(),
+          notify: false,
         };
         saveProfile(profile);
         const inst: Institute = {

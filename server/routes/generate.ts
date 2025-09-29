@@ -9,10 +9,9 @@ const upload = multer({
   },
 });
 
-const EXTERNAL_API =
-  "https://api-va5v.onrender.com/generate-questions" as const;
+const DEFAULT_API = "https://api-va5v.onrender.com/generate-questions" as const;
 
-const CACHE_TTL_MS = 5 * 60_000;
+const CACHE_TTL_MS = 15 * 60_000;
 const cache = new Map<string, { ts: number; json?: any; text?: string }>();
 
 // Middleware stack: multer first to parse multipart with single PDF file named "pdf" (we also accept "file")
@@ -60,41 +59,88 @@ export const handleGenerate: RequestHandler = async (req, res) => {
     form.append("pdf", blob, file.originalname || "document.pdf");
     if (query) form.append("query", query);
 
-    // Also support query as URL search param for target API if they expect it there
-    const url = new URL(EXTERNAL_API);
-    if (query) url.searchParams.set("query", query);
+    // Build list of upstreams to try: env -> default -> Netlify proxy on same host
+    const upstreams: string[] = [];
+    const envBase = process.env.PREDICT_ENDPOINT;
+    const normalize = (base: string) => {
+      try {
+        const u = new URL(base);
+        const path = u.pathname.replace(/\/+$/, "");
+        if (!/\/generate-questions$/.test(path))
+          u.pathname = `${path}/generate-questions`;
+        if (query) u.searchParams.set("query", query);
+        return u.toString();
+      } catch {
+        const b = String(base).replace(/\/+$/, "");
+        const url = new URL(`${b}/generate-questions`);
+        if (query) url.searchParams.set("query", query);
+        return url.toString();
+      }
+    };
+    if (envBase && envBase.trim()) upstreams.push(normalize(envBase));
+    upstreams.push(normalize(DEFAULT_API));
 
-    // Abort if upstream is too slow to respond (bump to 60s for public proxies)
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60_000);
+    // Same-host Netlify proxy fallback
+    const host = String(
+      req.headers["x-forwarded-host"] || req.headers.host || "",
+    );
+    const proto = String(req.headers["x-forwarded-proto"] || "https");
+    if (host)
+      upstreams.push(
+        `${proto}://${host}/.netlify/functions/proxy${query ? `?query=${encodeURIComponent(query)}` : ""}`,
+      );
 
-    const upstream = await fetch(url, {
-      method: "POST",
-      body: form,
-      signal: controller.signal,
-    }).finally(() => clearTimeout(timeout));
+    let finalResp: Response | null = null;
+    for (const target of upstreams) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60_000);
+        const resp = await fetch(target, {
+          method: "POST",
+          body: form,
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeout));
+        if (resp && resp.ok) {
+          finalResp = resp;
+          break;
+        }
+        // If not ok, continue trying next
+      } catch {
+        // network error -> try next
+      }
+    }
 
-    const contentType = upstream.headers.get("content-type") || "";
+    if (!finalResp) {
+      return res
+        .status(502)
+        .json({ error: true, message: "All upstreams failed" });
+    }
 
-    if (!upstream.ok) {
-      const errText = await upstream.text().catch(() => upstream.statusText);
-      return res.status(upstream.status).json({ error: true, message: errText || "Upstream error" });
+    const contentType = finalResp.headers.get("content-type") || "";
+
+    if (!finalResp.ok) {
+      const errText = await finalResp.text().catch(() => finalResp.statusText);
+      return res
+        .status(finalResp.status)
+        .json({ error: true, message: errText || "Upstream error" });
     }
 
     if (contentType.includes("application/json")) {
-      const json = await upstream.json();
+      const json = await finalResp.json();
       cache.set(key, { ts: Date.now(), json });
       return res.status(200).json(json);
     }
 
     // Fallback: return text result under a consistent shape
-    const text = await upstream.text();
+    const text = await finalResp.text();
     cache.set(key, { ts: Date.now(), text });
     return res.status(200).json({ result: text });
   } catch (err: any) {
     if (err?.name === "AbortError") {
       return res.status(504).json({ error: true, message: "Upstream timeout" });
     }
-    return res.status(500).json({ error: true, message: err?.message || "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ error: true, message: err?.message || "Internal Server Error" });
   }
 };

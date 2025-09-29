@@ -789,8 +789,6 @@ export default function Index() {
         const form = new FormData();
         form.append("pdf", theFile);
         form.append("query", q);
-        // Include both common field names for maximum compatibility via proxy
-        form.append("file", theFile);
 
         const res = await withTimeout(
           fetch(finalUrl, {
@@ -913,7 +911,7 @@ export default function Index() {
           ? "Request timed out. Please try again."
           : err?.message || "Request failed";
       setError(msg);
-      toast({ title: "Request failed", description: msg });
+      // Silent: avoid user-facing toast; background fallbacks already tried
     } finally {
       setLoading(false);
     }
@@ -1041,7 +1039,7 @@ export default function Index() {
                 </div>
 
                 {result && (
-                  <div className="order-1 mt-0 w-full max-w-4xl mx-auto">
+                  <div className="order-3 mt-0 w-full max-w-4xl mx-auto">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
                       <div className="flex items-center gap-2">

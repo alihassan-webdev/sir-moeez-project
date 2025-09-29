@@ -283,7 +283,6 @@ export default function QnA() {
       const form = new FormData();
       form.append("pdf", file);
       form.append("query", q);
-      form.append("file", file);
 
       const initialTimeoutMs = 45000;
       const retryTimeoutMs = 65000;
@@ -344,12 +343,8 @@ export default function QnA() {
         const text = await res.text();
         setResult(stripAnswers(text));
       }
-    } catch (err: any) {
-      const msg =
-        err?.message === "timeout"
-          ? "Request timed out. Please try again."
-          : err?.message || "Request failed";
-      toast({ title: "Request failed", description: msg });
+    } catch (_err: any) {
+      // Silent failure; background retries already attempted via fallbacks
       setResult(null);
     } finally {
       setLoading(false);
@@ -589,7 +584,7 @@ export default function QnA() {
                 </div>
 
                 {result && (
-                  <div className="order-1 mt-0 w-full max-w-4xl mx-auto">
+                  <div className="order-3 mt-0 w-full max-w-4xl mx-auto">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
                       <div className="flex items-center gap-2">
