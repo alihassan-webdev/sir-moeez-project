@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Link } from "react-router-dom";
-import { FileText, ListChecks, MessageSquare, Clock } from "lucide-react-react";
+import { FileText, ListChecks, MessageSquare, Clock } from "lucide-react";
+import { examTypeLabels, fetchLastAttemptByType, type ExamTypeSlug as ExamType } from "@/lib/results";
 
 function formatWhen(ts?: number): string {
   if (!ts) return "No attempts";
