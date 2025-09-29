@@ -231,7 +231,11 @@ export default function Profile() {
                     }
                     placeholder="Your name"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/40 text-muted-foreground" : undefined}
+                    className={
+                      !isEditing
+                        ? "bg-muted/40 text-muted-foreground"
+                        : undefined
+                    }
                   />
                 </div>
 
@@ -245,7 +249,11 @@ export default function Profile() {
                     }
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/40 text-muted-foreground" : undefined}
+                    className={
+                      !isEditing
+                        ? "bg-muted/40 text-muted-foreground"
+                        : undefined
+                    }
                   />
                 </div>
 
@@ -259,7 +267,11 @@ export default function Profile() {
                     }
                     placeholder="Your institute name"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/40 text-muted-foreground" : undefined}
+                    className={
+                      !isEditing
+                        ? "bg-muted/40 text-muted-foreground"
+                        : undefined
+                    }
                   />
                 </div>
 
