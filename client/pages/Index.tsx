@@ -842,14 +842,11 @@ export default function Index() {
       setLoading(true);
       let res: Response | null = null;
 
-      // Try direct API endpoint first
+      // Direct API call disabled; route via Netlify proxy only
       let initialRes: Response | null = null;
-      if (API_URL) {
-        initialRes = await sendTo(API_URL, settings.initialTimeoutMs);
-        res = initialRes;
-      }
+      res = null as any;
 
-      // If direct request failed (network/CORS) or returned non-OK, try internal proxies
+      // Try internal proxy paths
       if (!res || !res.ok) {
         const proxies = [
           "/.netlify/functions/proxy",
