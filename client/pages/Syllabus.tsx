@@ -88,7 +88,7 @@ export default function Syllabus() {
               Select class and subject to browse chapters. Click a chapter to view or download.
             </p>
             <div className="mt-4">
-              <SidebarStats />
+              <SidebarStats title={null} />
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
