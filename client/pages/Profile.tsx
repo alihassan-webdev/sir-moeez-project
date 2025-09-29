@@ -86,8 +86,85 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                <div className="pt-2">
-                  <Button type="submit">Save changes</Button>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      className="mr-2 align-middle"
+                      checked={!!profile.notify}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, notify: e.target.checked }))
+                      }
+                    />
+                    Email notifications
+                  </label>
+                </div>
+
+                <div className="grid gap-2 pt-2">
+                  <Label htmlFor="newpwd">Change password</Label>
+                  <Input
+                    id="newpwd"
+                    type="password"
+                    value={pwd1}
+                    onChange={(e) => setPwd1(e.target.value)}
+                    placeholder="New password"
+                  />
+                  <Input
+                    id="newpwd2"
+                    type="password"
+                    value={pwd2}
+                    onChange={(e) => setPwd2(e.target.value)}
+                    placeholder="Confirm new password"
+                  />
+                  <div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={!pwd1 || pwd1 !== pwd2 || saving}
+                      onClick={async () => {
+                        try {
+                          const { updatePassword, sendPasswordResetEmail } = await import("firebase/auth");
+                          if (!auth.currentUser) throw new Error("Not logged in");
+                          if (pwd1 !== pwd2) throw new Error("Passwords do not match");
+                          await updatePassword(auth.currentUser, pwd1);
+                          setPwd1("");
+                          setPwd2("");
+                          toast({ title: "Password updated", description: "Your password has been changed." });
+                        } catch (err: any) {
+                          const code = String(err?.code || "");
+                          if (code.includes("requires-recent-login")) {
+                            // Fallback: send reset email
+                            try {
+                              if (auth.currentUser?.email) {
+                                const email = auth.currentUser.email;
+                                await sendPasswordResetEmail(auth, email);
+                                toast({ title: "Verification required", description: "We sent a reset link to your email." });
+                              }
+                            } catch {}
+                          } else {
+                            toast({ title: "Password update failed", description: err?.message || "Try again." });
+                          }
+                        }
+                      }}
+                    >
+                      Update password
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex gap-2">
+                  <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save changes"}</Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      setProfile(getProfile());
+                      setPwd1("");
+                      setPwd2("");
+                    }}
+                  >
+                    Reset
+                  </Button>
                 </div>
               </form>
             </div>
