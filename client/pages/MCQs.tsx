@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatResultHtml } from "@/lib/format";
 import ToolLock from "@/components/ToolLock";
+import { Link } from "react-router-dom";
+import { auth, db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 type Entry = { path: string; url: string; name: string };
 
