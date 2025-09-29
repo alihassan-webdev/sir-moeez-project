@@ -1,4 +1,5 @@
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export type UserProfile = {
   name: string;
@@ -10,7 +11,7 @@ export type UserProfile = {
 
 export type Institute = {
   name: string;
-  logo?: string; // data URL or external URL
+  logo?: string;
   type?: string;
   address?: string;
   city?: string;
@@ -37,7 +38,6 @@ export function getProfile(): UserProfile {
       return JSON.parse(raw) as UserProfile;
     } catch {}
   }
-  // default from auth if available
   const u = auth.currentUser;
   return {
     name: u?.displayName || "",
@@ -51,6 +51,37 @@ export function getProfile(): UserProfile {
 export function saveProfile(profile: UserProfile) {
   const id = getUserId();
   localStorage.setItem(PROFILE_KEY_PREFIX + id, JSON.stringify(profile));
+}
+
+export async function loadProfile(): Promise<UserProfile> {
+  const id = getUserId();
+  if (!id || id === "anonymous") return getProfile();
+  try {
+    const snap = await getDoc(doc(db, "profiles", id));
+    if (snap.exists()) {
+      const remote = snap.data() as Partial<UserProfile>;
+      const current = getProfile();
+      const merged: UserProfile = {
+        name: String(remote.name ?? current.name ?? ""),
+        email: String(remote.email ?? current.email ?? ""),
+        phone: String(remote.phone ?? current.phone ?? ""),
+        updatedAt: Number(remote.updatedAt ?? current.updatedAt ?? Date.now()),
+        notify: Boolean(remote.notify ?? current.notify ?? false),
+      };
+      saveProfile(merged);
+      return merged;
+    }
+  } catch {}
+  return getProfile();
+}
+
+export async function persistProfile(profile: UserProfile): Promise<void> {
+  saveProfile(profile);
+  const id = getUserId();
+  if (!id || id === "anonymous") return;
+  try {
+    await setDoc(doc(db, "profiles", id), profile, { merge: true });
+  } catch {}
 }
 
 export function getInstitute(): Institute | null {
