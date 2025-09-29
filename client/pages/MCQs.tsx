@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatResultHtml } from "@/lib/format";
+import ToolLock from "@/components/ToolLock";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -377,6 +378,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
             </section>
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
+              <ToolLock>
               <div className="flex flex-col gap-4">
                 <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -634,6 +636,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                   </div>
                 )}
               </div>
+              </ToolLock>
             </section>
           </div>
         </div>
