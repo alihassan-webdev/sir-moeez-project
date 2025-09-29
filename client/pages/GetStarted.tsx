@@ -240,20 +240,6 @@ function MyAccountCards() {
         </div>
       </Link>
 
-      <Link
-        to="/institute"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
-      >
-        <div className="flex flex-col h-full">
-          <div className="text-base font-semibold">Register institute</div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            Add institute details for licensing.
-          </div>
-          <div className="mt-auto pt-3 text-xs text-muted-foreground">
-            Edit later anytime.
-          </div>
-        </div>
-      </Link>
 
       <Link
         to="/support"

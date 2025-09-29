@@ -105,15 +105,6 @@ export default function MobileSheet() {
           </SheetClose>
           <SheetClose asChild>
             <Link
-              to="/institute"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/institute" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
-            >
-              Register Institute
-            </Link>
-          </SheetClose>
-          <SheetClose asChild>
-            <Link
               to="/support"
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/support" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
