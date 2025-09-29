@@ -18,11 +18,9 @@ export default function Profile() {
   const [form, setForm] = React.useState({
     name: "",
     phone: "",
-    address: "",
-    dob: "",
   });
 
-  const lastSavedRef = React.useRef({ name: "", phone: "", address: "", dob: "" });
+  const lastSavedRef = React.useRef({ name: "", phone: "" });
   const unsubRef = React.useRef<null | (() => void)>(null);
 
   React.useEffect(() => {
@@ -42,8 +40,6 @@ export default function Profile() {
               const next = {
                 name: String(d.name ?? ""),
                 phone: String(d.phone ?? ""),
-                address: String(d.address ?? ""),
-                dob: String(d.dob ?? ""),
               };
               lastSavedRef.current = next;
               setExists(true);
@@ -51,7 +47,7 @@ export default function Profile() {
               setIsEditing(false);
             } else {
               setExists(false);
-              const empty = { name: "", phone: "", address: "", dob: "" };
+              const empty = { name: "", phone: "" };
               lastSavedRef.current = empty;
               setForm(empty);
               setIsEditing(true);
@@ -83,12 +79,10 @@ export default function Profile() {
       const payload = {
         name: form.name || "",
         phone: form.phone || "",
-        address: form.address || "",
-        dob: form.dob || "",
         profileCompleted: true,
       };
       await setDoc(doc(db, "users", user.uid), payload, { merge: true });
-      lastSavedRef.current = { name: payload.name, phone: payload.phone, address: payload.address, dob: payload.dob };
+      lastSavedRef.current = { name: payload.name, phone: payload.phone };
       setIsEditing(false);
       setExists(true);
       toast({ title: "Profile saved", description: "Your profile is synced across devices." });
@@ -155,30 +149,6 @@ export default function Profile() {
                     value={form.phone}
                     onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                     placeholder="03XX-XXXXXXX"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={form.address}
-                    onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
-                    placeholder="Your address"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="dob">Date of birth</Label>
-                  <Input
-                    id="dob"
-                    type="date"
-                    value={form.dob}
-                    onChange={(e) => setForm((p) => ({ ...p, dob: e.target.value }))}
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
                   />
