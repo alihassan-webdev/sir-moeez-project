@@ -77,25 +77,6 @@ export default function MCQs() {
   const [result, setResult] = useState<string | null>(null);
   const lastSavedRef = React.useRef<string | null>(null);
 
-  useEffect(() => {
-    if (!result) return;
-    if (lastSavedRef.current === result) return;
-    lastSavedRef.current = result;
-    (async () => {
-      try {
-        const title = `${selectedClass ? selectedClass + " • " : ""}${selectedSubject || "MCQs"} — MCQs`;
-        void saveUserResult({
-          examType: "mcqs",
-          title,
-          resultData: result,
-          downloadUrl: null,
-          score: null,
-          instituteName: profile?.instituteName,
-          instituteLogo: profile?.instituteLogo,
-        });
-      } catch {}
-    })();
-  }, [result, selectedClass, selectedSubject, profile?.instituteName, profile?.instituteLogo]);
 
   const [profile, setProfile] = useState<{
     name?: string;
@@ -131,6 +112,26 @@ export default function MCQs() {
       profile?.instituteName &&
       profile?.instituteLogo,
   );
+
+  useEffect(() => {
+    if (!result) return;
+    if (lastSavedRef.current === result) return;
+    lastSavedRef.current = result;
+    (async () => {
+      try {
+        const title = `${selectedClass ? selectedClass + " • " : ""}${selectedSubject || "MCQs"} — MCQs`;
+        void saveUserResult({
+          examType: "mcqs",
+          title,
+          resultData: result,
+          downloadUrl: null,
+          score: null,
+          instituteName: profile?.instituteName,
+          instituteLogo: profile?.instituteLogo,
+        });
+      } catch {}
+    })();
+  }, [result, selectedClass, selectedSubject, profile?.instituteName, profile?.instituteLogo]);
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
