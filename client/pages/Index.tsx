@@ -661,6 +661,7 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
+  const lastSavedRef = useRef<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -911,6 +912,18 @@ export default function Index() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!result) return;
+    if (lastSavedRef.current === result) return;
+    lastSavedRef.current = result;
+    (async () => {
+      try {
+        const { saveResult } = await import("@/lib/results");
+        await saveResult({ examType: "exam", content: result });
+      } catch {}
+    })();
+  }, [result]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
