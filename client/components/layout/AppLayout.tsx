@@ -37,7 +37,6 @@ export function AppLayout({ children }: PropsWithChildren) {
     return () => clearTimeout(t);
   }, [path]);
 
-
   return (
     <div className="flex min-h-svh w-full flex-col">
       <header className="w-full sticky top-0 z-30 bg-white border-b border-input">

@@ -22,7 +22,12 @@ export default function Profile() {
     dob: "",
   });
 
-  const lastSavedRef = React.useRef({ name: "", phone: "", address: "", dob: "" });
+  const lastSavedRef = React.useRef({
+    name: "",
+    phone: "",
+    address: "",
+    dob: "",
+  });
   const unsubRef = React.useRef<null | (() => void)>(null);
 
   React.useEffect(() => {
@@ -59,7 +64,11 @@ export default function Profile() {
           },
           (err) => {
             console.error(err);
-            toast({ title: "Error", description: "Failed to load profile.", variant: "destructive" });
+            toast({
+              title: "Error",
+              description: "Failed to load profile.",
+              variant: "destructive",
+            });
           },
         );
       }
@@ -72,7 +81,11 @@ export default function Profile() {
 
   const onSave = async () => {
     if (!user?.uid) {
-      toast({ title: "Not logged in", description: "Please sign in first.", variant: "destructive" });
+      toast({
+        title: "Not logged in",
+        description: "Please sign in first.",
+        variant: "destructive",
+      });
       return;
     }
     setSaving(true);
@@ -88,13 +101,25 @@ export default function Profile() {
       await setDoc(doc(db, "users", user.uid), payload, { merge: true });
       const verify = await getDoc(doc(db, "users", user.uid));
       if (!verify.exists()) throw new Error("Server save verification failed");
-      lastSavedRef.current = { name: payload.name, phone: payload.phone, address: payload.address, dob: payload.dob };
+      lastSavedRef.current = {
+        name: payload.name,
+        phone: payload.phone,
+        address: payload.address,
+        dob: payload.dob,
+      };
       setIsEditing(false);
       setExists(true);
-      toast({ title: "Profile saved successfully", description: "Your profile is synced across devices." });
+      toast({
+        title: "Profile saved successfully",
+        description: "Your profile is synced across devices.",
+      });
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Save failed", description: e?.message || "Please try again.", variant: "destructive" });
+      toast({
+        title: "Save failed",
+        description: e?.message || "Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
@@ -112,7 +137,9 @@ export default function Profile() {
       <div className="min-h-svh">
         <Container className="py-6">
           <div className="rounded-xl border border-input bg-white p-6 card-yellow-shadow">
-            <p className="text-sm text-muted-foreground">Please log in to view your profile.</p>
+            <p className="text-sm text-muted-foreground">
+              Please log in to view your profile.
+            </p>
           </div>
         </Container>
       </div>
@@ -136,13 +163,18 @@ export default function Profile() {
                 {exists ? "Your saved details." : "Set up your profile."}
               </p>
 
-              <form className="mt-4 space-y-4 max-w-xl" onSubmit={(e) => e.preventDefault()}>
+              <form
+                className="mt-4 space-y-4 max-w-xl"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 <div className="grid gap-2">
                   <Label htmlFor="name">Full name</Label>
                   <Input
                     id="name"
                     value={form.name}
-                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, name: e.target.value }))
+                    }
                     placeholder="Your name"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
@@ -154,7 +186,9 @@ export default function Profile() {
                   <Input
                     id="phone"
                     value={form.phone}
-                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, phone: e.target.value }))
+                    }
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
@@ -166,7 +200,9 @@ export default function Profile() {
                   <Input
                     id="address"
                     value={form.address}
-                    onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, address: e.target.value }))
+                    }
                     placeholder="Your address"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
@@ -179,7 +215,9 @@ export default function Profile() {
                     id="dob"
                     type="date"
                     value={form.dob}
-                    onChange={(e) => setForm((p) => ({ ...p, dob: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, dob: e.target.value }))
+                    }
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
                   />
@@ -198,7 +236,12 @@ export default function Profile() {
                           "Save"
                         )}
                       </Button>
-                      <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={onCancel}
+                        disabled={saving}
+                      >
                         Cancel
                       </Button>
                     </>

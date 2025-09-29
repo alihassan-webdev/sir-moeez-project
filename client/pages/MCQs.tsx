@@ -599,7 +599,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              const { generateExamStylePdf } = await import("@/lib/pdf");
+                              const { generateExamStylePdf } = await import(
+                                "@/lib/pdf"
+                              );
                               await generateExamStylePdf({
                                 title: "MCQs",
                                 body: result,

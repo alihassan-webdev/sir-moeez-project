@@ -596,7 +596,9 @@ export default function QnA() {
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              const { generateExamStylePdf } = await import("@/lib/pdf");
+                              const { generateExamStylePdf } = await import(
+                                "@/lib/pdf"
+                              );
                               await generateExamStylePdf({
                                 title: "Questions",
                                 body: result,
