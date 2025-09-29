@@ -1,13 +1,14 @@
 import { PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, PropsWithChildren } from "react";
 import MobileSheet from "@/components/layout/MobileSheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
+import { useProfileLock } from "@/hooks/useProfileLock";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -37,8 +38,24 @@ export function AppLayout({ children }: PropsWithChildren) {
     return () => clearTimeout(t);
   }, [path]);
 
+  const { locked } = useProfileLock();
+
   return (
     <div className="flex min-h-svh w-full flex-col">
+      {/* Incomplete profile banner */}
+      {locked && (
+        <div className="fixed top-0 left-0 right-0 z-40 bg-red-600 text-white">
+          <div className="mx-auto max-w-6xl px-6 py-2 flex items-center justify-between gap-4">
+            <div className="text-sm font-medium">
+              ⚠️ Please complete your profile setup to unlock all features.
+            </div>
+            <Button asChild size="sm" className="bg-white text-red-700 hover:bg-white/90">
+              <Link to="/my-profile">Go to Profile</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+
       <header className="w-full sticky top-0 z-30 bg-white border-b border-input">
         <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
           <Link
@@ -85,7 +102,17 @@ export function AppLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <main className={cn("flex-1")}>{children}</main>
+      <div className={cn("relative flex-1", locked ? "pointer-events-none select-none" : undefined)}>
+        <main className={cn("flex-1", locked ? "filter blur-sm" : undefined)}>{children}</main>
+        {locked && (
+          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/40">
+            <div className="flex items-center gap-3 text-white">
+              <Lock className="h-6 w-6" />
+              <span className="text-sm font-medium">Profile locked</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {path !== "/login" && (
         <footer className="border-t bg-background/50">
