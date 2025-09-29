@@ -6,17 +6,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { getProfile, loadProfile, persistProfile, type UserProfile } from "@/lib/account";
+import { Check, Pencil } from "lucide-react";
 
 export default function ProfilePage() {
   const [profile, setProfile] = React.useState<UserProfile>(() => getProfile());
 
   const [saving, setSaving] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const [isEditing, setIsEditing] = React.useState(false);
 
   React.useEffect(() => {
     let mounted = true;
     loadProfile().then((remote) => {
-      if (mounted) setProfile(remote);
+      if (!mounted) return;
+      setProfile(remote);
+      setIsEditing(!remote.profileCompleted);
+      setLoading(false);
     });
     return () => {
       mounted = false;
@@ -30,6 +35,7 @@ export default function ProfilePage() {
       const updated: UserProfile = {
         ...profile,
         updatedAt: Date.now(),
+        profileCompleted: true,
       };
       await persistProfile(updated);
       setProfile(updated);
@@ -60,7 +66,13 @@ export default function ProfilePage() {
                 Update your personal details.
               </p>
 
-              <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-xl">
+              {loading ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground py-6">
+                  <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                  Loading profile...
+                </div>
+              ) : (
+                <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-xl">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Full name</Label>
                   <Input
@@ -71,6 +83,7 @@ export default function ProfilePage() {
                     }
                     placeholder="Your name"
                     disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -83,6 +96,7 @@ export default function ProfilePage() {
                     }
                     placeholder="you@example.com"
                     disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -95,16 +109,49 @@ export default function ProfilePage() {
                     }
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
                   />
                 </div>
 
                 {/* Email notifications and password change removed as requested */}
 
+                <div className="grid gap-2">
+                  <Label htmlFor="education">Education</Label>
+                  <Input
+                    id="education"
+                    value={profile.education || ""}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, education: e.target.value }))
+                    }
+                    placeholder="e.g., B.Ed, M.Sc Physics"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={profile.address || ""}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, address: e.target.value }))
+                    }
+                    placeholder="City, Country"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
+
                 <div className="pt-2 flex gap-2">
                   {isEditing ? (
                     <>
                       <Button type="submit" disabled={saving}>
-                        {saving ? "Saving..." : "Save"}
+                        {saving ? (
+                          <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" /> Saving...</span>
+                        ) : (
+                          <span className="inline-flex items-center gap-2"><Check className="h-4 w-4" /> {profile.profileCompleted ? "Save Changes" : "Save Profile"}</span>
+                        )}
                       </Button>
                       <Button
                         type="button"
@@ -121,12 +168,14 @@ export default function ProfilePage() {
                     <Button
                       type="button"
                       onClick={() => setIsEditing(true)}
+                      variant="elevated"
                     >
-                      Edit
+                      <span className="inline-flex items-center gap-2"><Pencil className="h-4 w-4" /> Edit Profile</span>
                     </Button>
                   )}
                 </div>
               </form>
+              )}
             </div>
           </div>
         </div>
