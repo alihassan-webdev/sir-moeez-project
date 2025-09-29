@@ -36,27 +36,8 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const [checking, setChecking] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setChecking(false);
-    });
-    return () => unsub();
-  }, []);
-
-  if (checking) {
-    return (
-      <PageWrapper>
-        <div className="flex items-center justify-center py-20 text-sm text-muted-foreground">
-          Loading...
-        </div>
-      </PageWrapper>
-    );
-  }
-  if (!user) return <Navigate to="/login" replace />;
+  const current = auth.currentUser;
+  if (!current) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
