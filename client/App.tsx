@@ -24,6 +24,7 @@ import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
 import Support from "./pages/Support";
 import Login from "./pages/Login";
+import Onboarding from "./pages/Onboarding";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 
