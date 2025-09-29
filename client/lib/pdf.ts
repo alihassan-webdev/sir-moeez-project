@@ -12,7 +12,7 @@ export async function generateExamStylePdf(params: {
   title: string;
   body: string;
   filenameBase?: string;
-  instituteHeader?: { instituteName?: string; instituteLogo?: string };
+  instituteHeader?: { instituteName?: string; instituteLogo?: string; tagline?: string };
 }) {
   const { title, body, filenameBase, instituteHeader } = params;
   const mod: any = await import("jspdf");
@@ -86,13 +86,13 @@ export async function generateExamStylePdf(params: {
     y += 12;
   }
 
-  // Header removed: show only institute header above
-  doc.setDrawColor(190);
-  doc.setLineWidth(1);
-  doc.line(margin, y, pageW - margin, y);
-  y += 16;
+  // Title
+  doc.setFont("times", "bold");
+  doc.setFontSize(16);
+  doc.text("Examination Paper", pageW / 2, y, { align: "center" });
+  y += 18;
 
-  // Date line (no marks for MCQs/QnA)
+  // Date line
   doc.setFont("times", "normal");
   doc.setFontSize(12);
   const dateStr = new Date().toLocaleDateString();
@@ -260,8 +260,12 @@ export async function generateExamStylePdf(params: {
       const isOption = /^\s*(?:[A-Da-d][\).]|\([A-Da-d]\))\s+/.test(l);
       const indent = isOption ? 18 : 0;
       l = l.replace(/^(\s*)(?:Q\.?\s*)?(\d+)\./i, "$1$2.");
-      const baseBold = isQuestion || /^\s*Q\.?\s*\d+\./i.test(l);
-      doc.setFontSize(baseBold ? 13 : 12);
+      // Bold only the question number
+      if (isQuestion) {
+        l = l.replace(/^(\s*)(\d+\.)/, "$1**$2**");
+      }
+      const baseBold = false;
+      doc.setFontSize(isQuestion ? 13 : 12);
       drawStyledLine(l, baseBold, margin + indent, contentW - indent);
       if (isOption) y -= 3;
     }
@@ -280,15 +284,17 @@ export async function generateExamStylePdf(params: {
     6,
   );
 
-  // Watermark footer
+  // Footer with page numbers and optional tagline
   const totalPages = doc.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
-    doc.setFont("times", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(200);
-    doc.text(headingTitle, pageW / 2, pageH - 28, { align: "center" });
+    doc.setFont("times", "normal");
+    doc.setFontSize(10);
     doc.setTextColor(0);
+    doc.text(`Page ${i} of ${totalPages}`, pageW / 2, pageH - 24, { align: "center" });
+    if (instituteHeader?.tagline) {
+      doc.text(String(instituteHeader.tagline), pageW - margin, pageH - 24, { align: "right" });
+    }
   }
 
   const base = sanitizeFilenameBase(filenameBase || headingTitle);
