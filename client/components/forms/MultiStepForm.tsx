@@ -15,8 +15,7 @@ import { auth } from "@/lib/firebase";
 
 // Schemas
 const personalInfoSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(7, "Phone must be at least 7 characters"),
 });
@@ -48,8 +47,7 @@ const stepsDef = [
     description: "Tell us about yourself",
     schema: personalInfoSchema,
     fields: [
-      { name: "firstName", label: "First Name", type: "text", placeholder: "John" },
-      { name: "lastName", label: "Last Name", type: "text", placeholder: "Doe" },
+      { name: "fullName", label: "Full Name", type: "text", placeholder: "John Doe" },
       { name: "email", label: "Email", type: "email", placeholder: "john.doe@example.com" },
       { name: "phone", label: "Phone No.", type: "text", placeholder: "+1 555 555 5555" },
     ],
@@ -100,8 +98,7 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
     const inst = getInstitute();
     setData((d) => ({
       ...d,
-      firstName: prof.name?.split(" ")[0] || "",
-      lastName: prof.name?.split(" ").slice(1).join(" ") || "",
+      fullName: prof.name || "",
       email: prof.email || auth.currentUser?.email || "",
       phone: prof.phone || "",
       instituteName: inst?.name || "",
@@ -160,7 +157,7 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
       setIsSubmitting(true);
       setTimeout(() => {
         // save profile and institute
-        const fullName = `${updated.firstName ?? ""} ${updated.lastName ?? ""}`.trim();
+        const fullName = String(updated.fullName || "").trim();
         const profile: UserProfile = {
           name: fullName,
           email: String(updated.email || auth.currentUser?.email || ""),
