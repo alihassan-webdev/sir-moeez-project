@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
-import { persistProfile } from "@/lib/account";
+import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
@@ -19,9 +18,11 @@ export default function Profile() {
   const [form, setForm] = React.useState({
     name: "",
     phone: "",
+    address: "",
+    dob: "",
   });
 
-  const lastSavedRef = React.useRef({ name: "", phone: "" });
+  const lastSavedRef = React.useRef({ name: "", phone: "", address: "", dob: "" });
   const unsubRef = React.useRef<null | (() => void)>(null);
 
   React.useEffect(() => {
@@ -41,25 +42,24 @@ export default function Profile() {
               const next = {
                 name: String(d.name ?? ""),
                 phone: String(d.phone ?? ""),
+                address: String(d.address ?? ""),
+                dob: String(d.dob ?? ""),
               };
               lastSavedRef.current = next;
               setExists(true);
-              setForm(next);
+              if (!isEditing) setForm(next);
               setIsEditing(false);
             } else {
               setExists(false);
-              const empty = { name: "", phone: "" };
+              const empty = { name: "", phone: "", address: "", dob: "" };
               lastSavedRef.current = empty;
               setForm(empty);
               setIsEditing(true);
             }
           },
-          () => {
-            toast({
-              title: "Error",
-              description: "Failed to load profile.",
-              variant: "destructive",
-            });
+          (err) => {
+            console.error(err);
+            toast({ title: "Error", description: "Failed to load profile.", variant: "destructive" });
           },
         );
       }
@@ -68,56 +68,33 @@ export default function Profile() {
       unsubAuth();
       if (unsubRef.current) unsubRef.current();
     };
-  }, []);
-
-  const waitForUser = async (): Promise<User | null> => {
-    if (auth.currentUser) return auth.currentUser;
-    return new Promise((resolve) => {
-      const off = onAuthStateChanged(auth, (u) => {
-        off();
-        resolve(u);
-      });
-      setTimeout(() => {
-        try { off(); } catch {}
-        resolve(auth.currentUser);
-      }, 1500);
-    });
-  };
+  }, [isEditing]);
 
   const onSave = async () => {
+    if (!user?.uid) {
+      toast({ title: "Not logged in", description: "Please sign in first.", variant: "destructive" });
+      return;
+    }
     setSaving(true);
     try {
-      const u = (await waitForUser()) as User | null;
-      if (!u?.uid) throw new Error("Not logged in");
       const payload = {
         name: form.name || "",
         phone: form.phone || "",
+        address: form.address || "",
+        dob: form.dob || "",
         profileCompleted: true,
         updatedAt: Date.now(),
       };
-      await setDoc(doc(db, "users", u.uid), payload, { merge: true });
-      lastSavedRef.current = { name: payload.name, phone: payload.phone };
+      await setDoc(doc(db, "users", user.uid), payload, { merge: true });
+      const verify = await getDoc(doc(db, "users", user.uid));
+      if (!verify.exists()) throw new Error("Server save verification failed");
+      lastSavedRef.current = { name: payload.name, phone: payload.phone, address: payload.address, dob: payload.dob };
       setIsEditing(false);
       setExists(true);
-      toast({ title: "Profile saved", description: "Your profile is synced across devices." });
+      toast({ title: "Profile saved successfully", description: "Your profile is synced across devices." });
     } catch (e: any) {
       console.error(e);
-      try {
-        await persistProfile({
-          name: form.name || "",
-          email: auth.currentUser?.email || "",
-          phone: form.phone || "",
-          address: "",
-          updatedAt: Date.now(),
-          profileCompleted: true,
-        } as any);
-        lastSavedRef.current = { name: form.name || "", phone: form.phone || "" };
-        setIsEditing(false);
-        setExists(true);
-        toast({ title: "Saved locally", description: "Will sync when online.", });
-      } catch (err: any) {
-        toast({ title: "Save failed", description: err?.message || e?.message || "Please try again.", variant: "destructive" });
-      }
+      toast({ title: "Save failed", description: e?.message || "Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -179,6 +156,30 @@ export default function Profile() {
                     value={form.phone}
                     onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                     placeholder="03XX-XXXXXXX"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={form.address}
+                    onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+                    placeholder="Your address"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="dob">Date of birth</Label>
+                  <Input
+                    id="dob"
+                    type="date"
+                    value={form.dob}
+                    onChange={(e) => setForm((p) => ({ ...p, dob: e.target.value }))}
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
                   />
