@@ -2,7 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import { examTypeLabels, fetchAllResultsByType, type ExamTypeSlug as ExamType } from "@/lib/results";
+import {
+  examTypeLabels,
+  fetchAllResultsByType,
+  type ExamTypeSlug as ExamType,
+} from "@/lib/results";
 import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
@@ -10,7 +14,10 @@ import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 
 function useInstituteHeader() {
-  const [inst, setInst] = useState<{ instituteName?: string; instituteLogo?: string } | null>(null);
+  const [inst, setInst] = useState<{
+    instituteName?: string;
+    instituteLogo?: string;
+  } | null>(null);
   useEffect(() => {
     const u = auth.currentUser;
     if (!u?.uid) return;
@@ -23,7 +30,8 @@ function useInstituteHeader() {
       }
       setInst({
         instituteName: String(d.instituteName || d.name || ""),
-        instituteLogo: typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
+        instituteLogo:
+          typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
       });
     });
     return () => unsub();
@@ -35,7 +43,9 @@ export default function ResultDetail() {
   const params = useParams();
   const type = (params.type as ExamType) || "mcqs";
   const label = examTypeLabels[type] || "Results";
-  const [items, setItems] = useState<Awaited<ReturnType<typeof fetchAllResultsByType>>>([]);
+  const [items, setItems] = useState<
+    Awaited<ReturnType<typeof fetchAllResultsByType>>
+  >([]);
   const header = useInstituteHeader();
 
   useEffect(() => {
@@ -79,8 +89,12 @@ export default function ResultDetail() {
                   Your generated results for {label} with download options.
                 </p>
                 <div className="mt-4">
-                  <Link to="/results" className="inline-flex items-center text-sm text-primary">
-                    <ArrowLeft className="h-4 w-4 mr-1" /> Back to Result History
+                  <Link
+                    to="/results"
+                    className="inline-flex items-center text-sm text-primary"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-1" /> Back to Result
+                    History
                   </Link>
                 </div>
               </div>
@@ -93,13 +107,21 @@ export default function ResultDetail() {
                 </div>
               )}
               {items.map((it) => {
-                const ts = (it.createdAt as any)?.toMillis?.() || it.generatedDateTime || 0;
+                const ts =
+                  (it.createdAt as any)?.toMillis?.() ||
+                  it.generatedDateTime ||
+                  0;
                 const date = ts ? new Date(ts).toLocaleString() : "";
                 return (
-                  <div key={it.id} className="rounded-xl bg-white border border-input p-4 sm:p-5 card-yellow-shadow">
+                  <div
+                    key={it.id}
+                    className="rounded-xl bg-white border border-input p-4 sm:p-5 card-yellow-shadow"
+                  >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
-                        <div className="text-sm text-muted-foreground">Generated</div>
+                        <div className="text-sm text-muted-foreground">
+                          Generated
+                        </div>
                         <div className="text-base font-semibold">{date}</div>
                       </div>
                       <div className="flex items-center gap-2">

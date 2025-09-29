@@ -77,7 +77,6 @@ export default function MCQs() {
   const [result, setResult] = useState<string | null>(null);
   const lastSavedRef = React.useRef<string | null>(null);
 
-
   const [profile, setProfile] = useState<{
     name?: string;
     phone?: string;
@@ -131,7 +130,13 @@ export default function MCQs() {
         });
       } catch {}
     })();
-  }, [result, selectedClass, selectedSubject, profile?.instituteName, profile?.instituteLogo]);
+  }, [
+    result,
+    selectedClass,
+    selectedSubject,
+    profile?.instituteName,
+    profile?.instituteLogo,
+  ]);
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;

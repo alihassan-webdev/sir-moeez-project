@@ -3,7 +3,11 @@ import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Link } from "react-router-dom";
 import { FileText, ListChecks, MessageSquare, Clock } from "lucide-react";
-import { examTypeLabels, fetchLastAttemptByType, type ExamTypeSlug as ExamType } from "@/lib/results";
+import {
+  examTypeLabels,
+  fetchLastAttemptByType,
+  type ExamTypeSlug as ExamType,
+} from "@/lib/results";
 
 function formatWhen(ts?: number): string {
   if (!ts) return "No attempts";
@@ -41,11 +45,31 @@ export default function Results() {
     };
   }, []);
 
-  const cards: { to: string; icon: React.ReactNode; label: string; type: ExamType }[] = useMemo(
+  const cards: {
+    to: string;
+    icon: React.ReactNode;
+    label: string;
+    type: ExamType;
+  }[] = useMemo(
     () => [
-      { to: "/results/mcqs", icon: <ListChecks className="h-7 w-7 sm:h-8 sm:w-8" />, label: examTypeLabels.mcqs, type: "mcqs" },
-      { to: "/results/qna", icon: <MessageSquare className="h-7 w-7 sm:h-8 sm:w-8" />, label: examTypeLabels.qna, type: "qna" },
-      { to: "/results/exam", icon: <FileText className="h-7 w-7 sm:h-8 sm:w-8" />, label: examTypeLabels.exam, type: "exam" },
+      {
+        to: "/results/mcqs",
+        icon: <ListChecks className="h-7 w-7 sm:h-8 sm:w-8" />,
+        label: examTypeLabels.mcqs,
+        type: "mcqs",
+      },
+      {
+        to: "/results/qna",
+        icon: <MessageSquare className="h-7 w-7 sm:h-8 sm:w-8" />,
+        label: examTypeLabels.qna,
+        type: "qna",
+      },
+      {
+        to: "/results/exam",
+        icon: <FileText className="h-7 w-7 sm:h-8 sm:w-8" />,
+        label: examTypeLabels.exam,
+        type: "exam",
+      },
     ],
     [],
   );
@@ -90,7 +114,9 @@ export default function Results() {
                         <Clock className="h-3.5 w-3.5" />
                         <span>{formatWhen(lasts[c.type])}</span>
                       </div>
-                      <div className="mt-auto pt-3 text-xs text-primary font-medium">View Results →</div>
+                      <div className="mt-auto pt-3 text-xs text-primary font-medium">
+                        View Results →
+                      </div>
                     </div>
                   </Link>
                 ))}

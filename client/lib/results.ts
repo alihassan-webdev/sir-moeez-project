@@ -78,14 +78,23 @@ export async function saveUserResult(params: {
 async function fetchOrdered(limitCount?: number) {
   const uid = getUserId();
   if (!uid) return [] as ResultDoc[];
-  const q = query(resultsColRef(), orderBy("createdAt", "desc"), ...(limitCount ? [limit(limitCount)] : []));
+  const q = query(
+    resultsColRef(),
+    orderBy("createdAt", "desc"),
+    ...(limitCount ? [limit(limitCount)] : []),
+  );
   const snap = await getDocs(q);
   return snap.docs.map((d) => {
     const data = d.data() as any;
     const storedSlug = (data.examTypeSlug as string) || "";
-    const inferredSlug: ExamTypeSlug = (storedSlug === "mcqs" || storedSlug === "qna" || storedSlug === "exam")
-      ? storedSlug
-      : (data.examType === "MCQ" ? "mcqs" : data.examType === "QnA" ? "qna" : "exam");
+    const inferredSlug: ExamTypeSlug =
+      storedSlug === "mcqs" || storedSlug === "qna" || storedSlug === "exam"
+        ? storedSlug
+        : data.examType === "MCQ"
+          ? "mcqs"
+          : data.examType === "QnA"
+            ? "qna"
+            : "exam";
     return {
       id: d.id,
       examType: inferredSlug,
@@ -93,15 +102,20 @@ async function fetchOrdered(limitCount?: number) {
       content: String(data.resultData ?? data.content ?? ""),
       createdAt: data.createdAt ?? null,
       generatedDateTime: Number(data.generatedDateTime || 0) || undefined,
-      downloadUrl: typeof data.downloadUrl === "string" ? data.downloadUrl : null,
+      downloadUrl:
+        typeof data.downloadUrl === "string" ? data.downloadUrl : null,
       score: typeof data.score === "number" ? data.score : null,
-      instituteName: typeof data.instituteName === "string" ? data.instituteName : undefined,
-      instituteLogo: typeof data.instituteLogo === "string" ? data.instituteLogo : undefined,
+      instituteName:
+        typeof data.instituteName === "string" ? data.instituteName : undefined,
+      instituteLogo:
+        typeof data.instituteLogo === "string" ? data.instituteLogo : undefined,
     } as ResultDoc;
   });
 }
 
-export async function fetchLastAttemptByType(examType: ExamTypeSlug): Promise<ResultDoc | null> {
+export async function fetchLastAttemptByType(
+  examType: ExamTypeSlug,
+): Promise<ResultDoc | null> {
   const all = await fetchOrdered(50);
   for (const r of all) {
     if (r.examType === examType) return r;
@@ -109,7 +123,9 @@ export async function fetchLastAttemptByType(examType: ExamTypeSlug): Promise<Re
   return null;
 }
 
-export async function fetchAllResultsByType(examType: ExamTypeSlug): Promise<ResultDoc[]> {
+export async function fetchAllResultsByType(
+  examType: ExamTypeSlug,
+): Promise<ResultDoc[]> {
   const all = await fetchOrdered();
   return all.filter((r) => r.examType === examType);
 }
