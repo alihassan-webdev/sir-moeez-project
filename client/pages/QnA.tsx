@@ -344,7 +344,10 @@ export default function QnA() {
         const text =
           typeof json === "string"
             ? json
-            : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         const finalText = stripAnswers(String(text));
         setResult(finalText);
         setCached(cacheKey, finalText);

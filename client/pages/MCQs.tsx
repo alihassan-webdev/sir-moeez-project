@@ -384,7 +384,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
         const text =
           typeof json === "string"
             ? json
-            : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         const finalText = String(text);
         setResult(finalText);
         setCached(cacheKey, finalText);

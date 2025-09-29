@@ -13,7 +13,10 @@ export function makeKey(parts: (string | number | null | undefined)[]): string {
   );
 }
 
-export function getCached(key: string, maxAgeMs = DEFAULT_TTL_MS): string | null {
+export function getCached(
+  key: string,
+  maxAgeMs = DEFAULT_TTL_MS,
+): string | null {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return null;

@@ -7,7 +7,8 @@ const cache = new Map(); // key -> { ts, status, headers, body, isBase64 }
 function hashBody(b) {
   try {
     if (!b) return "";
-    if (Buffer.isBuffer(b)) return crypto.createHash("sha256").update(b).digest("hex");
+    if (Buffer.isBuffer(b))
+      return crypto.createHash("sha256").update(b).digest("hex");
     return crypto.createHash("sha256").update(String(b)).digest("hex");
   } catch {
     return "";
@@ -33,7 +34,8 @@ exports.handler = async function (event) {
     try {
       const u = new URL(BASE);
       const path = u.pathname.replace(/\/+$/, "");
-      if (!/\/generate-questions$/.test(path)) u.pathname = `${path}/generate-questions`;
+      if (!/\/generate-questions$/.test(path))
+        u.pathname = `${path}/generate-questions`;
       return u.toString();
     } catch {
       const b = String(BASE).replace(/\/+$/, "");
@@ -94,16 +96,26 @@ exports.handler = async function (event) {
         body,
         signal: controller.signal,
       });
-      const contentType = resp.headers.get("content-type") || "application/octet-stream";
+      const contentType =
+        resp.headers.get("content-type") || "application/octet-stream";
       const arrayBuffer = await resp.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const isText = contentType.includes("application/json") || contentType.startsWith("text/");
-      const responseBody = isText ? buffer.toString("utf-8") : buffer.toString("base64");
+      const isText =
+        contentType.includes("application/json") ||
+        contentType.startsWith("text/");
+      const responseBody = isText
+        ? buffer.toString("utf-8")
+        : buffer.toString("base64");
       const responseHeaders = {
         "Content-Type": contentType,
         "Cache-Control": isText ? "no-store" : "no-store",
       };
-      return { status: resp.status, headers: responseHeaders, body: responseBody, isBase64: !isText };
+      return {
+        status: resp.status,
+        headers: responseHeaders,
+        body: responseBody,
+        isBase64: !isText,
+      };
     } finally {
       clearTimeout(t);
     }

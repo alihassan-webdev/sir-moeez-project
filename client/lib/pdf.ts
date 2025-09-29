@@ -36,15 +36,24 @@ export async function generateExamStylePdf(params: {
       if (instituteHeader.instituteLogo) {
         const dataUrl = instituteHeader.instituteLogo;
         const fmt = /data:image\/(png|jpeg|jpg)/i.test(dataUrl)
-          ? (dataUrl.match(/data:image\/(png|jpeg|jpg)/i)![1].toUpperCase() === "PNG" ? "PNG" : "JPEG")
+          ? dataUrl.match(/data:image\/(png|jpeg|jpg)/i)![1].toUpperCase() ===
+            "PNG"
+            ? "PNG"
+            : "JPEG"
           : "PNG";
         try {
-          const dims: { w: number; h: number } = await new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve({ w: img.naturalWidth || img.width, h: img.naturalHeight || img.height });
-            img.onerror = reject;
-            img.src = dataUrl;
-          });
+          const dims: { w: number; h: number } = await new Promise(
+            (resolve, reject) => {
+              const img = new Image();
+              img.onload = () =>
+                resolve({
+                  w: img.naturalWidth || img.width,
+                  h: img.naturalHeight || img.height,
+                });
+              img.onerror = reject;
+              img.src = dataUrl;
+            },
+          );
           const box = 60;
           const ratio = dims.w && dims.h ? dims.w / dims.h : 1;
           let w = box;
