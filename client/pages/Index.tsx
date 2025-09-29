@@ -666,6 +666,31 @@ export default function Index() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
+    if (!result) return;
+    if (lastSavedRef.current === result) return;
+    lastSavedRef.current = result;
+    (async () => {
+      try {
+        const [{ saveUserResult }, { getInstitute }] = await Promise.all([
+          import("@/lib/results"),
+          import("@/lib/account"),
+        ]);
+        const inst = getInstitute();
+        const title = (query || "Exam Paper").slice(0, 80);
+        void saveUserResult({
+          examType: "exam",
+          title,
+          resultData: result,
+          downloadUrl: null,
+          score: null,
+          instituteName: inst?.name,
+          instituteLogo: inst?.logo,
+        });
+      } catch {}
+    })();
+  }, [result, query]);
+
+  useEffect(() => {
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) {
