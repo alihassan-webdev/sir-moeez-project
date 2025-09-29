@@ -3,104 +3,113 @@ import {
   addDoc,
   collection,
   getDocs,
+  limit,
+  orderBy,
   query,
   serverTimestamp,
   Timestamp,
-  where,
 } from "firebase/firestore";
 
-export type ExamType = "mcqs" | "qna" | "exam";
+export type ExamTypeSlug = "mcqs" | "qna" | "exam";
 
-export const examTypeLabels: Record<ExamType, string> = {
+export const examTypeLabels: Record<ExamTypeSlug, string> = {
   mcqs: "MCQ Generator",
   qna: "Questions Generator",
   exam: "Exam Generator",
 };
 
+export const storedExamTypeLabel: Record<ExamTypeSlug, string> = {
+  mcqs: "MCQ",
+  qna: "QnA",
+  exam: "Full Exam",
+};
+
 export type ResultDoc = {
   id: string;
-  userId: string;
-  examType: ExamType;
+  examType: ExamTypeSlug;
+  title?: string;
   content: string;
   createdAt?: Timestamp | null;
   generatedDateTime?: number;
+  downloadUrl?: string | null;
+  score?: number | null;
+  instituteName?: string;
+  instituteLogo?: string;
 };
 
-export async function saveResult(params: {
-  examType: ExamType;
-  content: string;
-}): Promise<string | null> {
+function getUserId() {
   const u = auth.currentUser;
-  const userId = u?.uid || u?.email || null;
-  if (!userId) return null;
-  const payload = {
-    userId,
-    examType: params.examType,
-    content: params.content,
+  return u?.uid || u?.email || null;
+}
+
+function resultsColRef() {
+  const uid = getUserId();
+  if (!uid) throw new Error("Not authenticated");
+  return collection(db, "users", uid, "results");
+}
+
+export async function saveUserResult(params: {
+  examType: ExamTypeSlug;
+  title?: string;
+  resultData: string;
+  downloadUrl?: string | null;
+  score?: number | null;
+  instituteName?: string;
+  instituteLogo?: string;
+}): Promise<string | null> {
+  const uid = getUserId();
+  if (!uid) return null;
+  const payload: any = {
+    examType: storedExamTypeLabel[params.examType],
+    examTypeSlug: params.examType,
+    title: params.title || "",
+    resultData: params.resultData,
     createdAt: serverTimestamp(),
     generatedDateTime: Date.now(),
+    downloadUrl: params.downloadUrl ?? null,
+    score: typeof params.score === "number" ? params.score : null,
+    instituteName: params.instituteName || "",
+    instituteLogo: params.instituteLogo || "",
   };
-  const ref = await addDoc(collection(db, "results"), payload);
+  const ref = await addDoc(resultsColRef(), payload);
   return ref.id;
 }
 
-export async function fetchLastAttemptByType(examType: ExamType): Promise<
-  ResultDoc | null
-> {
-  const u = auth.currentUser;
-  const userId = u?.uid || u?.email || null;
-  if (!userId) return null;
-  const q = query(
-    collection(db, "results"),
-    where("userId", "==", userId),
-    where("examType", "==", examType),
-  );
+async function fetchOrdered(limitCount?: number) {
+  const uid = getUserId();
+  if (!uid) return [] as ResultDoc[];
+  const q = query(resultsColRef(), orderBy("createdAt", "desc"), ...(limitCount ? [limit(limitCount)] : []));
   const snap = await getDocs(q);
-  if (snap.empty) return null;
-  let best: ResultDoc | null = null;
-  for (const d of snap.docs) {
+  return snap.docs.map((d) => {
     const data = d.data() as any;
-    const created = (data.createdAt as any)?.toMillis?.() || Number(data.generatedDateTime || 0) || 0;
-    if (!best || created > ((best.createdAt as any)?.toMillis?.() || best.generatedDateTime || 0)) {
-      best = {
-        id: d.id,
-        userId: String(data.userId || ""),
-        examType: String(data.examType || "exam") as ExamType,
-        content: String(data.content || ""),
-        createdAt: data.createdAt ?? null,
-        generatedDateTime: Number(data.generatedDateTime || 0) || undefined,
-      };
-    }
-  }
-  return best;
-}
-
-export async function fetchAllResultsByType(examType: ExamType): Promise<
-  ResultDoc[]
-> {
-  const u = auth.currentUser;
-  const userId = u?.uid || u?.email || null;
-  if (!userId) return [];
-  const q = query(
-    collection(db, "results"),
-    where("userId", "==", userId),
-    where("examType", "==", examType),
-  );
-  const snap = await getDocs(q);
-  const arr = snap.docs.map((d) => {
-    const data = d.data() as any;
+    const storedSlug = (data.examTypeSlug as string) || "";
+    const inferredSlug: ExamTypeSlug = (storedSlug === "mcqs" || storedSlug === "qna" || storedSlug === "exam")
+      ? storedSlug
+      : (data.examType === "MCQ" ? "mcqs" : data.examType === "QnA" ? "qna" : "exam");
     return {
       id: d.id,
-      userId: String(data.userId || ""),
-      examType: String(data.examType || "exam") as ExamType,
-      content: String(data.content || ""),
+      examType: inferredSlug,
+      title: String(data.title || ""),
+      content: String(data.resultData ?? data.content ?? ""),
       createdAt: data.createdAt ?? null,
       generatedDateTime: Number(data.generatedDateTime || 0) || undefined,
+      downloadUrl: typeof data.downloadUrl === "string" ? data.downloadUrl : null,
+      score: typeof data.score === "number" ? data.score : null,
+      instituteName: typeof data.instituteName === "string" ? data.instituteName : undefined,
+      instituteLogo: typeof data.instituteLogo === "string" ? data.instituteLogo : undefined,
     } as ResultDoc;
   });
-  return arr.sort((a, b) => {
-    const at = (a.createdAt as any)?.toMillis?.() || a.generatedDateTime || 0;
-    const bt = (b.createdAt as any)?.toMillis?.() || b.generatedDateTime || 0;
-    return bt - at;
-  });
+}
+
+export async function fetchLastAttemptByType(examType: ExamTypeSlug): Promise<ResultDoc | null> {
+  const all = await fetchOrdered(50);
+  for (const r of all) {
+    if (r.examType === examType) return r;
+  }
+  return null;
+}
+
+export async function fetchAllResultsByType(examType: ExamTypeSlug): Promise<ResultDoc[]> {
+  const all = await fetchOrdered();
+  return all.filter((r) => r.examType === examType);
 }
