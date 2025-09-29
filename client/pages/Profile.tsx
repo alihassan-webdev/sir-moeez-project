@@ -5,16 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { getProfile, saveProfile, type UserProfile } from "@/lib/account";
-import { auth } from "@/lib/firebase";
+import { getProfile, loadProfile, persistProfile, type UserProfile } from "@/lib/account";
 
 export default function ProfilePage() {
   const [profile, setProfile] = React.useState<UserProfile>(() => getProfile());
-  const emailFromAuth = auth.currentUser?.email || profile.email;
 
   const [saving, setSaving] = React.useState(false);
-  const [pwd1, setPwd1] = React.useState("");
-  const [pwd2, setPwd2] = React.useState("");
+
+  React.useEffect(() => {
+    let mounted = true;
+    loadProfile().then((remote) => {
+      if (mounted) setProfile(remote);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,14 +28,13 @@ export default function ProfilePage() {
     try {
       const updated: UserProfile = {
         ...profile,
-        email: emailFromAuth,
         updatedAt: Date.now(),
       };
-      saveProfile(updated);
+      await persistProfile(updated);
       setProfile(updated);
       toast({
         title: "Profile saved",
-        description: "Your profile has been updated.",
+        description: "Your profile has been updated across devices.",
       });
     } finally {
       setSaving(false);
@@ -69,9 +74,11 @@ export default function ProfilePage() {
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
-                    value={emailFromAuth}
-                    readOnly
-                    className="bg-muted/30"
+                    value={profile.email}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, email: e.target.value }))
+                    }
+                    placeholder="you@example.com"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -86,84 +93,7 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      className="mr-2 align-middle"
-                      checked={!!profile.notify}
-                      onChange={(e) =>
-                        setProfile((p) => ({ ...p, notify: e.target.checked }))
-                      }
-                    />
-                    Email notifications
-                  </label>
-                </div>
-
-                <div className="grid gap-2 pt-2">
-                  <Label htmlFor="newpwd">Change password</Label>
-                  <Input
-                    id="newpwd"
-                    type="password"
-                    value={pwd1}
-                    onChange={(e) => setPwd1(e.target.value)}
-                    placeholder="New password"
-                  />
-                  <Input
-                    id="newpwd2"
-                    type="password"
-                    value={pwd2}
-                    onChange={(e) => setPwd2(e.target.value)}
-                    placeholder="Confirm new password"
-                  />
-                  <div>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      disabled={!pwd1 || pwd1 !== pwd2 || saving}
-                      onClick={async () => {
-                        try {
-                          const { updatePassword, sendPasswordResetEmail } =
-                            await import("firebase/auth");
-                          if (!auth.currentUser)
-                            throw new Error("Not logged in");
-                          if (pwd1 !== pwd2)
-                            throw new Error("Passwords do not match");
-                          await updatePassword(auth.currentUser, pwd1);
-                          setPwd1("");
-                          setPwd2("");
-                          toast({
-                            title: "Password updated",
-                            description: "Your password has been changed.",
-                          });
-                        } catch (err: any) {
-                          const code = String(err?.code || "");
-                          if (code.includes("requires-recent-login")) {
-                            // Fallback: send reset email
-                            try {
-                              if (auth.currentUser?.email) {
-                                const email = auth.currentUser.email;
-                                await sendPasswordResetEmail(auth, email);
-                                toast({
-                                  title: "Verification required",
-                                  description:
-                                    "We sent a reset link to your email.",
-                                });
-                              }
-                            } catch {}
-                          } else {
-                            toast({
-                              title: "Password update failed",
-                              description: err?.message || "Try again.",
-                            });
-                          }
-                        }
-                      }}
-                    >
-                      Update password
-                    </Button>
-                  </div>
-                </div>
+                {/* Email notifications and password change removed as requested */}
 
                 <div className="pt-2 flex gap-2">
                   <Button type="submit" disabled={saving}>
@@ -174,8 +104,6 @@ export default function ProfilePage() {
                     variant="secondary"
                     onClick={() => {
                       setProfile(getProfile());
-                      setPwd1("");
-                      setPwd2("");
                     }}
                   >
                     Reset
