@@ -15,9 +15,10 @@ export async function generateExamStylePdf(params: {
   instituteHeader?: { instituteName?: string; instituteLogo?: string };
 }) {
   const { title, body, filenameBase, instituteHeader } = params;
-  const { jsPDF } = await import("jspdf");
+  const mod: any = await import("jspdf");
+  const JsPDF = mod.jsPDF || mod.default;
   try { await import("html2canvas"); } catch {}
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const doc = new JsPDF({ unit: "pt", format: "a4" });
 
   const margin = 64;
   const pageW = doc.internal.pageSize.getWidth();
