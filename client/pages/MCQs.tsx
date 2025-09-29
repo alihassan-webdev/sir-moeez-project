@@ -74,6 +74,37 @@ export default function MCQs() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
+  const [profile, setProfile] = useState<{
+    name?: string;
+    phone?: string;
+    instituteName?: string;
+    instituteLogo?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const u = auth.currentUser;
+    if (!u?.uid) return;
+    const ref = doc(db, "users", u.uid);
+    const unsub = onSnapshot(ref, (snap) => {
+      const d = snap.data() as any | undefined;
+      if (!d) {
+        setProfile({});
+        return;
+      }
+      setProfile({
+        name: String(d.name || ""),
+        phone: String(d.phone || ""),
+        instituteName: String(d.instituteName || ""),
+        instituteLogo: typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
+      });
+    });
+    return () => unsub();
+  }, []);
+
+  const isProfileCompleteForPdf = Boolean(
+    profile?.name && profile?.phone && profile?.instituteName && profile?.instituteLogo,
+  );
+
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
