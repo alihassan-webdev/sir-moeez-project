@@ -4,8 +4,8 @@ export type UserProfile = {
   name: string;
   email: string;
   phone?: string;
-  role?: string;
   updatedAt: number;
+  notify?: boolean;
 };
 
 export type Institute = {
@@ -43,8 +43,8 @@ export function getProfile(): UserProfile {
     name: u?.displayName || "",
     email: u?.email || "",
     phone: "",
-    role: "",
     updatedAt: Date.now(),
+    notify: false,
   };
 }
 
