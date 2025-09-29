@@ -1,7 +1,6 @@
 import * as React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -97,9 +96,6 @@ export default function Syllabus() {
                 </p>
               </div>
             </section>
-            <div className="mt-4">
-              <SidebarStats title={null} />
-            </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
