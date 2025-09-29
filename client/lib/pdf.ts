@@ -12,7 +12,11 @@ export async function generateExamStylePdf(params: {
   title: string;
   body: string;
   filenameBase?: string;
-  instituteHeader?: { instituteName?: string; instituteLogo?: string; tagline?: string };
+  instituteHeader?: {
+    instituteName?: string;
+    instituteLogo?: string;
+    tagline?: string;
+  };
 }) {
   const { title, body, filenameBase, instituteHeader } = params;
   const mod: any = await import("jspdf");
@@ -291,9 +295,13 @@ export async function generateExamStylePdf(params: {
     doc.setFont("times", "normal");
     doc.setFontSize(10);
     doc.setTextColor(0);
-    doc.text(`Page ${i} of ${totalPages}`, pageW / 2, pageH - 24, { align: "center" });
+    doc.text(`Page ${i} of ${totalPages}`, pageW / 2, pageH - 24, {
+      align: "center",
+    });
     if (instituteHeader?.tagline) {
-      doc.text(String(instituteHeader.tagline), pageW - margin, pageH - 24, { align: "right" });
+      doc.text(String(instituteHeader.tagline), pageW - margin, pageH - 24, {
+        align: "right",
+      });
     }
   }
 

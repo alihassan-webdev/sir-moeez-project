@@ -1046,20 +1046,40 @@ export default function Index() {
                           onClick={async () => {
                             if (!result) return;
                             try {
-                              const { generateExamStylePdf } = await import("@/lib/pdf");
-                              const { getInstitute } = await import("@/lib/account");
+                              const { generateExamStylePdf } = await import(
+                                "@/lib/pdf"
+                              );
+                              const { getInstitute } = await import(
+                                "@/lib/account"
+                              );
                               const inst = getInstitute();
 
-                              function makeFilenameFromPrompt(q: string | undefined) {
+                              function makeFilenameFromPrompt(
+                                q: string | undefined,
+                              ) {
                                 const raw = (q || "").trim();
                                 if (!raw) return "exam-paper";
-                                const verbs = ["make", "generate", "produce", "create", "give", "write", "please", "build", "compose", "form"];
+                                const verbs = [
+                                  "make",
+                                  "generate",
+                                  "produce",
+                                  "create",
+                                  "give",
+                                  "write",
+                                  "please",
+                                  "build",
+                                  "compose",
+                                  "form",
+                                ];
                                 let s = raw;
                                 let changed = true;
                                 while (changed) {
                                   changed = false;
                                   for (const v of verbs) {
-                                    const re = new RegExp("^" + v + "\\s+", "i");
+                                    const re = new RegExp(
+                                      "^" + v + "\\s+",
+                                      "i",
+                                    );
                                     if (re.test(s)) {
                                       s = s.replace(re, "").trim();
                                       changed = true;
