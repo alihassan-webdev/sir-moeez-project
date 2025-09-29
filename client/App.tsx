@@ -26,6 +26,8 @@ import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
 import Support from "./pages/Support";
 import Onboarding from "./pages/Onboarding";
+import Results from "./pages/Results";
+import ResultDetail from "./pages/ResultDetail";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { ProfileLockProvider } from "@/hooks/useProfileLock";
@@ -196,6 +198,30 @@ function AnimatedRoutes() {
                 <RequireProfileCompleted>
                   <PageWrapper>
                     <Support />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/results"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Results />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/results/:type"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <ResultDetail />
                   </PageWrapper>
                 </RequireProfileCompleted>
               </RequireAuth>

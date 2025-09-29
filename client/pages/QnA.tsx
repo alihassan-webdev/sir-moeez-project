@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatResultHtml } from "@/lib/format";
 import ToolLock from "@/components/ToolLock";
+import { saveUserResult } from "@/lib/results";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -70,6 +71,28 @@ export default function QnA() {
   const [qaCount, setQaCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const lastSavedRef = React.useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!result) return;
+    if (lastSavedRef.current === result) return;
+    lastSavedRef.current = result;
+    (async () => {
+      try {
+        const inst = getInstitute();
+        const title = `${selectedClass ? selectedClass + " • " : ""}${selectedSubject || "Questions"} — QnA`;
+        void saveUserResult({
+          examType: "qna",
+          title,
+          resultData: result,
+          downloadUrl: null,
+          score: null,
+          instituteName: inst?.name,
+          instituteLogo: inst?.logo,
+        });
+      } catch {}
+    })();
+  }, [result, selectedClass, selectedSubject]);
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;

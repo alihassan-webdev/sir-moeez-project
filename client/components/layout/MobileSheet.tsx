@@ -81,6 +81,15 @@ export default function MobileSheet() {
               Syllabus
             </Link>
           </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/results"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path.startsWith("/results") ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Result History
+            </Link>
+          </SheetClose>
 
           <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
             My account

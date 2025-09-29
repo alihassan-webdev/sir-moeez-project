@@ -26,6 +26,7 @@ import ToolLock from "@/components/ToolLock";
 import { Link } from "react-router-dom";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
+import { saveUserResult } from "@/lib/results";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -74,6 +75,7 @@ export default function MCQs() {
   const [mcqCount, setMcqCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const lastSavedRef = React.useRef<string | null>(null);
 
   const [profile, setProfile] = useState<{
     name?: string;
@@ -109,6 +111,32 @@ export default function MCQs() {
       profile?.instituteName &&
       profile?.instituteLogo,
   );
+
+  useEffect(() => {
+    if (!result) return;
+    if (lastSavedRef.current === result) return;
+    lastSavedRef.current = result;
+    (async () => {
+      try {
+        const title = `${selectedClass ? selectedClass + " • " : ""}${selectedSubject || "MCQs"} — MCQs`;
+        void saveUserResult({
+          examType: "mcqs",
+          title,
+          resultData: result,
+          downloadUrl: null,
+          score: null,
+          instituteName: profile?.instituteName,
+          instituteLogo: profile?.instituteLogo,
+        });
+      } catch {}
+    })();
+  }, [
+    result,
+    selectedClass,
+    selectedSubject,
+    profile?.instituteName,
+    profile?.instituteLogo,
+  ]);
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
