@@ -1,7 +1,6 @@
 import * as React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -86,16 +85,17 @@ export default function Syllabus() {
           </aside>
 
           <div>
-            <div className="mt-4">
-              <h1 className="text-2xl font-bold">Syllabus</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Select class and subject to browse chapters. Click a chapter to
-                view or download.
-              </p>
-              <div className="mt-4">
-                <SidebarStats title={null} />
+            <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 mt-4">
+              <div className="absolute inset-0 bg-background -z-10" />
+              <div className="relative mx-auto max-w-3xl text-center">
+                <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl text-primary">
+                  Syllabus
+                </h1>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Select class and subject to browse chapters. Click a chapter to view or download.
+                </p>
               </div>
-            </div>
+            </section>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>

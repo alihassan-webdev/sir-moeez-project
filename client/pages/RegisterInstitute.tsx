@@ -4,13 +4,6 @@ import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
 
@@ -22,13 +15,7 @@ export default function RegisterInstitutePage() {
     () =>
       inst || {
         name: "",
-        type: "School",
-        address: "",
-        city: "",
-        contactEmail: "",
-        contactPhone: "",
-        teachersCount: undefined,
-        website: "",
+        logo: "",
         registeredAt: Date.now(),
       },
   );
@@ -78,95 +65,33 @@ export default function RegisterInstitutePage() {
                     placeholder="e.g., City Public School"
                   />
                 </div>
+
                 <div className="grid gap-2">
-                  <Label>Type</Label>
-                  <Select
-                    value={form.type}
-                    onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="School">School</SelectItem>
-                      <SelectItem value="College">College</SelectItem>
-                      <SelectItem value="University">University</SelectItem>
-                      <SelectItem value="Institute">Institute</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="logo">Institute logo</Label>
                   <Input
-                    id="address"
-                    value={form.address}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, address: e.target.value }))
-                    }
-                    placeholder="Street, Area"
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const dataUrl = String(reader.result || "");
+                        setForm((f) => ({ ...f, logo: dataUrl }));
+                      };
+                      reader.readAsDataURL(file);
+                    }}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    value={form.city}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, city: e.target.value }))
-                    }
-                    placeholder="Karachi"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="contactEmail">Contact email</Label>
-                  <Input
-                    id="contactEmail"
-                    type="email"
-                    value={form.contactEmail}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, contactEmail: e.target.value }))
-                    }
-                    placeholder="admin@school.edu"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="contactPhone">Contact phone</Label>
-                  <Input
-                    id="contactPhone"
-                    value={form.contactPhone}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, contactPhone: e.target.value }))
-                    }
-                    placeholder="03XX-XXXXXXX"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="teachersCount">Teachers count</Label>
-                  <Input
-                    id="teachersCount"
-                    type="number"
-                    value={form.teachersCount ?? ""}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        teachersCount: e.target.value
-                          ? Number(e.target.value)
-                          : undefined,
-                      }))
-                    }
-                    placeholder="25"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    value={form.website}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, website: e.target.value }))
-                    }
-                    placeholder="https://example.edu"
-                  />
+                  {form.logo ? (
+                    <div className="mt-2">
+                      <img
+                        src={form.logo}
+                        alt="Logo preview"
+                        className="h-20 w-20 object-contain rounded border"
+                      />
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="pt-2">

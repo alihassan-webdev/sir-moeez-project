@@ -6,7 +6,6 @@ import {
   ListChecks,
   MessageSquare,
   User,
-  Building2,
   LifeBuoy,
   BookOpen,
 } from "lucide-react";
@@ -94,12 +93,6 @@ export default function SidebarPanelInner() {
           icon={User}
           label="My Profile"
           active={pathname === "/profile"}
-        />
-        <NavItem
-          to="/institute"
-          icon={Building2}
-          label="Register Institute"
-          active={pathname === "/institute"}
         />
         <NavItem
           to="/support"

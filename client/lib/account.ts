@@ -10,6 +10,7 @@ export type UserProfile = {
 
 export type Institute = {
   name: string;
+  logo?: string; // data URL or external URL
   type?: string;
   address?: string;
   city?: string;

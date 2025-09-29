@@ -1,6 +1,6 @@
 import React from "react";
 import Container from "@/components/layout/Container";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FileText,
   Layers,
@@ -11,9 +11,20 @@ import {
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
+import { getProfile, getInstitute } from "@/lib/account";
 
 export default function GetStarted() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    const prof = getProfile();
+    const inst = getInstitute();
+    const missingPersonal = !prof.name || !prof.email || !prof.phone;
+    const missingLogo = !inst?.logo || !inst?.name;
+    if (missingPersonal || missingLogo) {
+      navigate("/onboarding", { replace: true });
+    }
+  }, [navigate]);
   // Build real stats from bundled PDFs
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -236,21 +247,6 @@ function MyAccountCards() {
           </div>
           <div className="mt-auto pt-3 text-xs text-muted-foreground">
             Email linked to your login.
-          </div>
-        </div>
-      </Link>
-
-      <Link
-        to="/institute"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
-      >
-        <div className="flex flex-col h-full">
-          <div className="text-base font-semibold">Register institute</div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            Add institute details for licensing.
-          </div>
-          <div className="mt-auto pt-3 text-xs text-muted-foreground">
-            Edit later anytime.
           </div>
         </div>
       </Link>

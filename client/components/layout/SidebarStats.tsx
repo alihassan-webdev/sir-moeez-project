@@ -60,19 +60,19 @@ export default function SidebarStats({ title = null }: SidebarStatsProps) {
         </div>
       )}
       <div className="flex items-stretch gap-3 overflow-x-auto scrollbar-yellow pr-1">
-        <div className="rounded-lg border border-input bg-white px-4 py-3 min-w-[9rem] flex-1">
+        <div className="rounded-lg border border-input bg-white px-4 py-3">
           <div className="text-xs font-semibold text-muted-foreground">
             Classes
           </div>
           <div className="text-lg font-extrabold">{classesCount}</div>
         </div>
-        <div className="rounded-lg border border-input bg-white px-4 py-3 min-w-[9rem] flex-1">
+        <div className="rounded-lg border border-input bg-white px-4 py-3">
           <div className="text-xs font-semibold text-muted-foreground">
             Subjects
           </div>
           <div className="text-lg font-extrabold">{subjectsCount}</div>
         </div>
-        <div className="rounded-lg border border-input bg-white px-4 py-3 min-w-[9rem] flex-1">
+        <div className="rounded-lg border border-input bg-white px-4 py-3">
           <div className="text-xs font-semibold text-muted-foreground">
             Chapters
           </div>

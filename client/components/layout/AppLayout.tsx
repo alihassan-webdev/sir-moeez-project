@@ -23,7 +23,7 @@ export function AppLayout({ children }: PropsWithChildren) {
     "/syllabus",
     "/subscription",
     "/profile",
-    "/institute",
+    "/onboarding",
     "/support",
   ].includes(path);
 

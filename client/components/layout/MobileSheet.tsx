@@ -24,7 +24,7 @@ export default function MobileSheet() {
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="overflow-y-auto">
+      <SheetContent side="right" className="overflow-y-auto scrollbar-none">
         <SheetHeader>
           <SheetTitle>Navigate</SheetTitle>
         </SheetHeader>
@@ -101,15 +101,6 @@ export default function MobileSheet() {
               className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/profile" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
             >
               My Profile
-            </Link>
-          </SheetClose>
-          <SheetClose asChild>
-            <Link
-              to="/institute"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/institute" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
-            >
-              Register Institute
             </Link>
           </SheetClose>
           <SheetClose asChild>

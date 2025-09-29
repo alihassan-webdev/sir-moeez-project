@@ -141,6 +141,17 @@
   filter: brightness(0.92);
 }
 
+/* Utility: hide scrollbar but keep scrolling */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and old Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome, Safari */
+}
+
 /* Black input utility to keep inputs black on focus and autofill */
 .input-black {
   background-color: #000 !important;

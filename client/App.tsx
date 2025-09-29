@@ -22,9 +22,9 @@ import QnA from "./pages/QnA";
 import Syllabus from "./pages/Syllabus";
 import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
-import RegisterInstitute from "./pages/RegisterInstitute";
 import Support from "./pages/Support";
 import Login from "./pages/Login";
+import Onboarding from "./pages/Onboarding";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 
@@ -168,11 +168,11 @@ function AnimatedRoutes() {
           }
         />
         <Route
-          path="/institute"
+          path="/onboarding"
           element={
             <RequireAuth>
               <PageWrapper>
-                <RegisterInstitute />
+                <Onboarding />
               </PageWrapper>
             </RequireAuth>
           }
