@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import { examTypeLabels, fetchAllResultsByType, type ExamType } from "@/lib/results";
+import { examTypeLabels, fetchAllResultsByType, type ExamTypeSlug as ExamType } from "@/lib/results";
 import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
