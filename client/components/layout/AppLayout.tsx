@@ -102,7 +102,9 @@ export function AppLayout({ children }: PropsWithChildren) {
         {banner?.show && path !== "/profile" && (
           <div className="w-full bg-yellow-100 border-t border-b border-yellow-300">
             <div className="mx-auto max-w-6xl px-6 py-2 text-sm text-yellow-900 flex items-center justify-between gap-3">
-              <span>⚠️ Please complete your profile to unlock all features.</span>
+              <span>
+                ⚠️ Please complete your profile to unlock all features.
+              </span>
               <Link to="/profile" className="font-semibold underline">
                 Go to Profile
               </Link>

@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { getProfile, loadProfile, persistProfile, type UserProfile } from "@/lib/account";
+import {
+  getProfile,
+  loadProfile,
+  persistProfile,
+  type UserProfile,
+} from "@/lib/account";
 import { Check, Pencil } from "lucide-react";
 
 export default function ProfilePage() {
@@ -73,92 +78,102 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-xl">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Full name</Label>
-                  <Input
-                    id="name"
-                    value={profile.name}
-                    onChange={(e) =>
-                      setProfile((p) => ({ ...p, name: e.target.value }))
-                    }
-                    placeholder="Your name"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    value={profile.email}
-                    onChange={(e) =>
-                      setProfile((p) => ({ ...p, email: e.target.value }))
-                    }
-                    placeholder="you@example.com"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={profile.phone || ""}
-                    onChange={(e) =>
-                      setProfile((p) => ({ ...p, phone: e.target.value }))
-                    }
-                    placeholder="03XX-XXXXXXX"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Full name</Label>
+                    <Input
+                      id="name"
+                      value={profile.name}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, name: e.target.value }))
+                      }
+                      placeholder="Your name"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-muted/30" : undefined}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={profile.email}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, email: e.target.value }))
+                      }
+                      placeholder="you@example.com"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-muted/30" : undefined}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      value={profile.phone || ""}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, phone: e.target.value }))
+                      }
+                      placeholder="03XX-XXXXXXX"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-muted/30" : undefined}
+                    />
+                  </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={profile.address || ""}
-                    onChange={(e) =>
-                      setProfile((p) => ({ ...p, address: e.target.value }))
-                    }
-                    placeholder="Your address"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      value={profile.address || ""}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, address: e.target.value }))
+                      }
+                      placeholder="Your address"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-muted/30" : undefined}
+                    />
+                  </div>
 
-                <div className="pt-2 flex gap-2">
-                  {isEditing ? (
-                    <>
-                      <Button type="submit" disabled={saving}>
-                        {saving ? (
-                          <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" /> Saving...</span>
-                        ) : (
-                          <span className="inline-flex items-center gap-2"><Check className="h-4 w-4" /> {profile.profileCompleted ? "Save Changes" : "Save Profile"}</span>
-                        )}
-                      </Button>
+                  <div className="pt-2 flex gap-2">
+                    {isEditing ? (
+                      <>
+                        <Button type="submit" disabled={saving}>
+                          {saving ? (
+                            <span className="inline-flex items-center gap-2">
+                              <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />{" "}
+                              Saving...
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-2">
+                              <Check className="h-4 w-4" />{" "}
+                              {profile.profileCompleted
+                                ? "Save Changes"
+                                : "Save Profile"}
+                            </span>
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => {
+                            setProfile(getProfile());
+                            setIsEditing(false);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
                       <Button
                         type="button"
-                        variant="secondary"
-                        onClick={() => {
-                          setProfile(getProfile());
-                          setIsEditing(false);
-                        }}
+                        onClick={() => setIsEditing(true)}
+                        variant="elevated"
                       >
-                        Cancel
+                        <span className="inline-flex items-center gap-2">
+                          <Pencil className="h-4 w-4" /> Edit Profile
+                        </span>
                       </Button>
-                    </>
-                  ) : (
-                    <Button
-                      type="button"
-                      onClick={() => setIsEditing(true)}
-                      variant="elevated"
-                    >
-                      <span className="inline-flex items-center gap-2"><Pencil className="h-4 w-4" /> Edit Profile</span>
-                    </Button>
-                  )}
-                </div>
-              </form>
+                    )}
+                  </div>
+                </form>
               )}
             </div>
           </div>
