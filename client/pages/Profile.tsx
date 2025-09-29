@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { persistProfile } from "@/lib/account";
 
 export default function Profile() {
@@ -70,28 +70,54 @@ export default function Profile() {
     };
   }, []);
 
+  const waitForUser = async (): Promise<User | null> => {
+    if (auth.currentUser) return auth.currentUser;
+    return new Promise((resolve) => {
+      const off = onAuthStateChanged(auth, (u) => {
+        off();
+        resolve(u);
+      });
+      setTimeout(() => {
+        try { off(); } catch {}
+        resolve(auth.currentUser);
+      }, 1500);
+    });
+  };
+
   const onSave = async () => {
-    if (!user?.uid && !auth.currentUser) {
-      toast({ title: "Not logged in", description: "Please sign in first." });
-      return;
-    }
     setSaving(true);
     try {
+      const u = (await waitForUser()) as User | null;
+      if (!u?.uid) throw new Error("Not logged in");
       const payload = {
         name: form.name || "",
         phone: form.phone || "",
-        email: auth.currentUser?.email || "",
-        updatedAt: Date.now(),
         profileCompleted: true,
-      } as any;
-      await persistProfile(payload);
+        updatedAt: Date.now(),
+      };
+      await setDoc(doc(db, "users", u.uid), payload, { merge: true });
       lastSavedRef.current = { name: payload.name, phone: payload.phone };
       setIsEditing(false);
       setExists(true);
       toast({ title: "Profile saved", description: "Your profile is synced across devices." });
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Save failed", description: e?.message || "Please try again.", variant: "destructive" });
+      try {
+        await persistProfile({
+          name: form.name || "",
+          email: auth.currentUser?.email || "",
+          phone: form.phone || "",
+          address: "",
+          updatedAt: Date.now(),
+          profileCompleted: true,
+        } as any);
+        lastSavedRef.current = { name: form.name || "", phone: form.phone || "" };
+        setIsEditing(false);
+        setExists(true);
+        toast({ title: "Saved locally", description: "Will sync when online.", });
+      } catch (err: any) {
+        toast({ title: "Save failed", description: err?.message || e?.message || "Please try again.", variant: "destructive" });
+      }
     } finally {
       setSaving(false);
     }
