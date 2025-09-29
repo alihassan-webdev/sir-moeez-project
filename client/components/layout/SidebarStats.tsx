@@ -1,6 +1,10 @@
 import * as React from "react";
 
-export default function SidebarStats() {
+type SidebarStatsProps = {
+  title?: string | null;
+};
+
+export default function SidebarStats({ title = null }: SidebarStatsProps) {
   // Build real stats from bundled PDFs
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -50,20 +54,25 @@ export default function SidebarStats() {
 
   return (
     <div className="mt-5 border-t pt-4">
-      <div className="grid grid-cols-1 gap-3">
-        <div className="rounded-lg border border-input bg-white px-4 py-3">
+      {title !== null && (
+        <div className="text-sm font-semibold text-muted-foreground px-1 mb-2">
+          {title}
+        </div>
+      )}
+      <div className="flex items-stretch gap-3 overflow-x-auto scrollbar-yellow pr-1">
+        <div className="rounded-lg border border-input bg-white px-4 py-3 min-w-[9rem] flex-1">
           <div className="text-xs font-semibold text-muted-foreground">
             Classes
           </div>
           <div className="text-lg font-extrabold">{classesCount}</div>
         </div>
-        <div className="rounded-lg border border-input bg-white px-4 py-3">
+        <div className="rounded-lg border border-input bg-white px-4 py-3 min-w-[9rem] flex-1">
           <div className="text-xs font-semibold text-muted-foreground">
             Subjects
           </div>
           <div className="text-lg font-extrabold">{subjectsCount}</div>
         </div>
-        <div className="rounded-lg border border-input bg-white px-4 py-3">
+        <div className="rounded-lg border border-input bg-white px-4 py-3 min-w-[9rem] flex-1">
           <div className="text-xs font-semibold text-muted-foreground">
             Chapters
           </div>

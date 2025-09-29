@@ -20,6 +20,7 @@ export function AppLayout({ children }: PropsWithChildren) {
     "/app",
     "/mcqs",
     "/qna",
+    "/syllabus",
     "/subscription",
     "/profile",
     "/institute",

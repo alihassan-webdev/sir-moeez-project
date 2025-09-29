@@ -62,35 +62,6 @@ export default function GetStarted() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-
-              <div className="mt-5 border-t pt-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">
-                      Classes
-                    </div>
-                    <div className="text-lg font-extrabold">
-                      {classes.length}
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">
-                      Subjects
-                    </div>
-                    <div className="text-lg font-extrabold">
-                      {subjects.length}
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">
-                      Chapters
-                    </div>
-                    <div className="text-lg font-extrabold">
-                      {chaptersCount}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </aside>
 
@@ -135,10 +106,10 @@ export default function GetStarted() {
               </p>
             </div>
 
-            {/* Quick create */}
+            {/* Exams */}
             <div className="mt-4">
-              <h2 className="text-xl sm:text-2xl font-bold">Quick create</h2>
-              <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
+              <h2 className="text-xl sm:text-2xl font-bold">Exams</h2>
+              <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr">
                 <Link
                   to="/mcqs"
                   className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
@@ -189,6 +160,24 @@ export default function GetStarted() {
                     <div className="text-base font-semibold">Generate Exam</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Open the Test Paper Generator
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  to="/syllabus"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                >
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+                      <BookOpen
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="text-base font-semibold">Syllabus</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Browse and download chapters by class & subject
                     </div>
                   </div>
                 </Link>

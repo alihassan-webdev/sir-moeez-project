@@ -8,7 +8,6 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { Link } from "react-router-dom";
 
 export default function MobileSheet() {
@@ -25,7 +24,7 @@ export default function MobileSheet() {
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
       </SheetTrigger>
-      <SheetContent side="right">
+      <SheetContent side="right" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Navigate</SheetTitle>
         </SheetHeader>
@@ -41,7 +40,7 @@ export default function MobileSheet() {
           </SheetClose>
 
           <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
-            Quick create
+            Exams
           </div>
           <SheetClose asChild>
             <Link
@@ -70,6 +69,16 @@ export default function MobileSheet() {
               className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
             >
               Generate Exam
+            </Link>
+          </SheetClose>
+
+          <SheetClose asChild>
+            <Link
+              to="/syllabus"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/syllabus" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Syllabus
             </Link>
           </SheetClose>
 
@@ -112,15 +121,6 @@ export default function MobileSheet() {
               Support
             </Link>
           </SheetClose>
-        </div>
-
-        <div className="mt-4 p-2">
-          <div className="text-sm font-semibold text-muted-foreground px-1">
-            Stats
-          </div>
-          <div className="mt-2">
-            <SidebarStats />
-          </div>
         </div>
       </SheetContent>
     </Sheet>

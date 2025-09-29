@@ -1,7 +1,6 @@
 import React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,12 +56,11 @@ export default function RegisterInstitutePage() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-              <SidebarStats />
             </div>
           </aside>
 
           <div>
-            <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow">
+            <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
               <h2 className="text-2xl font-bold">Register Institute</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Provide institute details for licensing and billing.
