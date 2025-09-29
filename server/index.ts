@@ -5,7 +5,6 @@ import { handleDemo } from "./routes/demo";
 import { handleGenerate, uploadPdf } from "./routes/generate";
 import { handleProxy } from "./routes/proxy";
 import path from "path";
-import expressStatic from "express";
 import { handleUploadLogo, uploadLogo } from "./routes/upload-logo";
 
 export function createServer() {
