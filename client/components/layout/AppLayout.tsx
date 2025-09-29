@@ -39,6 +39,7 @@ export function AppLayout({ children }: PropsWithChildren) {
   }, [path]);
 
   const { locked } = useProfileLock();
+  const lockActive = locked && path !== "/profile" && path !== "/my-profile";
 
   return (
     <div className="flex min-h-svh w-full flex-col">
