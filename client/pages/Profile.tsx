@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+import { persistProfile } from "@/lib/account";
 
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
@@ -70,7 +71,7 @@ export default function Profile() {
   }, []);
 
   const onSave = async () => {
-    if (!user?.uid) {
+    if (!user?.uid && !auth.currentUser) {
       toast({ title: "Not logged in", description: "Please sign in first." });
       return;
     }
@@ -79,15 +80,18 @@ export default function Profile() {
       const payload = {
         name: form.name || "",
         phone: form.phone || "",
+        email: auth.currentUser?.email || "",
+        updatedAt: Date.now(),
         profileCompleted: true,
-      };
-      await setDoc(doc(db, "users", user.uid), payload, { merge: true });
+      } as any;
+      await persistProfile(payload);
       lastSavedRef.current = { name: payload.name, phone: payload.phone };
       setIsEditing(false);
       setExists(true);
       toast({ title: "Profile saved", description: "Your profile is synced across devices." });
-    } catch {
-      toast({ title: "Save failed", description: "Please try again.", variant: "destructive" });
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: "Save failed", description: e?.message || "Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
