@@ -37,6 +37,12 @@ export default function Profile() {
     [form],
   );
 
+  const isEditingRef = React.useRef(isEditing);
+
+  React.useEffect(() => {
+    isEditingRef.current = isEditing;
+  }, [isEditing]);
+
   React.useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
       setUser(u || null);
@@ -59,8 +65,10 @@ export default function Profile() {
               };
               lastSavedRef.current = next;
               setExists(true);
-              setForm(next);
-              setIsEditing(false);
+              if (!isEditingRef.current) {
+                setForm(next);
+              }
+              setIsEditing((prev) => (prev ? prev : false));
             } else {
               setExists(false);
               const empty = {
@@ -69,8 +77,10 @@ export default function Profile() {
                 instituteName: String(inst?.name ?? ""),
               };
               lastSavedRef.current = empty;
-              setForm(empty);
-              setIsEditing(false);
+              if (!isEditingRef.current) {
+                setForm(empty);
+              }
+              setIsEditing((prev) => (prev ? prev : false));
             }
           },
           (err) => {
