@@ -613,10 +613,6 @@ export default function QnA() {
                             onClick={async () => {
                               if (!result) return;
                               try {
-                                const { generateExamStylePdf } = await import(
-                                  "@/lib/pdf"
-                                );
-                                const { getProfile } = await import("@/lib/account");
                                 const prof = getProfile();
                                 await generateExamStylePdf({
                                   title: "Questions",
