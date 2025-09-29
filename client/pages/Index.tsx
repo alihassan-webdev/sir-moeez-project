@@ -789,8 +789,6 @@ export default function Index() {
         const form = new FormData();
         form.append("pdf", theFile);
         form.append("query", q);
-        // Include both common field names for maximum compatibility via proxy
-        form.append("file", theFile);
 
         const res = await withTimeout(
           fetch(finalUrl, {
