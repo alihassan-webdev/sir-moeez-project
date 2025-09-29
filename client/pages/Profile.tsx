@@ -12,19 +12,28 @@ export default function ProfilePage() {
   const [profile, setProfile] = React.useState<UserProfile>(() => getProfile());
   const emailFromAuth = auth.currentUser?.email || profile.email;
 
-  const onSubmit = (e: React.FormEvent) => {
+  const [saving, setSaving] = React.useState(false);
+  const [pwd1, setPwd1] = React.useState("");
+  const [pwd2, setPwd2] = React.useState("");
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updated: UserProfile = {
-      ...profile,
-      email: emailFromAuth,
-      updatedAt: Date.now(),
-    };
-    saveProfile(updated);
-    setProfile(updated);
-    toast({
-      title: "Profile saved",
-      description: "Your profile has been updated.",
-    });
+    setSaving(true);
+    try {
+      const updated: UserProfile = {
+        ...profile,
+        email: emailFromAuth,
+        updatedAt: Date.now(),
+      };
+      saveProfile(updated);
+      setProfile(updated);
+      toast({
+        title: "Profile saved",
+        description: "Your profile has been updated.",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
