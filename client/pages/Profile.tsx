@@ -282,7 +282,7 @@ export default function Profile() {
                         type="button"
                         onClick={onSave}
                         disabled={saving || !isFormValid}
-                        className="bg-emerald-600 text-white shadow-md hover:bg-emerald-700 focus-visible:ring-emerald-500 disabled:bg-emerald-600 disabled:text-white disabled:opacity-70"
+                        variant="default"
                       >
                         {saving ? (
                           <span className="inline-flex items-center gap-2">
@@ -295,7 +295,7 @@ export default function Profile() {
                       </Button>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         onClick={onCancel}
                         disabled={saving}
                       >
@@ -305,9 +305,8 @@ export default function Profile() {
                   ) : (
                     <Button
                       type="button"
-                      variant="elevated"
+                      variant="default"
                       onClick={onEdit}
-                      className="bg-blue-600 text-white shadow-md hover:bg-blue-700 focus-visible:ring-blue-500"
                     >
                       Edit
                     </Button>
