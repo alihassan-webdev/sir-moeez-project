@@ -24,7 +24,7 @@ export default function MobileSheet() {
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="overflow-y-auto">
+      <SheetContent side="right" className="overflow-y-auto scrollbar-none">
         <SheetHeader>
           <SheetTitle>Navigate</SheetTitle>
         </SheetHeader>
