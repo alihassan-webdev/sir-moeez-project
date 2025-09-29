@@ -4,6 +4,9 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleGenerate, uploadPdf } from "./routes/generate";
 import { handleProxy } from "./routes/proxy";
+import path from "path";
+import expressStatic from "express";
+import { handleUploadLogo, uploadLogo } from "./routes/upload-logo";
 
 export function createServer() {
   const app = express();
@@ -24,6 +27,9 @@ export function createServer() {
   });
   app.use(express.json({ limit: "16mb" }));
   app.use(express.urlencoded({ extended: true }));
+
+  // Serve uploaded assets under /data
+  app.use("/data", express.static(path.join(process.cwd(), "data")));
 
   // Health and ping
   app.get("/health", (_req, res) => {
@@ -52,6 +58,9 @@ export function createServer() {
   // Universal proxy endpoint (CORS + POST forward). Register both paths for serverless base path quirks
   app.all("/api/proxy", handleProxy);
   app.all("/proxy", handleProxy);
+
+  // Logo upload endpoint
+  app.post("/api/upload-logo", uploadLogo, handleUploadLogo);
 
   // Global error handler
   app.use((err: any, _req: any, res: any, _next: any) => {
