@@ -16,15 +16,46 @@ import NotFound from "./pages/NotFound";
 import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
-const Index = React.lazy(() => import("./pages/Index"));
-const GetStarted = React.lazy(() => import("./pages/GetStarted"));
-const MCQs = React.lazy(() => import("./pages/MCQs"));
-const QnA = React.lazy(() => import("./pages/QnA"));
-const Syllabus = React.lazy(() => import("./pages/Syllabus"));
-const Subscription = React.lazy(() => import("./pages/Subscription"));
-const Profile = React.lazy(() => import("./pages/Profile"));
-const Support = React.lazy(() => import("./pages/Support"));
-const Onboarding = React.lazy(() => import("./pages/Onboarding"));
+
+function lazyWithRetry<T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>, delayMs = 600) {
+  return React.lazy(() =>
+    factory().catch((err) => {
+      const msg = String(err?.message || err);
+      const isChunkError =
+        msg.includes("Failed to fetch dynamically imported module") ||
+        msg.includes("Loading chunk") ||
+        err?.name === "TypeError";
+      if (!isChunkError) throw err;
+      return new Promise<{ default: T }>((resolve, reject) => {
+        setTimeout(() => {
+          factory().then(resolve).catch(reject);
+        }, delayMs);
+      });
+    }),
+  );
+}
+
+class LazyRetryBoundary extends React.Component<{ fallback: React.ReactNode; children: React.ReactNode }, { attempt: number; hasError: boolean }> {
+  state = { attempt: 0, hasError: false };
+  componentDidCatch() {
+    this.setState({ hasError: true });
+    setTimeout(() => this.setState((s) => ({ hasError: false, attempt: s.attempt + 1 })), 700);
+  }
+  render() {
+    if (this.state.hasError) return <>{this.props.fallback}</>;
+    return <React.Fragment key={this.state.attempt}>{this.props.children}</React.Fragment>;
+  }
+}
+
+const Index = lazyWithRetry(() => import("./pages/Index"));
+const GetStarted = lazyWithRetry(() => import("./pages/GetStarted"));
+const MCQs = lazyWithRetry(() => import("./pages/MCQs"));
+const QnA = lazyWithRetry(() => import("./pages/QnA"));
+const Syllabus = lazyWithRetry(() => import("./pages/Syllabus"));
+const Subscription = lazyWithRetry(() => import("./pages/Subscription"));
+const Profile = lazyWithRetry(() => import("./pages/Profile"));
+const Support = lazyWithRetry(() => import("./pages/Support"));
+const Onboarding = lazyWithRetry(() => import("./pages/Onboarding"));
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 
@@ -107,9 +138,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <Index />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <Index />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -121,9 +154,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <GetStarted />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <GetStarted />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -135,9 +170,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <MCQs />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <MCQs />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -149,9 +186,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <QnA />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <QnA />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -163,9 +202,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <Syllabus />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <Syllabus />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -177,9 +218,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <Subscription />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <Subscription />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -190,9 +233,11 @@ function AnimatedRoutes() {
           element={
             <RequireAuth>
               <PageWrapper>
-                <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                  <Profile />
-                </Suspense>
+                <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Profile />
+                  </Suspense>
+                </LazyRetryBoundary>
               </PageWrapper>
             </RequireAuth>
           }
@@ -203,9 +248,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <Onboarding />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <Onboarding />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -217,9 +264,11 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
-                    <Support />
-                  </Suspense>
+                  <LazyRetryBoundary fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                      <Support />
+                    </Suspense>
+                  </LazyRetryBoundary>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
