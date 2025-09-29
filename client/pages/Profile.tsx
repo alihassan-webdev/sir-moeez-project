@@ -13,7 +13,7 @@ import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
   const [exists, setExists] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(true);
+  const [isEditing, setIsEditing] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
 
   const [form, setForm] = React.useState({
@@ -28,6 +28,20 @@ export default function Profile() {
     instituteName: "",
   });
   const unsubRef = React.useRef<null | (() => void)>(null);
+
+  const isFormValid = React.useMemo(
+    () =>
+      form.name.trim().length > 0 &&
+      form.phone.trim().length > 0 &&
+      form.instituteName.trim().length > 0,
+    [form],
+  );
+
+  const isEditingRef = React.useRef(isEditing);
+
+  React.useEffect(() => {
+    isEditingRef.current = isEditing;
+  }, [isEditing]);
 
   React.useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
@@ -51,8 +65,10 @@ export default function Profile() {
               };
               lastSavedRef.current = next;
               setExists(true);
-              if (!isEditing) setForm(next);
-              setIsEditing(false);
+              if (!isEditingRef.current) {
+                setForm(next);
+              }
+              setIsEditing((prev) => (prev ? prev : false));
             } else {
               setExists(false);
               const empty = {
@@ -61,8 +77,10 @@ export default function Profile() {
                 instituteName: String(inst?.name ?? ""),
               };
               lastSavedRef.current = empty;
-              setForm(empty);
-              setIsEditing(true);
+              if (!isEditingRef.current) {
+                setForm(empty);
+              }
+              setIsEditing((prev) => (prev ? prev : false));
             }
           },
           (err) => {
@@ -80,7 +98,7 @@ export default function Profile() {
       unsubAuth();
       if (unsubRef.current) unsubRef.current();
     };
-  }, [isEditing]);
+  }, []);
 
   const onSave = async () => {
     if (!user?.uid) {
@@ -91,12 +109,25 @@ export default function Profile() {
       });
       return;
     }
+    const name = form.name.trim();
+    const phone = form.phone.trim();
+    const instituteName = form.instituteName.trim();
+
+    if (!name || !phone || !instituteName) {
+      toast({
+        title: "Missing information",
+        description: "Name, phone, and institute name are required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
-        name: form.name || "",
-        phone: form.phone || "",
-        instituteName: form.instituteName || "",
+        name,
+        phone,
+        instituteName,
         profileCompleted: true,
         updatedAt: Date.now(),
       } as const;
@@ -107,7 +138,7 @@ export default function Profile() {
       // Persist institute locally as well
       const existingInst: Institute | null = getInstitute();
       const instToSave: Institute = {
-        name: form.instituteName || "",
+        name,
         logo: existingInst?.logo,
         type: existingInst?.type,
         address: existingInst?.address,
@@ -121,14 +152,19 @@ export default function Profile() {
       saveInstitute(instToSave);
 
       lastSavedRef.current = {
-        name: payload.name,
-        phone: payload.phone,
-        instituteName: payload.instituteName,
+        name,
+        phone,
+        instituteName,
       };
+      setForm({
+        name,
+        phone,
+        instituteName,
+      });
       setIsEditing(false);
       setExists(true);
       toast({
-        title: "Profile saved successfully",
+        title: "Profile updated successfully",
         description: "Your profile is synced across devices.",
       });
     } catch (e: any) {
@@ -195,7 +231,11 @@ export default function Profile() {
                     }
                     placeholder="Your name"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
+                    className={
+                      !isEditing
+                        ? "bg-muted/40 text-muted-foreground"
+                        : undefined
+                    }
                   />
                 </div>
 
@@ -209,7 +249,11 @@ export default function Profile() {
                     }
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
+                    className={
+                      !isEditing
+                        ? "bg-muted/40 text-muted-foreground"
+                        : undefined
+                    }
                   />
                 </div>
 
@@ -223,17 +267,26 @@ export default function Profile() {
                     }
                     placeholder="Your institute name"
                     disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
+                    className={
+                      !isEditing
+                        ? "bg-muted/40 text-muted-foreground"
+                        : undefined
+                    }
                   />
                 </div>
 
                 <div className="pt-2 flex gap-2">
                   {isEditing ? (
                     <>
-                      <Button type="button" onClick={onSave} disabled={saving}>
+                      <Button
+                        type="button"
+                        onClick={onSave}
+                        disabled={saving || !isFormValid}
+                        className="bg-emerald-600 text-white shadow-md hover:bg-emerald-700 focus-visible:ring-emerald-500 disabled:bg-emerald-600 disabled:text-white disabled:opacity-70"
+                      >
                         {saving ? (
                           <span className="inline-flex items-center gap-2">
-                            <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
                             Saving...
                           </span>
                         ) : (
@@ -250,7 +303,12 @@ export default function Profile() {
                       </Button>
                     </>
                   ) : (
-                    <Button type="button" variant="elevated" onClick={onEdit}>
+                    <Button
+                      type="button"
+                      variant="elevated"
+                      onClick={onEdit}
+                      className="bg-blue-600 text-white shadow-md hover:bg-blue-700 focus-visible:ring-blue-500"
+                    >
                       Edit
                     </Button>
                   )}
