@@ -27,6 +27,7 @@ import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { loadProfile } from "@/lib/account";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,35 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     );
   }
   if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
+function RequireProfileCompleted({ children }: { children: React.ReactNode }) {
+  const [checking, setChecking] = useState(true);
+  const [completed, setCompleted] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    loadProfile().then((p) => {
+      if (!mounted) return;
+      setCompleted(!!p.profileCompleted);
+      setChecking(false);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (checking) {
+    return (
+      <PageWrapper>
+        <div className="flex items-center justify-center py-20 text-sm text-muted-foreground">
+          Loading...
+        </div>
+      </PageWrapper>
+    );
+  }
+  if (!completed) return <Navigate to="/profile" replace />;
   return <>{children}</>;
 }
 
@@ -101,9 +131,11 @@ function AnimatedRoutes() {
           path="/app"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <Index />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <Index />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -111,9 +143,11 @@ function AnimatedRoutes() {
           path="/get-started"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <GetStarted />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <GetStarted />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -121,9 +155,11 @@ function AnimatedRoutes() {
           path="/mcqs"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <MCQs />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <MCQs />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -131,9 +167,11 @@ function AnimatedRoutes() {
           path="/qna"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <QnA />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <QnA />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -141,9 +179,11 @@ function AnimatedRoutes() {
           path="/syllabus"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <Syllabus />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <Syllabus />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -151,9 +191,11 @@ function AnimatedRoutes() {
           path="/subscription"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <Subscription />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <Subscription />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -171,9 +213,11 @@ function AnimatedRoutes() {
           path="/onboarding"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <Onboarding />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <Onboarding />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />
@@ -181,9 +225,11 @@ function AnimatedRoutes() {
           path="/support"
           element={
             <RequireAuth>
-              <PageWrapper>
-                <Support />
-              </PageWrapper>
+              <RequireProfileCompleted>
+                <PageWrapper>
+                  <Support />
+                </PageWrapper>
+              </RequireProfileCompleted>
             </RequireAuth>
           }
         />

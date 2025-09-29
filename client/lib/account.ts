@@ -1,16 +1,18 @@
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc, deleteField } from "firebase/firestore";
 
 export type UserProfile = {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
   updatedAt: number;
-  notify?: boolean;
+  profileCompleted?: boolean;
 };
 
 export type Institute = {
   name: string;
-  logo?: string; // data URL or external URL
+  logo?: string;
   type?: string;
   address?: string;
   city?: string;
@@ -37,20 +39,69 @@ export function getProfile(): UserProfile {
       return JSON.parse(raw) as UserProfile;
     } catch {}
   }
-  // default from auth if available
   const u = auth.currentUser;
   return {
     name: u?.displayName || "",
     email: u?.email || "",
     phone: "",
+    address: "",
     updatedAt: Date.now(),
-    notify: false,
+    profileCompleted: false,
   };
 }
 
 export function saveProfile(profile: UserProfile) {
   const id = getUserId();
   localStorage.setItem(PROFILE_KEY_PREFIX + id, JSON.stringify(profile));
+}
+
+export async function loadProfile(): Promise<UserProfile> {
+  const id = getUserId();
+  if (!id || id === "anonymous") return getProfile();
+  try {
+    const snap = await getDoc(doc(db, "users", id));
+    if (snap.exists()) {
+      const remote = snap.data() as Partial<UserProfile>;
+      const current = getProfile();
+      const merged: UserProfile = {
+        name: String(remote.name ?? current.name ?? ""),
+        email: String(remote.email ?? current.email ?? ""),
+        phone: String(remote.phone ?? current.phone ?? ""),
+        address: String(remote.address ?? current.address ?? ""),
+        updatedAt: Number(remote.updatedAt ?? current.updatedAt ?? Date.now()),
+        profileCompleted: Boolean(
+          remote.profileCompleted ?? current.profileCompleted ?? false,
+        ),
+      };
+      saveProfile(merged);
+      return merged;
+    }
+  } catch {}
+  const fallback = getProfile();
+  saveProfile(fallback);
+  return fallback;
+}
+
+export async function persistProfile(profile: UserProfile): Promise<void> {
+  saveProfile(profile);
+  const id = getUserId();
+  if (!id || id === "anonymous") return;
+  try {
+    await setDoc(
+      doc(db, "users", id),
+      { ...profile, education: deleteField(), city: deleteField() },
+      { merge: true },
+    );
+  } catch {}
+}
+
+export function isProfileCompleted(): boolean {
+  try {
+    const p = getProfile();
+    return !!p.profileCompleted;
+  } catch {
+    return false;
+  }
 }
 
 export function getInstitute(): Institute | null {
