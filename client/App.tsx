@@ -50,7 +50,7 @@ class LazyRetryBoundary extends React.Component<{ fallback: React.ReactNode; chi
 const Index = lazyWithRetry(() => import("./pages/Index"));
 const GetStarted = lazyWithRetry(() => import("./pages/GetStarted"));
 const MCQs = lazyWithRetry(() => import("./pages/MCQs"));
-const QnA = lazyWithRetry(() => import("./pages/QnA"));
+import QnA from "./pages/QnA";
 const Syllabus = lazyWithRetry(() => import("./pages/Syllabus"));
 const Subscription = lazyWithRetry(() => import("./pages/Subscription"));
 const Profile = lazyWithRetry(() => import("./pages/Profile"));
