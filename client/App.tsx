@@ -11,20 +11,20 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
-import Index from "./pages/Index";
+import React, { useEffect, useState, Suspense } from "react";
 import NotFound from "./pages/NotFound";
 import AppLayout from "@/components/layout/AppLayout";
 import Landing from "./pages/Landing";
-import GetStarted from "./pages/GetStarted";
-import MCQs from "./pages/MCQs";
-import QnA from "./pages/QnA";
-import Syllabus from "./pages/Syllabus";
-import Subscription from "./pages/Subscription";
-import Profile from "./pages/Profile";
-import Support from "./pages/Support";
 import Login from "./pages/Login";
-import Onboarding from "./pages/Onboarding";
+const Index = React.lazy(() => import("./pages/Index"));
+const GetStarted = React.lazy(() => import("./pages/GetStarted"));
+const MCQs = React.lazy(() => import("./pages/MCQs"));
+const QnA = React.lazy(() => import("./pages/QnA"));
+const Syllabus = React.lazy(() => import("./pages/Syllabus"));
+const Subscription = React.lazy(() => import("./pages/Subscription"));
+const Profile = React.lazy(() => import("./pages/Profile"));
+const Support = React.lazy(() => import("./pages/Support"));
+const Onboarding = React.lazy(() => import("./pages/Onboarding"));
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 
@@ -107,7 +107,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Index />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Index />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -119,7 +121,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <GetStarted />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <GetStarted />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -131,7 +135,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <MCQs />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <MCQs />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -143,7 +149,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <QnA />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <QnA />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -155,7 +163,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Syllabus />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Syllabus />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -167,7 +177,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Subscription />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Subscription />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -178,7 +190,9 @@ function AnimatedRoutes() {
           element={
             <RequireAuth>
               <PageWrapper>
-                <Profile />
+                <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                  <Profile />
+                </Suspense>
               </PageWrapper>
             </RequireAuth>
           }
@@ -189,7 +203,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Onboarding />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Onboarding />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
@@ -201,7 +217,9 @@ function AnimatedRoutes() {
             <RequireAuth>
               <RequireProfileCompleted>
                 <PageWrapper>
-                  <Support />
+                  <Suspense fallback={<div className="flex items-center justify-center py-20 text-sm text-muted-foreground">Loading...</div>}>
+                    <Support />
+                  </Suspense>
                 </PageWrapper>
               </RequireProfileCompleted>
             </RequireAuth>
