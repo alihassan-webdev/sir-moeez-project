@@ -5,8 +5,10 @@ export type UserProfile = {
   name: string;
   email: string;
   phone?: string;
+  education?: string;
+  address?: string;
   updatedAt: number;
-  notify?: boolean;
+  profileCompleted?: boolean;
 };
 
 export type Institute = {
@@ -43,8 +45,10 @@ export function getProfile(): UserProfile {
     name: u?.displayName || "",
     email: u?.email || "",
     phone: "",
+    education: "",
+    address: "",
     updatedAt: Date.now(),
-    notify: false,
+    profileCompleted: false,
   };
 }
 
@@ -57,7 +61,7 @@ export async function loadProfile(): Promise<UserProfile> {
   const id = getUserId();
   if (!id || id === "anonymous") return getProfile();
   try {
-    const snap = await getDoc(doc(db, "profiles", id));
+    const snap = await getDoc(doc(db, "users", id));
     if (snap.exists()) {
       const remote = snap.data() as Partial<UserProfile>;
       const current = getProfile();
@@ -65,14 +69,20 @@ export async function loadProfile(): Promise<UserProfile> {
         name: String(remote.name ?? current.name ?? ""),
         email: String(remote.email ?? current.email ?? ""),
         phone: String(remote.phone ?? current.phone ?? ""),
+        education: String(remote.education ?? current.education ?? ""),
+        address: String(remote.address ?? current.address ?? ""),
         updatedAt: Number(remote.updatedAt ?? current.updatedAt ?? Date.now()),
-        notify: Boolean(remote.notify ?? current.notify ?? false),
+        profileCompleted: Boolean(
+          remote.profileCompleted ?? current.profileCompleted ?? false,
+        ),
       };
       saveProfile(merged);
       return merged;
     }
   } catch {}
-  return getProfile();
+  const fallback = getProfile();
+  saveProfile(fallback);
+  return fallback;
 }
 
 export async function persistProfile(profile: UserProfile): Promise<void> {
@@ -80,8 +90,17 @@ export async function persistProfile(profile: UserProfile): Promise<void> {
   const id = getUserId();
   if (!id || id === "anonymous") return;
   try {
-    await setDoc(doc(db, "profiles", id), profile, { merge: true });
+    await setDoc(doc(db, "users", id), profile, { merge: true });
   } catch {}
+}
+
+export function isProfileCompleted(): boolean {
+  try {
+    const p = getProfile();
+    return !!p.profileCompleted;
+  } catch {
+    return false;
+  }
 }
 
 export function getInstitute(): Institute | null {
