@@ -170,7 +170,10 @@ export default function GetStarted() {
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
-                      <BookOpen className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+                      <BookOpen
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="text-base font-semibold">Syllabus</div>
                     <div className="text-xs text-muted-foreground mt-1">
@@ -178,7 +181,7 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </Link>
-            </div>
+              </div>
             </div>
 
             {/* My account */}

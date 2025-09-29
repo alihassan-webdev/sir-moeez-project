@@ -122,7 +122,6 @@ export default function MobileSheet() {
             </Link>
           </SheetClose>
         </div>
-
       </SheetContent>
     </Sheet>
   );

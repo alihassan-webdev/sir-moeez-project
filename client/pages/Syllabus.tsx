@@ -57,7 +57,8 @@ export default function Syllabus() {
   const [selectedSubject, setSelectedSubject] = React.useState<string>("");
 
   const chapters = React.useMemo(() => {
-    if (!selectedClass || !selectedSubject) return [] as { path: string; url: string; name: string }[];
+    if (!selectedClass || !selectedSubject)
+      return [] as { path: string; url: string; name: string }[];
     const arr = (byClass[selectedClass] || []).filter((e) => {
       const m = e.path.replace(/^\/?datafiles\//, "");
       const sub = (m.split("/")[1] || "General").trim();
@@ -66,7 +67,9 @@ export default function Syllabus() {
     // sort by natural chapter number if present
     return arr
       .map((e) => ({ ...e, name: (e.name || "").replace(/\.pdf$/i, "") }))
-      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true }),
+      );
   }, [byClass, selectedClass, selectedSubject]);
 
   const canSelectSubject = !!selectedClass;
@@ -86,7 +89,8 @@ export default function Syllabus() {
             <div className="mt-4">
               <h1 className="text-2xl font-bold">Syllabus</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Select class and subject to browse chapters. Click a chapter to view or download.
+                Select class and subject to browse chapters. Click a chapter to
+                view or download.
               </p>
               <div className="mt-4">
                 <SidebarStats title={null} />
@@ -95,56 +99,104 @@ export default function Syllabus() {
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Class</label>
-                <Select value={selectedClass} onValueChange={(v) => { setSelectedClass(v); setSelectedSubject(""); }}>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Class
+                </label>
+                <Select
+                  value={selectedClass}
+                  onValueChange={(v) => {
+                    setSelectedClass(v);
+                    setSelectedSubject("");
+                  }}
+                >
                   <SelectTrigger className="mt-1" aria-label="Select class">
                     <SelectValue placeholder="Select class" />
                   </SelectTrigger>
                   <SelectContent>
                     {classes.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className={`transition-opacity ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
-                <label className="text-sm font-medium text-muted-foreground">Subject</label>
-                <Select value={selectedSubject} onValueChange={setSelectedSubject} disabled={!canSelectSubject}>
+              <div
+                className={`transition-opacity ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+              >
+                <label className="text-sm font-medium text-muted-foreground">
+                  Subject
+                </label>
+                <Select
+                  value={selectedSubject}
+                  onValueChange={setSelectedSubject}
+                  disabled={!canSelectSubject}
+                >
                   <SelectTrigger className="mt-1" aria-label="Select subject">
-                    <SelectValue placeholder={canSelectSubject ? "Select subject" : "Select class first"} />
+                    <SelectValue
+                      placeholder={
+                        canSelectSubject
+                          ? "Select subject"
+                          : "Select class first"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {subjects.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className={`transition-opacity ${!canSelectChapters ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
-                <label className="text-sm font-medium text-muted-foreground">Chapters</label>
+              <div
+                className={`transition-opacity ${!canSelectChapters ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+              >
+                <label className="text-sm font-medium text-muted-foreground">
+                  Chapters
+                </label>
                 <div className="mt-1 h-12 rounded-md border border-input bg-white px-3 py-2 flex items-center text-sm">
-                  {canSelectChapters ? `${chapters.length} chapter${chapters.length === 1 ? "" : "s"}` : "Select subject first"}
+                  {canSelectChapters
+                    ? `${chapters.length} chapter${chapters.length === 1 ? "" : "s"}`
+                    : "Select subject first"}
                 </div>
               </div>
             </div>
 
             <div className="mt-5 rounded-xl border border-input bg-white card-yellow-shadow">
-              <div className="px-4 py-3 border-b text-sm font-semibold">Chapters</div>
+              <div className="px-4 py-3 border-b text-sm font-semibold">
+                Chapters
+              </div>
               <div className="divide-y max-h-[60vh] overflow-y-auto scrollbar-yellow pr-1 pb-4">
                 {canSelectChapters && chapters.length > 0 ? (
                   chapters.map((c) => (
-                    <div key={c.path} className="flex items-center justify-between gap-3 px-4 py-3">
-                      <div className="text-sm font-medium truncate">{c.name}</div>
+                    <div
+                      key={c.path}
+                      className="flex items-center justify-between gap-3 px-4 py-3"
+                    >
+                      <div className="text-sm font-medium truncate">
+                        {c.name}
+                      </div>
                       <div className="flex items-center gap-2">
                         <Button asChild variant="elevated" size="sm">
-                          <a href={c.url} target="_blank" rel="noopener noreferrer" aria-label={`View ${c.name}`}> 
+                          <a
+                            href={c.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`View ${c.name}`}
+                          >
                             <Eye /> View
                           </a>
                         </Button>
                         <Button asChild variant="outline" size="sm">
-                          <a href={c.url} download={`${c.name}.pdf`} aria-label={`Download ${c.name}`}>
+                          <a
+                            href={c.url}
+                            download={`${c.name}.pdf`}
+                            aria-label={`Download ${c.name}`}
+                          >
                             <Download /> Download
                           </a>
                         </Button>
@@ -153,7 +205,11 @@ export default function Syllabus() {
                   ))
                 ) : (
                   <div className="px-4 py-10 text-sm text-muted-foreground text-center">
-                    {selectedClass ? (selectedSubject ? "No chapters found." : "Select a subject to see chapters.") : "Select a class to begin."}
+                    {selectedClass
+                      ? selectedSubject
+                        ? "No chapters found."
+                        : "Select a subject to see chapters."
+                      : "Select a class to begin."}
                   </div>
                 )}
               </div>
