@@ -8,6 +8,7 @@ import {
   User,
   Building2,
   LifeBuoy,
+  BookOpen,
 } from "lucide-react";
 
 function NavItem({
@@ -52,7 +53,7 @@ export default function SidebarPanelInner() {
         />
 
         <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
-          Quick create
+          Exams
         </div>
         <NavItem
           to="/mcqs"
@@ -71,6 +72,12 @@ export default function SidebarPanelInner() {
           icon={FileText}
           label="Generate Exam"
           active={pathname === "/app"}
+        />
+        <NavItem
+          to="/syllabus"
+          icon={BookOpen}
+          label="Syllabus"
+          active={pathname === "/syllabus"}
         />
 
         <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">

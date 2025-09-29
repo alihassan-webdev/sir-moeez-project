@@ -109,10 +109,10 @@ export default function GetStarted() {
               </p>
             </div>
 
-            {/* Quick create */}
+            {/* Exams */}
             <div className="mt-4">
-              <h2 className="text-xl sm:text-2xl font-bold">Quick create</h2>
-              <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
+              <h2 className="text-xl sm:text-2xl font-bold">Exams</h2>
+              <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr">
                 <Link
                   to="/mcqs"
                   className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
@@ -166,7 +166,22 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </Link>
-              </div>
+
+                <Link
+                  to="/syllabus"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                >
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+                      <BookOpen className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+                    </div>
+                    <div className="text-base font-semibold">Syllabus</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Browse and download chapters by class & subject
+                    </div>
+                  </div>
+                </Link>
+            </div>
             </div>
 
             {/* My account */}

@@ -41,7 +41,7 @@ export default function MobileSheet() {
           </SheetClose>
 
           <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
-            Quick create
+            Exams
           </div>
           <SheetClose asChild>
             <Link
@@ -70,6 +70,16 @@ export default function MobileSheet() {
               className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
             >
               Generate Exam
+            </Link>
+          </SheetClose>
+
+          <SheetClose asChild>
+            <Link
+              to="/syllabus"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/syllabus" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            >
+              Syllabus
             </Link>
           </SheetClose>
 

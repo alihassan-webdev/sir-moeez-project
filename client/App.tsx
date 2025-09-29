@@ -19,6 +19,7 @@ import Landing from "./pages/Landing";
 import GetStarted from "./pages/GetStarted";
 import MCQs from "./pages/MCQs";
 import QnA from "./pages/QnA";
+import Syllabus from "./pages/Syllabus";
 import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
 import RegisterInstitute from "./pages/RegisterInstitute";
@@ -132,6 +133,16 @@ function AnimatedRoutes() {
             <RequireAuth>
               <PageWrapper>
                 <QnA />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/syllabus"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Syllabus />
               </PageWrapper>
             </RequireAuth>
           }
