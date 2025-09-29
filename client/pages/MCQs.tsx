@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatResultHtml } from "@/lib/format";
 import ToolLock from "@/components/ToolLock";
+import { Link } from "react-router-dom";
+import { auth, db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -70,6 +73,41 @@ export default function MCQs() {
   const [mcqCount, setMcqCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+
+  const [profile, setProfile] = useState<{
+    name?: string;
+    phone?: string;
+    instituteName?: string;
+    instituteLogo?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const u = auth.currentUser;
+    if (!u?.uid) return;
+    const ref = doc(db, "users", u.uid);
+    const unsub = onSnapshot(ref, (snap) => {
+      const d = snap.data() as any | undefined;
+      if (!d) {
+        setProfile({});
+        return;
+      }
+      setProfile({
+        name: String(d.name || ""),
+        phone: String(d.phone || ""),
+        instituteName: String(d.instituteName || ""),
+        instituteLogo:
+          typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
+      });
+    });
+    return () => unsub();
+  }, []);
+
+  const isProfileCompleteForPdf = Boolean(
+    profile?.name &&
+      profile?.phone &&
+      profile?.instituteName &&
+      profile?.instituteLogo,
+  );
 
   // Progressive unlocking flags
   const canSelectSubject = !!selectedClass;
@@ -378,6 +416,22 @@ Use concise, exam-style wording suitable for classroom tests.`;
             </section>
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
+              {!isProfileCompleteForPdf && (
+                <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium">
+                      Please complete your profile (name, phone, institute name,
+                      and logo) before generating exams.
+                    </p>
+                  </div>
+                  <Link
+                    to="/profile"
+                    className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:opacity-90"
+                  >
+                    Go to Profile
+                  </Link>
+                </div>
+              )}
               <ToolLock>
                 <div className="flex flex-col gap-4">
                   <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
@@ -606,6 +660,14 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             disabled={!result || !!loading}
                             onClick={async () => {
                               if (!result) return;
+                              if (!isProfileCompleteForPdf) {
+                                toast({
+                                  title: "Profile incomplete",
+                                  description:
+                                    "Please complete your profile (name, phone, institute name, and logo) before generating exams.",
+                                });
+                                return;
+                              }
                               try {
                                 const { generateExamStylePdf } = await import(
                                   "@/lib/pdf"
@@ -614,6 +676,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
                                   title: "MCQs",
                                   body: result,
                                   filenameBase: "mcqs",
+                                  instituteHeader: {
+                                    instituteName: profile?.instituteName,
+                                    instituteLogo: profile?.instituteLogo,
+                                  },
                                 });
                               } catch (err) {
                                 console.error(err);

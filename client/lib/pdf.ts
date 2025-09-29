@@ -14,8 +14,9 @@ export async function generateExamStylePdf(params: {
   title: string;
   body: string;
   filenameBase?: string;
+  instituteHeader?: { instituteName?: string; instituteLogo?: string };
 }) {
-  const { title, body, filenameBase } = params;
+  const { title, body, filenameBase, instituteHeader } = params;
   const doc = new jsPDF({ unit: "pt", format: "a4" });
 
   const margin = 64;
@@ -29,7 +30,35 @@ export async function generateExamStylePdf(params: {
 
   const headingTitle = title || "Exam";
 
-  // Header
+  // Optional institute header (name centered, logo left)
+  if (instituteHeader?.instituteName) {
+    try {
+      if (instituteHeader.instituteLogo) {
+        const dataUrl = instituteHeader.instituteLogo;
+        const fmt = /data:image\/(png|jpeg|jpg)/i.test(dataUrl)
+          ? dataUrl.match(/data:image\/(png|jpeg|jpg)/i)![1].toUpperCase() ===
+            "PNG"
+            ? "PNG"
+            : "JPEG"
+          : "PNG";
+        doc.addImage(dataUrl, fmt as any, margin, y - 6, 60, 60);
+      }
+    } catch {}
+    doc.setFont("times", "bold");
+    doc.setFontSize(18);
+    const nameLines = doc.splitTextToSize(
+      String(instituteHeader.instituteName),
+      pageW - margin * 2 - 70,
+    );
+    doc.text(nameLines, pageW / 2, y + 20, { align: "center" });
+    y += 60;
+    doc.setDrawColor(210);
+    doc.setLineWidth(0.8);
+    doc.line(margin, y, pageW - margin, y);
+    y += 12;
+  }
+
+  // Main title header
   doc.setFont("times", "bold");
   const headerFontSize = 33;
   doc.setFontSize(headerFontSize);

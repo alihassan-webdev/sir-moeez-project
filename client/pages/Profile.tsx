@@ -20,12 +20,14 @@ export default function Profile() {
     name: "",
     phone: "",
     instituteName: "",
+    instituteLogo: undefined as string | undefined,
   });
 
   const lastSavedRef = React.useRef({
     name: "",
     phone: "",
     instituteName: "",
+    instituteLogo: undefined as string | undefined,
   });
   const unsubRef = React.useRef<null | (() => void)>(null);
 
@@ -38,7 +40,6 @@ export default function Profile() {
   );
 
   const isEditingRef = React.useRef(isEditing);
-
   React.useEffect(() => {
     isEditingRef.current = isEditing;
   }, [isEditing]);
@@ -62,12 +63,14 @@ export default function Profile() {
                 name: String(d.name ?? ""),
                 phone: String(d.phone ?? ""),
                 instituteName: String(d.instituteName ?? inst?.name ?? ""),
+                instituteLogo:
+                  typeof d.instituteLogo === "string"
+                    ? d.instituteLogo
+                    : undefined,
               };
               lastSavedRef.current = next;
               setExists(true);
-              if (!isEditingRef.current) {
-                setForm(next);
-              }
+              if (!isEditingRef.current) setForm(next);
               setIsEditing((prev) => (prev ? prev : false));
             } else {
               setExists(false);
@@ -75,11 +78,10 @@ export default function Profile() {
                 name: "",
                 phone: "",
                 instituteName: String(inst?.name ?? ""),
+                instituteLogo: undefined,
               };
               lastSavedRef.current = empty;
-              if (!isEditingRef.current) {
-                setForm(empty);
-              }
+              if (!isEditingRef.current) setForm(empty);
               setIsEditing((prev) => (prev ? prev : false));
             }
           },
@@ -112,6 +114,7 @@ export default function Profile() {
     const name = form.name.trim();
     const phone = form.phone.trim();
     const instituteName = form.instituteName.trim();
+    const instituteLogo = form.instituteLogo || undefined;
 
     if (!name || !phone || !instituteName) {
       toast({
@@ -128,6 +131,7 @@ export default function Profile() {
         name,
         phone,
         instituteName,
+        instituteLogo,
         profileCompleted: true,
         updatedAt: Date.now(),
       } as const;
@@ -135,11 +139,10 @@ export default function Profile() {
       const verify = await getDoc(doc(db, "users", user.uid));
       if (!verify.exists()) throw new Error("Server save verification failed");
 
-      // Persist institute locally as well
       const existingInst: Institute | null = getInstitute();
       const instToSave: Institute = {
-        name,
-        logo: existingInst?.logo,
+        name: instituteName,
+        logo: instituteLogo ?? existingInst?.logo,
         type: existingInst?.type,
         address: existingInst?.address,
         city: existingInst?.city,
@@ -155,11 +158,13 @@ export default function Profile() {
         name,
         phone,
         instituteName,
+        instituteLogo,
       };
       setForm({
         name,
         phone,
         instituteName,
+        instituteLogo,
       });
       setIsEditing(false);
       setExists(true);
@@ -185,6 +190,34 @@ export default function Profile() {
   };
 
   const onEdit = () => setIsEditing(true);
+
+  const handleLogoChange: React.ChangeEventHandler<HTMLInputElement> = async (
+    e,
+  ) => {
+    const file = e.currentTarget.files?.[0];
+    if (!file) return;
+    if (file.size > 300 * 1024) {
+      toast({
+        title: "Logo too large, please upload a smaller file.",
+        variant: "destructive",
+      });
+      e.currentTarget.value = "";
+      return;
+    }
+    const toDataUrl = (f: File) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = reject;
+        reader.readAsDataURL(f);
+      });
+    try {
+      const dataUrl = await toDataUrl(file);
+      setForm((p) => ({ ...p, instituteLogo: dataUrl }));
+    } catch {
+      toast({ title: "Failed to load logo", variant: "destructive" });
+    }
+  };
 
   if (!user) {
     return (
@@ -275,6 +308,38 @@ export default function Profile() {
                   />
                 </div>
 
+                <div className="grid gap-2">
+                  <Label htmlFor="logo">Institute Logo</Label>
+                  <div className="flex items-center gap-4">
+                    {form.instituteLogo ? (
+                      <img
+                        src={form.instituteLogo}
+                        alt="Institute Logo Preview"
+                        className="h-16 w-16 rounded-md border border-input object-contain bg-white"
+                      />
+                    ) : (
+                      <div className="h-16 w-16 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">
+                        60×60
+                      </div>
+                    )}
+                    <Input
+                      id="logo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoChange}
+                      disabled={!isEditing}
+                      className={
+                        !isEditing
+                          ? "bg-muted/40 text-muted-foreground"
+                          : undefined
+                      }
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Max 300KB. PNG or JPG recommended.
+                  </p>
+                </div>
+
                 <div className="pt-2 flex gap-2">
                   {isEditing ? (
                     <>
@@ -282,7 +347,7 @@ export default function Profile() {
                         type="button"
                         onClick={onSave}
                         disabled={saving || !isFormValid}
-                        className="bg-emerald-600 text-white shadow-md hover:bg-emerald-700 focus-visible:ring-emerald-500 disabled:bg-emerald-600 disabled:text-white disabled:opacity-70"
+                        variant="default"
                       >
                         {saving ? (
                           <span className="inline-flex items-center gap-2">
@@ -295,7 +360,7 @@ export default function Profile() {
                       </Button>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         onClick={onCancel}
                         disabled={saving}
                       >
@@ -303,12 +368,7 @@ export default function Profile() {
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      type="button"
-                      variant="elevated"
-                      onClick={onEdit}
-                      className="bg-blue-600 text-white shadow-md hover:bg-blue-700 focus-visible:ring-blue-500"
-                    >
+                    <Button type="button" variant="default" onClick={onEdit}>
                       Edit
                     </Button>
                   )}
