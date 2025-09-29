@@ -103,9 +103,9 @@ export function AppLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <div className={cn("relative flex-1", locked ? "pointer-events-none select-none" : undefined)}>
-        <main className={cn("flex-1", locked ? "filter blur-sm" : undefined)}>{children}</main>
-        {locked && (
+      <div className={cn("relative flex-1", lockActive ? "pointer-events-none select-none" : undefined)}>
+        <main className={cn("flex-1", lockActive ? "filter blur-sm" : undefined)}>{children}</main>
+        {lockActive && (
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/40">
             <div className="flex items-center gap-3 text-white">
               <Lock className="h-6 w-6" />
