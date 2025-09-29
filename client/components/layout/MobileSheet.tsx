@@ -8,7 +8,6 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { Link } from "react-router-dom";
 
 export default function MobileSheet() {
@@ -124,9 +123,6 @@ export default function MobileSheet() {
           </SheetClose>
         </div>
 
-        <div className="mt-4 p-2">
-          <SidebarStats />
-        </div>
       </SheetContent>
     </Sheet>
   );

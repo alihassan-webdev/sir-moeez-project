@@ -10,7 +10,6 @@ import {
   MessageSquare,
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
@@ -63,8 +62,6 @@ export default function GetStarted() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-
-              <SidebarStats />
             </div>
           </aside>
 

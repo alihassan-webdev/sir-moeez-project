@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import SidebarStats from "@/components/layout/SidebarStats";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
 import {
@@ -364,7 +363,6 @@ export default function QnA() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-              <SidebarStats />
             </div>
           </aside>
 

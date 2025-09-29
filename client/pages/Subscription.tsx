@@ -1,7 +1,6 @@
 import React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import SidebarStats from "@/components/layout/SidebarStats";
 import {
   PAYMENT_FREQUENCIES,
   TIERS,
@@ -65,7 +64,6 @@ export default function SubscriptionPage() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-              <SidebarStats />
 
               <div className="mt-5">
                 <div className="mb-2 text-sm font-semibold text-muted-foreground">
