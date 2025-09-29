@@ -19,7 +19,7 @@ export function ToolLock({ children, className }: { children: React.ReactNode; c
               </span>
               <span>⚠️ Please complete your profile setup to unlock this tool.</span>
             </div>
-            <Button asChild size="sm" className="bg-red-600 text-white hover:bg-red-600 shadow-md">
+            <Button asChild size="sm" className="bg-white text-red-600 hover:bg-white/90 shadow-md">
               <Link to="/my-profile">Go to Profile</Link>
             </Button>
           </div>
@@ -31,7 +31,7 @@ export function ToolLock({ children, className }: { children: React.ReactNode; c
           {children}
         </div>
         {locked && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-[1px]">
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/50 backdrop-blur-[1px]">
             <Lock className="h-7 w-7 text-white" />
           </div>
         )}
