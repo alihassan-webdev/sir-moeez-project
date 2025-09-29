@@ -28,6 +28,7 @@ import Support from "./pages/Support";
 import Onboarding from "./pages/Onboarding";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { ProfileLockProvider } from "@/hooks/useProfileLock";
 
 const queryClient = new QueryClient();
 
@@ -73,133 +74,148 @@ function AnimatedRoutes() {
   }
 
   return (
-    <AppLayout>
-      <Routes location={location}>
-        <Route
-          path="/login"
-          element={
-            <PageWrapper>
-              <Login />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/app"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
-                <PageWrapper>
-                  <Index />
-                </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/get-started"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
-                <PageWrapper>
-                  <GetStarted />
-                </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/mcqs"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
-                <PageWrapper>
-                  <MCQs />
-                </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/qna"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
-                <PageWrapper>
-                  <QnA />
-                </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/syllabus"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
-                <PageWrapper>
-                  <Syllabus />
-                </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/subscription"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
-                <PageWrapper>
-                  <Subscription />
-                </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <RequireAuth>
+    <ProfileLockProvider>
+      <AppLayout>
+        <Routes location={location}>
+          <Route
+            path="/login"
+            element={
               <PageWrapper>
-                <Profile />
+                <Login />
               </PageWrapper>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/onboarding"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
+            }
+          />
+          <Route
+            path="/app"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Index />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/get-started"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <GetStarted />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/mcqs"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <MCQs />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/qna"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <QnA />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/syllabus"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Syllabus />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/subscription"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Subscription />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
                 <PageWrapper>
-                  <Onboarding />
+                  <Profile />
                 </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/support"
-          element={
-            <RequireAuth>
-              <RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/my-profile"
+            element={
+              <RequireAuth>
                 <PageWrapper>
-                  <Support />
+                  <Profile />
                 </PageWrapper>
-              </RequireProfileCompleted>
-            </RequireAuth>
-          }
-        />
-        <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
-        <Route
-          path="*"
-          element={
-            <PageWrapper>
-              <NotFound />
-            </PageWrapper>
-          }
-        />
-      </Routes>
-    </AppLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/onboarding"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Onboarding />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/support"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Support />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/pricing"
+            element={<Navigate to="/#pricing" replace />}
+          />
+          <Route
+            path="*"
+            element={
+              <PageWrapper>
+                <NotFound />
+              </PageWrapper>
+            }
+          />
+        </Routes>
+      </AppLayout>
+    </ProfileLockProvider>
   );
 }
 

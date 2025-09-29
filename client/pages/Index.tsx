@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Download, ListChecks, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import {
@@ -403,252 +404,254 @@ function ExternalPdfSelector({
   };
 
   return (
-    <div className="rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-        {/* Class */}
-        <div
-          className={`transition-all duration-200 ease-out ${isLocked ? "opacity-50 pointer-events-none" : ""}`}
-        >
-          <label className="text-sm font-medium text-muted-foreground">
-            Class
-          </label>
-          <Select
-            value={selectedClass}
-            onValueChange={(v) => setSelectedClass(v)}
+    <ToolLock>
+      <div className="rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+          {/* Class */}
+          <div
+            className={`transition-all duration-200 ease-out ${isLocked ? "opacity-50 pointer-events-none" : ""}`}
           >
-            <SelectTrigger className="w-full" disabled={isLocked}>
-              <SelectValue placeholder="Select class" />
-            </SelectTrigger>
-            <SelectContent>
-              {classOptions.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Class
+            </label>
+            <Select
+              value={selectedClass}
+              onValueChange={(v) => setSelectedClass(v)}
+            >
+              <SelectTrigger className="w-full" disabled={isLocked}>
+                <SelectValue placeholder="Select class" />
+              </SelectTrigger>
+              <SelectContent>
+                {classOptions.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Subject */}
-        <div
-          className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-        >
-          <label className="text-sm font-medium text-muted-foreground">
-            Subject
-          </label>
-          <Select
-            key={`subject-${selectedClass || "none"}`}
-            value={selectedSubjectName}
-            onValueChange={(name) => handleSelectSubject(name)}
+          {/* Subject */}
+          <div
+            className={`transition-all duration-200 ease-out ${!canSelectSubject ? "opacity-50 pointer-events-none" : "opacity-100"}`}
           >
-            <SelectTrigger className="w-full" disabled={!canSelectSubject}>
-              <SelectValue
-                placeholder={
-                  selectedClass ? "Select subject" : "Select class first"
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {subjects.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Subject
+            </label>
+            <Select
+              key={`subject-${selectedClass || "none"}`}
+              value={selectedSubjectName}
+              onValueChange={(name) => handleSelectSubject(name)}
+            >
+              <SelectTrigger className="w-full" disabled={!canSelectSubject}>
+                <SelectValue
+                  placeholder={
+                    selectedClass ? "Select subject" : "Select class first"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {subjects.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Chapters */}
-        <div
-          className={`transition-all duration-200 ease-out ${!canSelectChapters ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-        >
-          <label className="text-sm font-medium text-muted-foreground">
-            Chapters
-          </label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-between rounded-md border border-primary/60 px-3 py-2 text-base hover:border-primary hover:bg-primary/10 hover:text-black focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-                disabled={!canSelectChapters || isMerging}
-              >
-                <span className="inline-flex items-center gap-2">
-                  <ListChecks className="h-4 w-4 opacity-80" />
-                  {isMerging
-                    ? "Merging..."
-                    : selectedCount === 0
-                      ? selectedSubjectName
-                        ? "Select chapters"
-                        : "Select subject first"
-                      : isAllSelected
-                        ? `All chapters selected (${selectedCount})`
-                        : `${selectedCount} chapter${selectedCount > 1 ? "s" : ""} selected`}
-                </span>
-                <ChevronDown className="h-4 w-4 opacity-80" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
-              <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
-                <span>Chapters</span>
-                <span className="text-xs">
-                  {selectedCount}/{allChapterPaths.length} selected
-                </span>
-              </DropdownMenuLabel>
-              <DropdownMenuCheckboxItem
-                checked={isAllSelected}
-                onCheckedChange={(c) => handleToggleAll(Boolean(c))}
-                className="font-semibold hover:bg-primary/10 hover:text-black focus:bg-primary/20 focus:text-black"
-              >
-                All chapters
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuSeparator />
-              <div className="max-h-60 overflow-y-auto scrollbar-yellow pr-1">
-                <div className="py-1">
-                  {chapterOptionsForSubject.map((s) => (
-                    <DropdownMenuCheckboxItem
-                      key={s.path}
-                      checked={selectedChapterPaths.includes(s.path)}
-                      onCheckedChange={(c) =>
-                        handleToggleChapter(s.path, Boolean(c))
-                      }
-                      className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
-                    >
-                      {s.name.replace(/\.pdf$/i, "")}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+          {/* Chapters */}
+          <div
+            className={`transition-all duration-200 ease-out ${!canSelectChapters ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+          >
+            <label className="text-sm font-medium text-muted-foreground">
+              Chapters
+            </label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between rounded-md border border-primary/60 px-3 py-2 text-base hover:border-primary hover:bg-primary/10 hover:text-black focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                  disabled={!canSelectChapters || isMerging}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <ListChecks className="h-4 w-4 opacity-80" />
+                    {isMerging
+                      ? "Merging..."
+                      : selectedCount === 0
+                        ? selectedSubjectName
+                          ? "Select chapters"
+                          : "Select subject first"
+                        : isAllSelected
+                          ? `All chapters selected (${selectedCount})`
+                          : `${selectedCount} chapter${selectedCount > 1 ? "s" : ""} selected`}
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-80" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80 border border-input bg-white text-foreground shadow-xl">
+                <DropdownMenuLabel className="flex items-center justify-between text-sm text-primary">
+                  <span>Chapters</span>
+                  <span className="text-xs">
+                    {selectedCount}/{allChapterPaths.length} selected
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuCheckboxItem
+                  checked={isAllSelected}
+                  onCheckedChange={(c) => handleToggleAll(Boolean(c))}
+                  className="font-semibold hover:bg-primary/10 hover:text-black focus:bg-primary/20 focus:text-black"
+                >
+                  All chapters
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuSeparator />
+                <div className="max-h-60 overflow-y-auto scrollbar-yellow pr-1">
+                  <div className="py-1">
+                    {chapterOptionsForSubject.map((s) => (
+                      <DropdownMenuCheckboxItem
+                        key={s.path}
+                        checked={selectedChapterPaths.includes(s.path)}
+                        onCheckedChange={(c) =>
+                          handleToggleChapter(s.path, Boolean(c))
+                        }
+                        className="hover:bg-secondary/15 hover:text-black focus:bg-secondary/20 focus:text-black"
+                      >
+                        {s.name.replace(/\.pdf$/i, "")}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-        {/* Marks */}
-        <div
-          className={`transition-all duration-200 ease-out ${!canEnterMarks ? "opacity-50 pointer-events-none" : "opacity-100"}`}
-        >
-          <label className="text-sm font-medium text-muted-foreground">
-            Total Marks
-          </label>
-          <div className="flex gap-2 items-center flex-wrap">
-            <input
-              type="number"
-              min={20}
-              max={100}
-              value={totalMarks ?? ""}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                const n = v === "" ? null : Number(v);
-                setTotalMarks(n);
-              }}
-              disabled={!canEnterMarks || !!loading || isMerging}
-              className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
-              placeholder="Enter marks"
-            />
-            <button
-              type="button"
-              onClick={() => setTotalMarks(30)}
-              disabled={!canEnterMarks || !!loading || isMerging}
-              aria-pressed={totalMarks === 30}
-              className={`rounded-md px-4 py-2 text-base border ${totalMarks === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-            >
-              30
-            </button>
-            <button
-              type="button"
-              onClick={() => setTotalMarks(50)}
-              disabled={!canEnterMarks || !!loading || isMerging}
-              aria-pressed={totalMarks === 50}
-              className={`rounded-md px-4 py-2 text-base border ${totalMarks === 50 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-            >
-              50
-            </button>
-            <button
-              type="button"
-              onClick={() => setTotalMarks(100)}
-              disabled={!canEnterMarks || !!loading || isMerging}
-              aria-pressed={totalMarks === 100}
-              className={`rounded-md px-4 py-2 text-base border ${totalMarks === 100 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
-            >
-              100
-            </button>
+          {/* Marks */}
+          <div
+            className={`transition-all duration-200 ease-out ${!canEnterMarks ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+          >
+            <label className="text-sm font-medium text-muted-foreground">
+              Total Marks
+            </label>
+            <div className="flex gap-2 items-center flex-wrap">
+              <input
+                type="number"
+                min={20}
+                max={100}
+                value={totalMarks ?? ""}
+                onChange={(e) => {
+                  const v = e.currentTarget.value;
+                  const n = v === "" ? null : Number(v);
+                  setTotalMarks(n);
+                }}
+                disabled={!canEnterMarks || !!loading || isMerging}
+                className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
+                placeholder="Enter marks"
+              />
+              <button
+                type="button"
+                onClick={() => setTotalMarks(30)}
+                disabled={!canEnterMarks || !!loading || isMerging}
+                aria-pressed={totalMarks === 30}
+                className={`rounded-md px-4 py-2 text-base border ${totalMarks === 30 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+              >
+                30
+              </button>
+              <button
+                type="button"
+                onClick={() => setTotalMarks(50)}
+                disabled={!canEnterMarks || !!loading || isMerging}
+                aria-pressed={totalMarks === 50}
+                className={`rounded-md px-4 py-2 text-base border ${totalMarks === 50 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+              >
+                50
+              </button>
+              <button
+                type="button"
+                onClick={() => setTotalMarks(100)}
+                disabled={!canEnterMarks || !!loading || isMerging}
+                aria-pressed={totalMarks === 100}
+                className={`rounded-md px-4 py-2 text-base border ${totalMarks === 100 ? "bg-primary text-primary-foreground border-primary" : "bg-white text-foreground/90 border-input hover:bg-muted/50"}`}
+              >
+                100
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Actions */}
-      <div className="mt-4 flex gap-3">
-        <Button
-          disabled={!canGenerate}
-          onClick={async () => {
-            if (!selectedClass) {
-              return toast({
-                title: "Select class",
-                description: "Please select a class first.",
-              });
-            }
-            if (!selectedSubjectName) {
-              return toast({
-                title: "Select subject",
-                description: "Please select a subject.",
-              });
-            }
-            if (selectedChapterPaths.length === 0) {
-              return toast({
-                title: "Select chapters",
-                description: "Please choose one or more chapters.",
-              });
-            }
-            if (totalMarks == null) {
-              return toast({
-                title: "Enter total marks",
-                description: "Please enter a value between 20 and 100.",
-              });
-            }
-            const subjectName = selectedSubjectName || "";
-            const marks = Math.min(100, Math.max(20, Number(totalMarks)));
-            if (marks !== totalMarks) setTotalMarks(marks);
-            const generated = buildPaperSchemePrompt(
-              subjectName,
-              selectedClass || "",
-              marks,
-            );
-            onSetPrompt(generated);
-            setIsLocked(true); // lock all fields
-            await onGenerate(generated);
-          }}
-          className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
-        >
-          {loading ? (
-            <>
-              <span className="opacity-0">Generating...</span>
-              <div className="loader">
-                <div className="jimu-primary-loading"></div>
-              </div>
-            </>
-          ) : (
-            "Generate"
-          )}
-        </Button>
+        {/* Actions */}
+        <div className="mt-4 flex gap-3">
+          <Button
+            disabled={!canGenerate}
+            onClick={async () => {
+              if (!selectedClass) {
+                return toast({
+                  title: "Select class",
+                  description: "Please select a class first.",
+                });
+              }
+              if (!selectedSubjectName) {
+                return toast({
+                  title: "Select subject",
+                  description: "Please select a subject.",
+                });
+              }
+              if (selectedChapterPaths.length === 0) {
+                return toast({
+                  title: "Select chapters",
+                  description: "Please choose one or more chapters.",
+                });
+              }
+              if (totalMarks == null) {
+                return toast({
+                  title: "Enter total marks",
+                  description: "Please enter a value between 20 and 100.",
+                });
+              }
+              const subjectName = selectedSubjectName || "";
+              const marks = Math.min(100, Math.max(20, Number(totalMarks)));
+              if (marks !== totalMarks) setTotalMarks(marks);
+              const generated = buildPaperSchemePrompt(
+                subjectName,
+                selectedClass || "",
+                marks,
+              );
+              onSetPrompt(generated);
+              setIsLocked(true); // lock all fields
+              await onGenerate(generated);
+            }}
+            className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
+          >
+            {loading ? (
+              <>
+                <span className="opacity-0">Generating...</span>
+                <div className="loader">
+                  <div className="jimu-primary-loading"></div>
+                </div>
+              </>
+            ) : (
+              "Generate"
+            )}
+          </Button>
 
-        <Button
-          className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
-          disabled={!isLocked}
-          onClick={() => {
-            setSelectedClass("");
-            setSelectedSubjectPath("");
-            setSelectedChapterPaths([]);
-            setTotalMarks(null);
-            setPromptText("");
-            setIsLocked(false);
-            onLoadFile(null);
-            onSetPrompt("");
-            onReset();
-          }}
-        >
-          Reset
-        </Button>
+          <Button
+            className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={!isLocked}
+            onClick={() => {
+              setSelectedClass("");
+              setSelectedSubjectPath("");
+              setSelectedChapterPaths([]);
+              setTotalMarks(null);
+              setPromptText("");
+              setIsLocked(false);
+              onLoadFile(null);
+              onSetPrompt("");
+              onReset();
+            }}
+          >
+            Reset
+          </Button>
+        </div>
       </div>
-    </div>
+    </ToolLock>
   );
 }
 

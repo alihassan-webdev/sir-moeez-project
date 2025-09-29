@@ -1,9 +1,9 @@
 import { PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, PropsWithChildren } from "react";
 import MobileSheet from "@/components/layout/MobileSheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
