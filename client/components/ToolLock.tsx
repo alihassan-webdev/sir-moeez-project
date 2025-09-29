@@ -23,9 +23,7 @@ export function ToolLock({
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/20">
                 <Lock className="h-3.5 w-3.5" />
               </span>
-              <span>
-                ⚠️ Please complete your profile setup to unlock this tool.
-              </span>
+              <span>Please complete your profile setup to unlock this tool.</span>
             </div>
             <Button
               asChild
