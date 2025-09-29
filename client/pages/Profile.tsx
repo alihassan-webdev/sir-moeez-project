@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
+import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
 
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
@@ -18,15 +19,13 @@ export default function Profile() {
   const [form, setForm] = React.useState({
     name: "",
     phone: "",
-    address: "",
-    dob: "",
+    instituteName: "",
   });
 
   const lastSavedRef = React.useRef({
     name: "",
     phone: "",
-    address: "",
-    dob: "",
+    instituteName: "",
   });
   const unsubRef = React.useRef<null | (() => void)>(null);
 
@@ -43,12 +42,12 @@ export default function Profile() {
           ref,
           (snap) => {
             const d = snap.data() as any | undefined;
+            const inst = getInstitute();
             if (d) {
               const next = {
                 name: String(d.name ?? ""),
                 phone: String(d.phone ?? ""),
-                address: String(d.address ?? ""),
-                dob: String(d.dob ?? ""),
+                instituteName: String(d.instituteName ?? inst?.name ?? ""),
               };
               lastSavedRef.current = next;
               setExists(true);
@@ -56,7 +55,11 @@ export default function Profile() {
               setIsEditing(false);
             } else {
               setExists(false);
-              const empty = { name: "", phone: "", address: "", dob: "" };
+              const empty = {
+                name: "",
+                phone: "",
+                instituteName: String(inst?.name ?? ""),
+              };
               lastSavedRef.current = empty;
               setForm(empty);
               setIsEditing(true);
@@ -93,19 +96,34 @@ export default function Profile() {
       const payload = {
         name: form.name || "",
         phone: form.phone || "",
-        address: form.address || "",
-        dob: form.dob || "",
+        instituteName: form.instituteName || "",
         profileCompleted: true,
         updatedAt: Date.now(),
-      };
+      } as const;
       await setDoc(doc(db, "users", user.uid), payload, { merge: true });
       const verify = await getDoc(doc(db, "users", user.uid));
       if (!verify.exists()) throw new Error("Server save verification failed");
+
+      // Persist institute locally as well
+      const existingInst: Institute | null = getInstitute();
+      const instToSave: Institute = {
+        name: form.instituteName || "",
+        logo: existingInst?.logo,
+        type: existingInst?.type,
+        address: existingInst?.address,
+        city: existingInst?.city,
+        contactEmail: existingInst?.contactEmail,
+        contactPhone: existingInst?.contactPhone,
+        teachersCount: existingInst?.teachersCount,
+        website: existingInst?.website,
+        registeredAt: existingInst?.registeredAt || Date.now(),
+      };
+      saveInstitute(instToSave);
+
       lastSavedRef.current = {
         name: payload.name,
         phone: payload.phone,
-        address: payload.address,
-        dob: payload.dob,
+        instituteName: payload.instituteName,
       };
       setIsEditing(false);
       setExists(true);
@@ -163,18 +181,13 @@ export default function Profile() {
                 {exists ? "Your saved details." : "Set up your profile."}
               </p>
 
-              <form
-                className="mt-4 space-y-4 max-w-xl"
-                onSubmit={(e) => e.preventDefault()}
-              >
+              <form className="mt-4 space-y-4 max-w-xl" onSubmit={(e) => e.preventDefault()}>
                 <div className="grid gap-2">
                   <Label htmlFor="name">Full name</Label>
                   <Input
                     id="name"
                     value={form.name}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, name: e.target.value }))
-                    }
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                     placeholder="Your name"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
@@ -186,9 +199,7 @@ export default function Profile() {
                   <Input
                     id="phone"
                     value={form.phone}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, phone: e.target.value }))
-                    }
+                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                     placeholder="03XX-XXXXXXX"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
@@ -196,28 +207,14 @@ export default function Profile() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="institute">Institute name</Label>
                   <Input
-                    id="address"
-                    value={form.address}
+                    id="institute"
+                    value={form.instituteName}
                     onChange={(e) =>
-                      setForm((p) => ({ ...p, address: e.target.value }))
+                      setForm((p) => ({ ...p, instituteName: e.target.value }))
                     }
-                    placeholder="Your address"
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-muted/30" : undefined}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="dob">Date of birth</Label>
-                  <Input
-                    id="dob"
-                    type="date"
-                    value={form.dob}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, dob: e.target.value }))
-                    }
+                    placeholder="Your institute name"
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted/30" : undefined}
                   />
