@@ -128,7 +128,7 @@ export default function Syllabus() {
 
             <div className="mt-5 rounded-xl border border-input bg-white card-yellow-shadow">
               <div className="px-4 py-3 border-b text-sm font-semibold">Chapters</div>
-              <div className="divide-y max-h-[60vh] overflow-y-auto">
+              <div className="divide-y max-h-[60vh] overflow-y-auto scrollbar-yellow pr-1 pb-4">
                 {canSelectChapters && chapters.length > 0 ? (
                   chapters.map((c) => (
                     <div key={c.path} className="flex items-center justify-between gap-3 px-4 py-3">
