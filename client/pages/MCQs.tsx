@@ -324,6 +324,22 @@ Use concise, exam-style wording suitable for classroom tests.`;
         return;
       }
 
+      const { makeKey, getCached, setCached } = await import("@/lib/cache");
+      const cacheKey = makeKey([
+        "v1",
+        "mcqs",
+        selectedClass,
+        selectedSubject,
+        [...selectedChapterPaths].sort().join(";"),
+        mcqCount,
+      ]);
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setResult(cached);
+        setLoading(false);
+        return;
+      }
+
       const q = buildMcqPrompt(mcqCount);
       const form = new FormData();
       form.append("pdf", file);
@@ -348,17 +364,12 @@ Use concise, exam-style wording suitable for classroom tests.`;
       };
 
       let res: Response | null = null;
-      if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
-      if (!res || !res.ok) {
-        const proxies = [
-          "/.netlify/functions/proxy",
-        ];
-        for (const p of proxies) {
-          const attempt = await sendTo(p, retryTimeoutMs);
-          if (attempt && attempt.ok) {
-            res = attempt;
-            break;
-          }
+      const proxies = ["/.netlify/functions/proxy"]; // Route via Netlify Function only
+      for (const p of proxies) {
+        const attempt = await sendTo(p, retryTimeoutMs);
+        if (attempt && attempt.ok) {
+          res = attempt;
+          break;
         }
       }
       if (!res) throw new Error("Network error. Please try again.");
@@ -372,14 +383,14 @@ Use concise, exam-style wording suitable for classroom tests.`;
         const text =
           typeof json === "string"
             ? json
-            : (json?.questions ??
-              json?.result ??
-              json?.message ??
-              JSON.stringify(json));
-        setResult(String(text));
+            : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+        const finalText = String(text);
+        setResult(finalText);
+        setCached(cacheKey, finalText);
       } else {
         const text = await res.text();
         setResult(text);
+        setCached(cacheKey, text);
       }
     } catch (_err: any) {
       // Silent failure; background retries already attempted via fallbacks
