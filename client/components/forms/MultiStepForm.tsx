@@ -10,7 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
-import { getInstitute, saveInstitute, getProfile, saveProfile, type Institute, type UserProfile } from "@/lib/account";
+import {
+  getInstitute,
+  saveInstitute,
+  getProfile,
+  saveProfile,
+  type Institute,
+  type UserProfile,
+} from "@/lib/account";
 import { auth } from "@/lib/firebase";
 
 // Schemas
@@ -47,9 +54,24 @@ const stepsDef = [
     description: "Tell us about yourself",
     schema: personalInfoSchema,
     fields: [
-      { name: "fullName", label: "Full Name", type: "text", placeholder: "John Doe" },
-      { name: "email", label: "Email", type: "email", placeholder: "john.doe@example.com" },
-      { name: "phone", label: "Phone No.", type: "text", placeholder: "+1 555 555 5555" },
+      {
+        name: "fullName",
+        label: "Full Name",
+        type: "text",
+        placeholder: "John Doe",
+      },
+      {
+        name: "email",
+        label: "Email",
+        type: "email",
+        placeholder: "john.doe@example.com",
+      },
+      {
+        name: "phone",
+        label: "Phone No.",
+        type: "text",
+        placeholder: "+1 555 555 5555",
+      },
     ],
   },
   {
@@ -58,7 +80,12 @@ const stepsDef = [
     description: "Add your institute details",
     schema: instituteSchema,
     fields: [
-      { name: "instituteName", label: "Institute Name", type: "text", placeholder: "City Public School" },
+      {
+        name: "instituteName",
+        label: "Institute Name",
+        type: "text",
+        placeholder: "City Public School",
+      },
     ],
   },
   {
@@ -67,9 +94,24 @@ const stepsDef = [
     description: "Create your account",
     schema: accountSchema,
     fields: [
-      { name: "username", label: "Username", type: "text", placeholder: "johndoe" },
-      { name: "password", label: "Password", type: "password", placeholder: "••••••••" },
-      { name: "confirmPassword", label: "Confirm Password", type: "password", placeholder: "••••••••" },
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+        placeholder: "johndoe",
+      },
+      {
+        name: "password",
+        label: "Password",
+        type: "password",
+        placeholder: "••••••••",
+      },
+      {
+        name: "confirmPassword",
+        label: "Confirm Password",
+        type: "password",
+        placeholder: "••••••••",
+      },
     ],
   },
 ] as const;
@@ -115,7 +157,10 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
     reset,
     setValue,
     watch,
-  } = useForm<any>({ resolver: zodResolver(currentSchema), defaultValues: data });
+  } = useForm<any>({
+    resolver: zodResolver(currentSchema),
+    defaultValues: data,
+  });
 
   useEffect(() => {
     reset(data);
@@ -124,8 +169,10 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
   const progress = ((step + 1) / stepsDef.length) * 100;
 
   const uploadLogo = async (file: File) => {
-    const instName = (watch("instituteName") as string) || data.instituteName || "";
-    const email = (watch("email") as string) || data.email || auth.currentUser?.email || "";
+    const instName =
+      (watch("instituteName") as string) || data.instituteName || "";
+    const email =
+      (watch("email") as string) || data.email || auth.currentUser?.email || "";
     if (!instName || !email) return;
     const fd = new FormData();
     fd.append("logo", file);
@@ -183,16 +230,29 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
     if (step > 0) setStep(step - 1);
   };
 
-  const variants = { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -50 } } as const;
+  const variants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -50 },
+  } as const;
 
   return (
-    <div className={cn("bg-card/40 mx-auto w-full max-w-md rounded-lg p-6 shadow-lg", className)}>
+    <div
+      className={cn(
+        "bg-card/40 mx-auto w-full max-w-md rounded-lg p-6 shadow-lg",
+        className,
+      )}
+    >
       {!isComplete ? (
         <>
           <div className="mb-8">
             <div className="mb-2 flex justify-between">
-              <span className="text-sm font-medium">Step {step + 1} of {stepsDef.length}</span>
-              <span className="text-sm font-medium">{Math.round(progress)}%</span>
+              <span className="text-sm font-medium">
+                Step {step + 1} of {stepsDef.length}
+              </span>
+              <span className="text-sm font-medium">
+                {Math.round(progress)}%
+              </span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -200,10 +260,16 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
           <div className="mb-8 flex justify-between">
             {stepsDef.map((s, i) => (
               <div key={s.id} className="flex flex-col items-center">
-                <div className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
-                  i < step ? "bg-primary text-primary-foreground" : i === step ? "bg-primary text-primary-foreground ring-primary/30 ring-2" : "bg-secondary text-secondary-foreground",
-                )}>
+                <div
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
+                    i < step
+                      ? "bg-primary text-primary-foreground"
+                      : i === step
+                        ? "bg-primary text-primary-foreground ring-primary/30 ring-2"
+                        : "bg-secondary text-secondary-foreground",
+                  )}
+                >
                   {i < step ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
                 </div>
                 <span className="mt-1 hidden text-xs sm:block">{s.title}</span>
@@ -212,19 +278,40 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div key={step} initial="hidden" animate="visible" exit="exit" variants={variants} transition={{ duration: 0.3 }}>
+            <motion.div
+              key={step}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={variants}
+              transition={{ duration: 0.3 }}
+            >
               <div className="mb-6">
                 <h2 className="text-xl font-bold">{stepsDef[step].title}</h2>
-                <p className="text-muted-foreground text-sm">{stepsDef[step].description}</p>
+                <p className="text-muted-foreground text-sm">
+                  {stepsDef[step].description}
+                </p>
               </div>
 
               <form onSubmit={handleSubmit(onNext)} className="space-y-4">
                 {stepsDef[step].fields.map((field) => (
                   <div key={field.name} className="space-y-2">
                     <Label htmlFor={field.name}>{field.label}</Label>
-                    <Input id={field.name} type={(field as any).type} placeholder={(field as any).placeholder} {...register(field.name as any)} className={cn(errors[field.name as string] && "border-destructive")} />
+                    <Input
+                      id={field.name}
+                      type={(field as any).type}
+                      placeholder={(field as any).placeholder}
+                      {...register(field.name as any)}
+                      className={cn(
+                        errors[field.name as string] && "border-destructive",
+                      )}
+                    />
                     {errors[field.name as string] && (
-                      <p className="text-destructive text-sm">{String((errors as any)[field.name]?.message ?? "Invalid")}</p>
+                      <p className="text-destructive text-sm">
+                        {String(
+                          (errors as any)[field.name]?.message ?? "Invalid",
+                        )}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -248,20 +335,38 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
                     />
                     {logoPreview ? (
                       <div className="mt-2">
-                        <img src={logoPreview} alt="Logo preview" className="h-20 w-20 object-contain rounded border" />
+                        <img
+                          src={logoPreview}
+                          alt="Logo preview"
+                          className="h-20 w-20 object-contain rounded border"
+                        />
                       </div>
                     ) : null}
                   </div>
                 )}
 
                 <div className="flex justify-between pt-4">
-                  <Button type="button" variant="outline" onClick={onPrev} disabled={step === 0} className={cn(step === 0 && "invisible")}> 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onPrev}
+                    disabled={step === 0}
+                    className={cn(step === 0 && "invisible")}
+                  >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back
                   </Button>
                   <Button type="submit" disabled={isSubmitting}>
-                    {step === stepsDef.length - 1 ? (isSubmitting ? "Submitting..." : "Submit") : (<>
-                      Next <ArrowRight className="ml-2 h-4 w-4" />
-                    </>)}
+                    {step === stepsDef.length - 1 ? (
+                      isSubmitting ? (
+                        "Submitting..."
+                      ) : (
+                        "Submit"
+                      )
+                    ) : (
+                      <>
+                        Next <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </form>
@@ -269,13 +374,30 @@ export default function MultiStepForm({ className, onSubmit }: Props) {
           </AnimatePresence>
         </>
       ) : (
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="py-10 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="py-10 text-center"
+        >
           <div className="bg-primary/10 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full">
             <CheckCircle2 className="text-primary h-8 w-8" />
           </div>
           <h2 className="mb-2 text-2xl font-bold">Form Submitted!</h2>
-          <p className="text-muted-foreground mb-6">Thank you for completing the form. We'll be in touch soon.</p>
-          <Button onClick={() => { setStep(0); setData({}); setLogoPreview(null); setIsComplete(false); reset({}); }}>Start Over</Button>
+          <p className="text-muted-foreground mb-6">
+            Thank you for completing the form. We'll be in touch soon.
+          </p>
+          <Button
+            onClick={() => {
+              setStep(0);
+              setData({});
+              setLogoPreview(null);
+              setIsComplete(false);
+              reset({});
+            }}
+          >
+            Start Over
+          </Button>
         </motion.div>
       )}
     </div>

@@ -251,7 +251,6 @@ function MyAccountCards() {
         </div>
       </Link>
 
-
       <Link
         to="/support"
         className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"

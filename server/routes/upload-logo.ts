@@ -13,7 +13,9 @@ function sanitize(s: string) {
 
 const storage = multer.diskStorage({
   destination: (req, _file, cb) => {
-    const rawInstitute = String((req.body?.instituteName as string) || "institute");
+    const rawInstitute = String(
+      (req.body?.instituteName as string) || "institute",
+    );
     const inst = sanitize(rawInstitute || "institute");
     const dest = path.join(process.cwd(), "data", "logos", inst);
     fs.mkdirSync(dest, { recursive: true });
@@ -21,7 +23,9 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const email = sanitize(String((req.body?.email as string) || "user"));
-    const rawInstitute = String((req.body?.instituteName as string) || "institute");
+    const rawInstitute = String(
+      (req.body?.instituteName as string) || "institute",
+    );
     const inst = sanitize(rawInstitute || "institute");
     const ext = path.extname(file.originalname || "");
     const name = `${email}__${inst}${ext || ".png"}`;
