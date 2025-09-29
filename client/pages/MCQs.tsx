@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
-import { generateExamStylePdf } from "@/lib/pdf";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -600,6 +599,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           onClick={async () => {
                             if (!result) return;
                             try {
+                              const { generateExamStylePdf } = await import(
+                                "@/lib/pdf"
+                              );
                               await generateExamStylePdf({
                                 title: "MCQs",
                                 body: result,
