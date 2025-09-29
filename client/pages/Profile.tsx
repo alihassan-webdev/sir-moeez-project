@@ -76,17 +76,6 @@ export default function ProfilePage() {
                     placeholder="03XX-XXXXXXX"
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="role">Role / Title</Label>
-                  <Input
-                    id="role"
-                    value={profile.role || ""}
-                    onChange={(e) =>
-                      setProfile((p) => ({ ...p, role: e.target.value }))
-                    }
-                    placeholder="Teacher / HOD"
-                  />
-                </div>
 
                 <div className="pt-2">
                   <Button type="submit">Save changes</Button>
