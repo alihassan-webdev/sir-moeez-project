@@ -26,6 +26,7 @@ import ToolLock from "@/components/ToolLock";
 import { Link } from "react-router-dom";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
+import { saveResult } from "@/lib/results";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -74,6 +75,18 @@ export default function MCQs() {
   const [mcqCount, setMcqCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const lastSavedRef = React.useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!result) return;
+    if (lastSavedRef.current === result) return;
+    lastSavedRef.current = result;
+    (async () => {
+      try {
+        await saveResult({ examType: "mcqs", content: result });
+      } catch {}
+    })();
+  }, [result]);
 
   const [profile, setProfile] = useState<{
     name?: string;
