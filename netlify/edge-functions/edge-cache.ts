@@ -4,7 +4,17 @@ export default async (request: Request, context: any) => {
 
   // Only cache GET requests for static assets and data files
   const isGet = request.method === "GET";
-  const isAsset = pathname.startsWith("/assets/") || pathname.startsWith("/datafiles/") || pathname.endsWith(".js") || pathname.endsWith(".css") || pathname.endsWith(".svg") || pathname.endsWith(".png") || pathname.endsWith(".jpg") || pathname.endsWith(".jpeg") || pathname.endsWith(".webp") || pathname.endsWith(".woff2");
+  const isAsset =
+    pathname.startsWith("/assets/") ||
+    pathname.startsWith("/datafiles/") ||
+    pathname.endsWith(".js") ||
+    pathname.endsWith(".css") ||
+    pathname.endsWith(".svg") ||
+    pathname.endsWith(".png") ||
+    pathname.endsWith(".jpg") ||
+    pathname.endsWith(".jpeg") ||
+    pathname.endsWith(".webp") ||
+    pathname.endsWith(".woff2");
 
   const response = await context.next();
 

@@ -66,7 +66,8 @@ export const handleGenerate: RequestHandler = async (req, res) => {
       try {
         const u = new URL(base);
         const path = u.pathname.replace(/\/+$/, "");
-        if (!/\/generate-questions$/.test(path)) u.pathname = `${path}/generate-questions`;
+        if (!/\/generate-questions$/.test(path))
+          u.pathname = `${path}/generate-questions`;
         if (query) u.searchParams.set("query", query);
         return u.toString();
       } catch {
@@ -80,9 +81,14 @@ export const handleGenerate: RequestHandler = async (req, res) => {
     upstreams.push(normalize(DEFAULT_API));
 
     // Same-host Netlify proxy fallback
-    const host = String(req.headers["x-forwarded-host"] || req.headers.host || "");
+    const host = String(
+      req.headers["x-forwarded-host"] || req.headers.host || "",
+    );
     const proto = String(req.headers["x-forwarded-proto"] || "https");
-    if (host) upstreams.push(`${proto}://${host}/.netlify/functions/proxy${query ? `?query=${encodeURIComponent(query)}` : ""}`);
+    if (host)
+      upstreams.push(
+        `${proto}://${host}/.netlify/functions/proxy${query ? `?query=${encodeURIComponent(query)}` : ""}`,
+      );
 
     let finalResp: Response | null = null;
     for (const target of upstreams) {
@@ -105,14 +111,18 @@ export const handleGenerate: RequestHandler = async (req, res) => {
     }
 
     if (!finalResp) {
-      return res.status(502).json({ error: true, message: "All upstreams failed" });
+      return res
+        .status(502)
+        .json({ error: true, message: "All upstreams failed" });
     }
 
     const contentType = finalResp.headers.get("content-type") || "";
 
     if (!finalResp.ok) {
       const errText = await finalResp.text().catch(() => finalResp.statusText);
-      return res.status(finalResp.status).json({ error: true, message: errText || "Upstream error" });
+      return res
+        .status(finalResp.status)
+        .json({ error: true, message: errText || "Upstream error" });
     }
 
     if (contentType.includes("application/json")) {
@@ -129,6 +139,8 @@ export const handleGenerate: RequestHandler = async (req, res) => {
     if (err?.name === "AbortError") {
       return res.status(504).json({ error: true, message: "Upstream timeout" });
     }
-    return res.status(500).json({ error: true, message: err?.message || "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ error: true, message: err?.message || "Internal Server Error" });
   }
 };

@@ -123,13 +123,19 @@ export default function ProfilePage() {
                       disabled={!pwd1 || pwd1 !== pwd2 || saving}
                       onClick={async () => {
                         try {
-                          const { updatePassword, sendPasswordResetEmail } = await import("firebase/auth");
-                          if (!auth.currentUser) throw new Error("Not logged in");
-                          if (pwd1 !== pwd2) throw new Error("Passwords do not match");
+                          const { updatePassword, sendPasswordResetEmail } =
+                            await import("firebase/auth");
+                          if (!auth.currentUser)
+                            throw new Error("Not logged in");
+                          if (pwd1 !== pwd2)
+                            throw new Error("Passwords do not match");
                           await updatePassword(auth.currentUser, pwd1);
                           setPwd1("");
                           setPwd2("");
-                          toast({ title: "Password updated", description: "Your password has been changed." });
+                          toast({
+                            title: "Password updated",
+                            description: "Your password has been changed.",
+                          });
                         } catch (err: any) {
                           const code = String(err?.code || "");
                           if (code.includes("requires-recent-login")) {
@@ -138,11 +144,18 @@ export default function ProfilePage() {
                               if (auth.currentUser?.email) {
                                 const email = auth.currentUser.email;
                                 await sendPasswordResetEmail(auth, email);
-                                toast({ title: "Verification required", description: "We sent a reset link to your email." });
+                                toast({
+                                  title: "Verification required",
+                                  description:
+                                    "We sent a reset link to your email.",
+                                });
                               }
                             } catch {}
                           } else {
-                            toast({ title: "Password update failed", description: err?.message || "Try again." });
+                            toast({
+                              title: "Password update failed",
+                              description: err?.message || "Try again.",
+                            });
                           }
                         }
                       }}
@@ -153,7 +166,9 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="pt-2 flex gap-2">
-                  <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save changes"}</Button>
+                  <Button type="submit" disabled={saving}>
+                    {saving ? "Saving..." : "Save changes"}
+                  </Button>
                   <Button
                     type="button"
                     variant="secondary"
