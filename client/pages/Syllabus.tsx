@@ -83,12 +83,14 @@ export default function Syllabus() {
           </aside>
 
           <div>
-            <h1 className="text-2xl font-bold">Syllabus</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Select class and subject to browse chapters. Click a chapter to view or download.
-            </p>
-            <div className="mt-4">
-              <SidebarStats title={null} />
+            <div className="-mt-5">
+              <h1 className="text-2xl font-bold">Syllabus</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Select class and subject to browse chapters. Click a chapter to view or download.
+              </p>
+              <div className="mt-4">
+                <SidebarStats title={null} />
+              </div>
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
