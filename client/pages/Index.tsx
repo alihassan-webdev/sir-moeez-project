@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Download, ListChecks, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import {
@@ -403,6 +404,7 @@ function ExternalPdfSelector({
   };
 
   return (
+    <ToolLock>
     <div className="rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
         {/* Class */}
@@ -649,6 +651,7 @@ function ExternalPdfSelector({
         </Button>
       </div>
     </div>
+    </ToolLock>
   );
 }
 
