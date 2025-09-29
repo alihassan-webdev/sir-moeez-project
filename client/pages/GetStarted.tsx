@@ -231,7 +231,7 @@ function MyAccountCards() {
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">My profile</div>
           <div className="mt-1 text-xs text-muted-foreground">
-            Update your name, phone and role.
+            Update your name and phone.
           </div>
           <div className="mt-auto pt-3 text-xs text-muted-foreground">
             Email linked to your login.
