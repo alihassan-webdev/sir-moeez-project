@@ -8,7 +8,6 @@ import MobileSheet from "@/components/layout/MobileSheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { getProfile, loadProfile } from "@/lib/account";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -38,20 +37,6 @@ export function AppLayout({ children }: PropsWithChildren) {
     return () => clearTimeout(t);
   }, [path]);
 
-  const [banner, setBanner] = useState<{ show: boolean } | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    const local = getProfile();
-    if (mounted) setBanner({ show: !local.profileCompleted });
-    loadProfile().then((p) => {
-      if (!mounted) return;
-      setBanner({ show: !p.profileCompleted });
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [path]);
 
   return (
     <div className="flex min-h-svh w-full flex-col">
@@ -99,18 +84,6 @@ export function AppLayout({ children }: PropsWithChildren) {
             )}
           </div>
         </div>
-        {banner?.show && path !== "/profile" && (
-          <div className="w-full bg-yellow-100 border-t border-b border-yellow-300">
-            <div className="mx-auto max-w-6xl px-6 py-2 text-sm text-yellow-900 flex items-center justify-between gap-3">
-              <span>
-                ⚠️ Please complete your profile to unlock all features.
-              </span>
-              <Link to="/profile" className="font-semibold underline">
-                Go to Profile
-              </Link>
-            </div>
-          </div>
-        )}
       </header>
 
       <main className={cn("flex-1")}>{children}</main>
