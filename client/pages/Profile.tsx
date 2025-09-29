@@ -1,58 +1,122 @@
-import React from "react";
+import * as React from "react";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import {
-  getProfile,
-  loadProfile,
-  persistProfile,
-  type UserProfile,
-} from "@/lib/account";
-import { Check, Pencil } from "lucide-react";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 
-export default function ProfilePage() {
-  const [profile, setProfile] = React.useState<UserProfile>(() => getProfile());
-
+export default function Profile() {
+  const [user, setUser] = React.useState<User | null>(auth.currentUser);
+  const [exists, setExists] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-  const [isEditing, setIsEditing] = React.useState(false);
+
+  const [form, setForm] = React.useState({
+    name: "",
+    phone: "",
+    address: "",
+    dob: "",
+  });
+
+  const lastSavedRef = React.useRef({ name: "", phone: "", address: "", dob: "" });
+  const unsubRef = React.useRef<null | (() => void)>(null);
 
   React.useEffect(() => {
-    let mounted = true;
-    loadProfile().then((remote) => {
-      if (!mounted) return;
-      setProfile(remote);
-      setIsEditing(!remote.profileCompleted);
-      setLoading(false);
+    const unsubAuth = onAuthStateChanged(auth, (u) => {
+      setUser(u || null);
+      if (unsubRef.current) {
+        unsubRef.current();
+        unsubRef.current = null;
+      }
+      if (u?.uid) {
+        const ref = doc(db, "users", u.uid);
+        unsubRef.current = onSnapshot(
+          ref,
+          (snap) => {
+            const d = snap.data() as any | undefined;
+            if (d) {
+              const next = {
+                name: String(d.name ?? ""),
+                phone: String(d.phone ?? ""),
+                address: String(d.address ?? ""),
+                dob: String(d.dob ?? ""),
+              };
+              lastSavedRef.current = next;
+              setExists(true);
+              setForm(next);
+              setIsEditing(false);
+            } else {
+              setExists(false);
+              const empty = { name: "", phone: "", address: "", dob: "" };
+              lastSavedRef.current = empty;
+              setForm(empty);
+              setIsEditing(true);
+            }
+          },
+          () => {
+            toast({
+              title: "Error",
+              description: "Failed to load profile.",
+              variant: "destructive",
+            });
+          },
+        );
+      }
     });
     return () => {
-      mounted = false;
+      unsubAuth();
+      if (unsubRef.current) unsubRef.current();
     };
   }, []);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSave = async () => {
+    if (!user?.uid) {
+      toast({ title: "Not logged in", description: "Please sign in first." });
+      return;
+    }
     setSaving(true);
     try {
-      const updated: UserProfile = {
-        ...profile,
-        updatedAt: Date.now(),
+      const payload = {
+        name: form.name || "",
+        phone: form.phone || "",
+        address: form.address || "",
+        dob: form.dob || "",
         profileCompleted: true,
       };
-      await persistProfile(updated);
-      setProfile(updated);
-      toast({
-        title: "Profile saved",
-        description: "Your profile has been updated across devices.",
-      });
+      await setDoc(doc(db, "users", user.uid), payload, { merge: true });
+      lastSavedRef.current = { name: payload.name, phone: payload.phone, address: payload.address, dob: payload.dob };
       setIsEditing(false);
+      setExists(true);
+      toast({ title: "Profile saved", description: "Your profile is synced across devices." });
+    } catch {
+      toast({ title: "Save failed", description: "Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
   };
+
+  const onCancel = () => {
+    setForm(lastSavedRef.current);
+    setIsEditing(false);
+  };
+
+  const onEdit = () => setIsEditing(true);
+
+  if (!user) {
+    return (
+      <div className="min-h-svh">
+        <Container className="py-6">
+          <div className="rounded-xl border border-input bg-white p-6 card-yellow-shadow">
+            <p className="text-sm text-muted-foreground">Please log in to view your profile.</p>
+          </div>
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-svh">
@@ -68,113 +132,82 @@ export default function ProfilePage() {
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
               <h2 className="text-2xl font-bold">My Profile</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Update your personal details.
+                {exists ? "Your saved details." : "Set up your profile."}
               </p>
 
-              {loading ? (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground py-6">
-                  <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                  Loading profile...
+              <form className="mt-4 space-y-4 max-w-xl" onSubmit={(e) => e.preventDefault()}>
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Full name</Label>
+                  <Input
+                    id="name"
+                    value={form.name}
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="Your name"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
                 </div>
-              ) : (
-                <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-xl">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Full name</Label>
-                    <Input
-                      id="name"
-                      value={profile.name}
-                      onChange={(e) =>
-                        setProfile((p) => ({ ...p, name: e.target.value }))
-                      }
-                      placeholder="Your name"
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted/30" : undefined}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      value={profile.email}
-                      onChange={(e) =>
-                        setProfile((p) => ({ ...p, email: e.target.value }))
-                      }
-                      placeholder="you@example.com"
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted/30" : undefined}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={profile.phone || ""}
-                      onChange={(e) =>
-                        setProfile((p) => ({ ...p, phone: e.target.value }))
-                      }
-                      placeholder="03XX-XXXXXXX"
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted/30" : undefined}
-                    />
-                  </div>
 
-                  <div className="grid gap-2">
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      value={profile.address || ""}
-                      onChange={(e) =>
-                        setProfile((p) => ({ ...p, address: e.target.value }))
-                      }
-                      placeholder="Your address"
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted/30" : undefined}
-                    />
-                  </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={form.phone}
+                    onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                    placeholder="03XX-XXXXXXX"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
 
-                  <div className="pt-2 flex gap-2">
-                    {isEditing ? (
-                      <>
-                        <Button type="submit" disabled={saving}>
-                          {saving ? (
-                            <span className="inline-flex items-center gap-2">
-                              <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />{" "}
-                              Saving...
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-2">
-                              <Check className="h-4 w-4" />{" "}
-                              {profile.profileCompleted
-                                ? "Save Changes"
-                                : "Save Profile"}
-                            </span>
-                          )}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => {
-                            setProfile(getProfile());
-                            setIsEditing(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        type="button"
-                        onClick={() => setIsEditing(true)}
-                        variant="elevated"
-                      >
-                        <span className="inline-flex items-center gap-2">
-                          <Pencil className="h-4 w-4" /> Edit Profile
-                        </span>
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={form.address}
+                    onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+                    placeholder="Your address"
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="dob">Date of birth</Label>
+                  <Input
+                    id="dob"
+                    type="date"
+                    value={form.dob}
+                    onChange={(e) => setForm((p) => ({ ...p, dob: e.target.value }))}
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-muted/30" : undefined}
+                  />
+                </div>
+
+                <div className="pt-2 flex gap-2">
+                  {isEditing ? (
+                    <>
+                      <Button type="button" onClick={onSave} disabled={saving}>
+                        {saving ? (
+                          <span className="inline-flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                            Saving...
+                          </span>
+                        ) : (
+                          "Save"
+                        )}
                       </Button>
-                    )}
-                  </div>
-                </form>
-              )}
+                      <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <Button type="button" variant="elevated" onClick={onEdit}>
+                      Edit
+                    </Button>
+                  )}
+                </div>
+              </form>
             </div>
           </div>
         </div>
