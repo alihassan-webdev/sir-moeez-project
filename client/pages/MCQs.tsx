@@ -648,6 +648,14 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             disabled={!result || !!loading}
                             onClick={async () => {
                               if (!result) return;
+                              if (!isProfileCompleteForPdf) {
+                                toast({
+                                  title: "Profile incomplete",
+                                  description:
+                                    "Please complete your profile (name, phone, institute name, and logo) before generating exams.",
+                                });
+                                return;
+                              }
                               try {
                                 const { generateExamStylePdf } = await import(
                                   "@/lib/pdf"
@@ -656,6 +664,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
                                   title: "MCQs",
                                   body: result,
                                   filenameBase: "mcqs",
+                                  instituteHeader: {
+                                    instituteName: profile?.instituteName,
+                                    instituteLogo: profile?.instituteLogo,
+                                  },
                                 });
                               } catch (err) {
                                 console.error(err);
