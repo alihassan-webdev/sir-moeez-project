@@ -5,7 +5,6 @@ export type UserProfile = {
   name: string;
   email: string;
   phone?: string;
-  education?: string;
   address?: string;
   updatedAt: number;
   profileCompleted?: boolean;
@@ -45,7 +44,6 @@ export function getProfile(): UserProfile {
     name: u?.displayName || "",
     email: u?.email || "",
     phone: "",
-    education: "",
     address: "",
     updatedAt: Date.now(),
     profileCompleted: false,
@@ -69,7 +67,6 @@ export async function loadProfile(): Promise<UserProfile> {
         name: String(remote.name ?? current.name ?? ""),
         email: String(remote.email ?? current.email ?? ""),
         phone: String(remote.phone ?? current.phone ?? ""),
-        education: String(remote.education ?? current.education ?? ""),
         address: String(remote.address ?? current.address ?? ""),
         updatedAt: Number(remote.updatedAt ?? current.updatedAt ?? Date.now()),
         profileCompleted: Boolean(
