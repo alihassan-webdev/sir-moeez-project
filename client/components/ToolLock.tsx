@@ -30,7 +30,7 @@ export function ToolLock({
             <Button
               asChild
               size="sm"
-              className="bg-white text-red-600 hover:bg-white/90 shadow-md"
+              className="bg-white text-red-600 shadow-md transition-colors duration-200 hover:bg-red-600 hover:text-white"
             >
               <Link to="/my-profile">Go to Profile</Link>
             </Button>
