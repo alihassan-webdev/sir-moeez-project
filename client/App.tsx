@@ -168,6 +168,16 @@ function AnimatedRoutes() {
           }
         />
         <Route
+          path="/onboarding"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Onboarding />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
           path="/support"
           element={
             <RequireAuth>
