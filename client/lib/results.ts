@@ -3,8 +3,6 @@ import {
   addDoc,
   collection,
   getDocs,
-  limit,
-  orderBy,
   query,
   serverTimestamp,
   Timestamp,
@@ -56,21 +54,25 @@ export async function fetchLastAttemptByType(examType: ExamType): Promise<
     collection(db, "results"),
     where("userId", "==", userId),
     where("examType", "==", examType),
-    orderBy("createdAt", "desc"),
-    limit(1),
   );
   const snap = await getDocs(q);
   if (snap.empty) return null;
-  const d = snap.docs[0];
-  const data = d.data() as any;
-  return {
-    id: d.id,
-    userId: String(data.userId || ""),
-    examType: String(data.examType || "exam") as ExamType,
-    content: String(data.content || ""),
-    createdAt: data.createdAt ?? null,
-    generatedDateTime: Number(data.generatedDateTime || 0) || undefined,
-  };
+  let best: ResultDoc | null = null;
+  for (const d of snap.docs) {
+    const data = d.data() as any;
+    const created = (data.createdAt as any)?.toMillis?.() || Number(data.generatedDateTime || 0) || 0;
+    if (!best || created > ((best.createdAt as any)?.toMillis?.() || best.generatedDateTime || 0)) {
+      best = {
+        id: d.id,
+        userId: String(data.userId || ""),
+        examType: String(data.examType || "exam") as ExamType,
+        content: String(data.content || ""),
+        createdAt: data.createdAt ?? null,
+        generatedDateTime: Number(data.generatedDateTime || 0) || undefined,
+      };
+    }
+  }
+  return best;
 }
 
 export async function fetchAllResultsByType(examType: ExamType): Promise<
@@ -83,11 +85,9 @@ export async function fetchAllResultsByType(examType: ExamType): Promise<
     collection(db, "results"),
     where("userId", "==", userId),
     where("examType", "==", examType),
-    orderBy("createdAt", "desc"),
-    limit(200),
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => {
+  const arr = snap.docs.map((d) => {
     const data = d.data() as any;
     return {
       id: d.id,
@@ -97,5 +97,10 @@ export async function fetchAllResultsByType(examType: ExamType): Promise<
       createdAt: data.createdAt ?? null,
       generatedDateTime: Number(data.generatedDateTime || 0) || undefined,
     } as ResultDoc;
+  });
+  return arr.sort((a, b) => {
+    const at = (a.createdAt as any)?.toMillis?.() || a.generatedDateTime || 0;
+    const bt = (b.createdAt as any)?.toMillis?.() || b.generatedDateTime || 0;
+    return bt - at;
   });
 }
