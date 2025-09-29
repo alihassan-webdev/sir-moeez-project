@@ -25,7 +25,7 @@ export function AppLayout({ children }: PropsWithChildren) {
     "/profile",
     "/onboarding",
     "/support",
-  ].includes(path);
+  ].includes(path) || path.startsWith("/results");
 
   useSwipeNavigation(() => {
     if (window.history.length > 1) navigate(-1);
