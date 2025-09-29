@@ -10,6 +10,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
+import SidebarStats from "@/components/layout/SidebarStats";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
@@ -63,34 +64,7 @@ export default function GetStarted() {
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
 
-              <div className="mt-5 border-t pt-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">
-                      Classes
-                    </div>
-                    <div className="text-lg font-extrabold">
-                      {classes.length}
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">
-                      Subjects
-                    </div>
-                    <div className="text-lg font-extrabold">
-                      {subjects.length}
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-input bg-white px-4 py-3">
-                    <div className="text-xs font-semibold text-muted-foreground">
-                      Chapters
-                    </div>
-                    <div className="text-lg font-extrabold">
-                      {chaptersCount}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <SidebarStats />
             </div>
           </aside>
 

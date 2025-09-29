@@ -25,7 +25,7 @@ export default function MobileSheet() {
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
       </SheetTrigger>
-      <SheetContent side="right">
+      <SheetContent side="right" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Navigate</SheetTitle>
         </SheetHeader>
@@ -115,12 +115,7 @@ export default function MobileSheet() {
         </div>
 
         <div className="mt-4 p-2">
-          <div className="text-sm font-semibold text-muted-foreground px-1">
-            Stats
-          </div>
-          <div className="mt-2">
-            <SidebarStats />
-          </div>
+          <SidebarStats />
         </div>
       </SheetContent>
     </Sheet>

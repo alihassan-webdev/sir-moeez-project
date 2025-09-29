@@ -1,6 +1,10 @@
 import * as React from "react";
 
-export default function SidebarStats() {
+type SidebarStatsProps = {
+  title?: string | null;
+};
+
+export default function SidebarStats({ title = "Syllabus" }: SidebarStatsProps) {
   // Build real stats from bundled PDFs
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -50,6 +54,11 @@ export default function SidebarStats() {
 
   return (
     <div className="mt-5 border-t pt-4">
+      {title !== null && (
+        <div className="text-sm font-semibold text-muted-foreground px-1 mb-2">
+          {title}
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-3">
         <div className="rounded-lg border border-input bg-white px-4 py-3">
           <div className="text-xs font-semibold text-muted-foreground">
