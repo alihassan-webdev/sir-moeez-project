@@ -306,9 +306,6 @@ export default function QnA() {
       if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
       if (!res || !res.ok) {
         const proxies = [
-          "/api/generate-questions",
-          "/api/proxy",
-          "/proxy",
           "/.netlify/functions/proxy",
         ];
         for (const p of proxies) {
@@ -607,10 +604,16 @@ export default function QnA() {
                                 const { generateExamStylePdf } = await import(
                                   "@/lib/pdf"
                                 );
+                                const { getProfile } = await import("@/lib/account");
+                                const prof = getProfile();
                                 await generateExamStylePdf({
                                   title: "Questions",
                                   body: result,
                                   filenameBase: "questions",
+                                  instituteHeader: {
+                                    instituteName: String(prof?.instituteName || ""),
+                                    instituteLogo: prof?.instituteLogo,
+                                  },
                                 });
                               } catch (err) {
                                 console.error(err);

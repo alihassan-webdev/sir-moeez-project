@@ -351,9 +351,6 @@ Use concise, exam-style wording suitable for classroom tests.`;
       if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
       if (!res || !res.ok) {
         const proxies = [
-          "/api/generate-questions",
-          "/api/proxy",
-          "/proxy",
           "/.netlify/functions/proxy",
         ];
         for (const p of proxies) {

@@ -852,10 +852,7 @@ export default function Index() {
       // If direct request failed (network/CORS) or returned non-OK, try internal proxies
       if (!res || !res.ok) {
         const proxies = [
-          "/api/generate-questions", // Express backend proxy (local/production)
-          "/api/proxy",
-          "/proxy",
-          "/.netlify/functions/proxy", // Netlify serverless fallback
+          "/.netlify/functions/proxy",
         ];
         for (const proxyPath of proxies) {
           try {
@@ -1114,29 +1111,45 @@ export default function Index() {
                               const safeQuery = makeFilenameFromPrompt(query);
                               const filename = `${safeQuery}_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
 
-                              // Cover/header
-                              doc.setFont("times", "bold");
-                              const headerFontSize = 33; // 50% larger than previous 22
-                              doc.setFontSize(headerFontSize);
-                              const headingTitle = "Exam Generator";
-                              const headerLines = doc.splitTextToSize(
-                                headingTitle,
-                                pageW - margin * 2,
-                              );
-                              doc.text(headerLines, pageW / 2, y, {
-                                align: "center",
-                              });
-                              const headerLineHeight = Math.round(
-                                headerFontSize * 0.8,
-                              );
-                              y += Math.max(
-                                headerLineHeight + 6,
-                                headerLines.length * headerLineHeight + 10,
-                              );
-                              doc.setDrawColor(190);
-                              doc.setLineWidth(1);
-                              doc.line(margin, y, pageW - margin, y);
-                              y += 16;
+                              // Header: institute logo (60x60 box, aspect-fit) and name centered
+                              try {
+                                const { getProfile } = await import("@/lib/account");
+                                const prof = getProfile();
+                                if (prof?.instituteName) {
+                                  if (prof?.instituteLogo) {
+                                    const dataUrl = prof.instituteLogo;
+                                    const fmt = /data:image\/(png|jpeg|jpg)/i.test(dataUrl)
+                                      ? (dataUrl.match(/data:image\/(png|jpeg|jpg)/i)![1].toUpperCase() === "PNG" ? "PNG" : "JPEG")
+                                      : "PNG";
+                                    try {
+                                      const dims: { w: number; h: number } = await new Promise((resolve, reject) => {
+                                        const img = new Image();
+                                        img.onload = () => resolve({ w: img.naturalWidth || img.width, h: img.naturalHeight || img.height });
+                                        img.onerror = reject;
+                                        img.src = dataUrl;
+                                      });
+                                      const box = 60;
+                                      const ratio = dims.w && dims.h ? dims.w / dims.h : 1;
+                                      let w = box;
+                                      let h = box;
+                                      if (ratio > 1) { w = box; h = Math.max(1, box / ratio); } else { h = box; w = Math.max(1, box * ratio); }
+                                      const yPos = y - 6 + (box - h) / 2;
+                                      doc.addImage(dataUrl, fmt as any, margin, yPos, w, h);
+                                    } catch {
+                                      doc.addImage(prof.instituteLogo, "PNG" as any, margin, y - 6, 60, 60);
+                                    }
+                                  }
+                                  doc.setFont("times", "bold");
+                                  doc.setFontSize(18);
+                                  const nameLines = doc.splitTextToSize(String(prof.instituteName), pageW - margin * 2 - 70);
+                                  doc.text(nameLines, pageW / 2, y + 20, { align: "center" });
+                                  y += 60;
+                                  doc.setDrawColor(190);
+                                  doc.setLineWidth(1);
+                                  doc.line(margin, y, pageW - margin, y);
+                                  y += 16;
+                                }
+                              } catch {}
 
                               doc.setFont("times", "normal");
                               doc.setFontSize(12);
