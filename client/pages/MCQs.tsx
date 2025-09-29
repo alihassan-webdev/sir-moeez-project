@@ -668,7 +668,6 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             aria-label="Download PDF"
                             variant="secondary"
                             size="icon"
-                            className="rounded-full"
                             disabled={!result || !!loading}
                             onClick={async () => {
                               if (!result) return;
