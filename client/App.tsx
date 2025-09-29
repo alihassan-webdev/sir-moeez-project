@@ -28,6 +28,7 @@ import Support from "./pages/Support";
 import Onboarding from "./pages/Onboarding";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { ProfileLockProvider } from "@/hooks/useProfileLock";
 
 const queryClient = new QueryClient();
 
@@ -73,8 +74,9 @@ function AnimatedRoutes() {
   }
 
   return (
-    <AppLayout>
-      <Routes location={location}>
+    <ProfileLockProvider>
+      <AppLayout>
+        <Routes location={location}>
         <Route
           path="/login"
           element={
@@ -166,6 +168,16 @@ function AnimatedRoutes() {
           }
         />
         <Route
+          path="/my-profile"
+          element={
+            <RequireAuth>
+              <PageWrapper>
+                <Profile />
+              </PageWrapper>
+            </RequireAuth>
+          }
+        />
+        <Route
           path="/onboarding"
           element={
             <RequireAuth>
@@ -198,8 +210,9 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-      </Routes>
-    </AppLayout>
+        </Routes>
+      </AppLayout>
+    </ProfileLockProvider>
   );
 }
 
