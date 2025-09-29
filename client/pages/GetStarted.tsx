@@ -148,7 +148,7 @@ export default function GetStarted() {
 
                 <Link
                   to="/app"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow sm"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -178,6 +178,21 @@ export default function GetStarted() {
                     <div className="text-base font-semibold">Syllabus</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Browse and download chapters by class & subject
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  to="/results"
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                >
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+                      <History className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+                    </div>
+                    <div className="text-base font-semibold">Result History</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Review and download your past results
                     </div>
                   </div>
                 </Link>
