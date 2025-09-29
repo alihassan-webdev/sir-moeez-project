@@ -587,7 +587,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                 </div>
 
                 {result && (
-                  <div className="order-1 mt-0 w-full max-w-4xl mx-auto">
+                  <div className="order-3 mt-0 w-full max-w-4xl mx-auto">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
                       <div className="flex items-center gap-2">
