@@ -268,7 +268,7 @@ export default function Profile() {
                     disabled={!isEditing}
                     className={
                       !isEditing
-                        ? "bg-muted/40 text-muted-foreground"
+                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
                         : undefined
                     }
                   />
@@ -286,7 +286,7 @@ export default function Profile() {
                     disabled={!isEditing}
                     className={
                       !isEditing
-                        ? "bg-muted/40 text-muted-foreground"
+                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
                         : undefined
                     }
                   />
@@ -304,7 +304,7 @@ export default function Profile() {
                     disabled={!isEditing}
                     className={
                       !isEditing
-                        ? "bg-muted/40 text-muted-foreground"
+                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
                         : undefined
                     }
                   />
