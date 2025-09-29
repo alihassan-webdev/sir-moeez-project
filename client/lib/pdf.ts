@@ -36,18 +36,12 @@ export async function generateExamStylePdf(params: {
       if (instituteHeader.instituteLogo) {
         const dataUrl = instituteHeader.instituteLogo;
         const fmt = /data:image\/(png|jpeg|jpg)/i.test(dataUrl)
-          ? (dataUrl.match(/data:image\/(png|jpeg|jpg)/i)![1].toUpperCase() === "PNG"
-              ? "PNG"
-              : "JPEG")
+          ? dataUrl.match(/data:image\/(png|jpeg|jpg)/i)![1].toUpperCase() ===
+            "PNG"
+            ? "PNG"
+            : "JPEG"
           : "PNG";
-        doc.addImage(
-          dataUrl,
-          fmt as any,
-          margin,
-          y - 6,
-          60,
-          60,
-        );
+        doc.addImage(dataUrl, fmt as any, margin, y - 6, 60, 60);
       }
     } catch {}
     doc.setFont("times", "bold");

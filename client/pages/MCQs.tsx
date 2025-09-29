@@ -95,14 +95,18 @@ export default function MCQs() {
         name: String(d.name || ""),
         phone: String(d.phone || ""),
         instituteName: String(d.instituteName || ""),
-        instituteLogo: typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
+        instituteLogo:
+          typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
       });
     });
     return () => unsub();
   }, []);
 
   const isProfileCompleteForPdf = Boolean(
-    profile?.name && profile?.phone && profile?.instituteName && profile?.instituteLogo,
+    profile?.name &&
+      profile?.phone &&
+      profile?.instituteName &&
+      profile?.instituteLogo,
   );
 
   // Progressive unlocking flags
@@ -415,9 +419,17 @@ Use concise, exam-style wording suitable for classroom tests.`;
               {!isProfileCompleteForPdf && (
                 <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium">Please complete your profile (name, phone, institute name, and logo) before generating exams.</p>
+                    <p className="text-sm font-medium">
+                      Please complete your profile (name, phone, institute name,
+                      and logo) before generating exams.
+                    </p>
                   </div>
-                  <Link to="/profile" className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:opacity-90">Go to Profile</Link>
+                  <Link
+                    to="/profile"
+                    className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:opacity-90"
+                  >
+                    Go to Profile
+                  </Link>
                 </div>
               )}
               <ToolLock>

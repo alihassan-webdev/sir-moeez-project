@@ -64,7 +64,9 @@ export default function Profile() {
                 phone: String(d.phone ?? ""),
                 instituteName: String(d.instituteName ?? inst?.name ?? ""),
                 instituteLogo:
-                  typeof d.instituteLogo === "string" ? d.instituteLogo : undefined,
+                  typeof d.instituteLogo === "string"
+                    ? d.instituteLogo
+                    : undefined,
               };
               lastSavedRef.current = next;
               setExists(true);
@@ -333,7 +335,9 @@ export default function Profile() {
                       }
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">Max 300KB. PNG or JPG recommended.</p>
+                  <p className="text-xs text-muted-foreground">
+                    Max 300KB. PNG or JPG recommended.
+                  </p>
                 </div>
 
                 <div className="pt-2 flex gap-2">
