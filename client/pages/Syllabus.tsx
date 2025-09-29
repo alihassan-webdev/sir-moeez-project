@@ -79,7 +79,6 @@ export default function Syllabus() {
           <aside className="hidden md:block">
             <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
               <SidebarPanelInner />
-              <SidebarStats />
             </div>
           </aside>
 
@@ -88,6 +87,9 @@ export default function Syllabus() {
             <p className="text-sm text-muted-foreground mt-1">
               Select class and subject to browse chapters. Click a chapter to view or download.
             </p>
+            <div className="mt-4">
+              <SidebarStats />
+            </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
