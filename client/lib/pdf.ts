@@ -1,5 +1,3 @@
-import { jsPDF } from "jspdf";
-
 function sanitizeFilenameBase(s: string) {
   const out = s
     .trim()
@@ -17,7 +15,9 @@ export async function generateExamStylePdf(params: {
   instituteHeader?: { instituteName?: string; instituteLogo?: string };
 }) {
   const { title, body, filenameBase, instituteHeader } = params;
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const mod: any = await import("jspdf");
+  const JsPDF = mod.jsPDF || mod.default;
+  const doc = new JsPDF({ unit: "pt", format: "a4" });
 
   const margin = 64;
   const pageW = doc.internal.pageSize.getWidth();
@@ -41,7 +41,35 @@ export async function generateExamStylePdf(params: {
             ? "PNG"
             : "JPEG"
           : "PNG";
-        doc.addImage(dataUrl, fmt as any, margin, y - 6, 60, 60);
+        try {
+          const dims: { w: number; h: number } = await new Promise(
+            (resolve, reject) => {
+              const img = new Image();
+              img.onload = () =>
+                resolve({
+                  w: img.naturalWidth || img.width,
+                  h: img.naturalHeight || img.height,
+                });
+              img.onerror = reject;
+              img.src = dataUrl;
+            },
+          );
+          const box = 60;
+          const ratio = dims.w && dims.h ? dims.w / dims.h : 1;
+          let w = box;
+          let h = box;
+          if (ratio > 1) {
+            w = box;
+            h = Math.max(1, box / ratio);
+          } else {
+            h = box;
+            w = Math.max(1, box * ratio);
+          }
+          const yPos = y - 6 + (box - h) / 2;
+          doc.addImage(dataUrl, fmt as any, margin, yPos, w, h);
+        } catch {
+          doc.addImage(dataUrl, fmt as any, margin, y - 6, 60, 60);
+        }
       }
     } catch {}
     doc.setFont("times", "bold");
@@ -58,17 +86,7 @@ export async function generateExamStylePdf(params: {
     y += 12;
   }
 
-  // Main title header
-  doc.setFont("times", "bold");
-  const headerFontSize = 33;
-  doc.setFontSize(headerFontSize);
-  const headerLines = doc.splitTextToSize(headingTitle, pageW - margin * 2);
-  doc.text(headerLines, pageW / 2, y, { align: "center" });
-  const headerLineHeight = Math.round(headerFontSize * 0.8);
-  y += Math.max(
-    headerLineHeight + 6,
-    headerLines.length * headerLineHeight + 10,
-  );
+  // Header removed: show only institute header above
   doc.setDrawColor(190);
   doc.setLineWidth(1);
   doc.line(margin, y, pageW - margin, y);

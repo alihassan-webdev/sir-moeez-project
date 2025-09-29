@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
+import { generateExamStylePdf } from "@/lib/pdf";
+import { getInstitute } from "@/lib/account";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -279,6 +281,22 @@ export default function QnA() {
         return;
       }
 
+      const { makeKey, getCached, setCached } = await import("@/lib/cache");
+      const cacheKey = makeKey([
+        "v1",
+        "qna",
+        selectedClass,
+        selectedSubject,
+        [...selectedChapterPaths].sort().join(";"),
+        qaCount,
+      ]);
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setResult(cached);
+        setLoading(false);
+        return;
+      }
+
       const q = buildQaPrompt(qaCount);
       const form = new FormData();
       form.append("pdf", file);
@@ -303,20 +321,12 @@ export default function QnA() {
       };
 
       let res: Response | null = null;
-      if (API_URL) res = await sendTo(API_URL, initialTimeoutMs);
-      if (!res || !res.ok) {
-        const proxies = [
-          "/api/generate-questions",
-          "/api/proxy",
-          "/proxy",
-          "/.netlify/functions/proxy",
-        ];
-        for (const p of proxies) {
-          const attempt = await sendTo(p, retryTimeoutMs);
-          if (attempt && attempt.ok) {
-            res = attempt;
-            break;
-          }
+      const proxies = ["/.netlify/functions/proxy"]; // Route via Netlify Function only
+      for (const p of proxies) {
+        const attempt = await sendTo(p, retryTimeoutMs);
+        if (attempt && attempt.ok) {
+          res = attempt;
+          break;
         }
       }
       if (!res) throw new Error("Network error. Please try again.");
@@ -338,10 +348,14 @@ export default function QnA() {
               json?.result ??
               json?.message ??
               JSON.stringify(json));
-        setResult(stripAnswers(String(text)));
+        const finalText = stripAnswers(String(text));
+        setResult(finalText);
+        setCached(cacheKey, finalText);
       } else {
         const text = await res.text();
-        setResult(stripAnswers(text));
+        const finalText = stripAnswers(text);
+        setResult(finalText);
+        setCached(cacheKey, finalText);
       }
     } catch (_err: any) {
       // Silent failure; background retries already attempted via fallbacks
@@ -604,13 +618,15 @@ export default function QnA() {
                             onClick={async () => {
                               if (!result) return;
                               try {
-                                const { generateExamStylePdf } = await import(
-                                  "@/lib/pdf"
-                                );
+                                const inst = getInstitute();
                                 await generateExamStylePdf({
                                   title: "Questions",
                                   body: result,
                                   filenameBase: "questions",
+                                  instituteHeader: {
+                                    instituteName: String(inst?.name || ""),
+                                    instituteLogo: inst?.logo,
+                                  },
                                 });
                               } catch (err) {
                                 console.error(err);

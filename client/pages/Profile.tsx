@@ -9,6 +9,7 @@ import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
+import { Upload } from "lucide-react";
 
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
@@ -30,6 +31,7 @@ export default function Profile() {
     instituteLogo: undefined as string | undefined,
   });
   const unsubRef = React.useRef<null | (() => void)>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const isFormValid = React.useMemo(
     () =>
@@ -266,7 +268,7 @@ export default function Profile() {
                     disabled={!isEditing}
                     className={
                       !isEditing
-                        ? "bg-muted/40 text-muted-foreground"
+                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
                         : undefined
                     }
                   />
@@ -284,7 +286,7 @@ export default function Profile() {
                     disabled={!isEditing}
                     className={
                       !isEditing
-                        ? "bg-muted/40 text-muted-foreground"
+                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
                         : undefined
                     }
                   />
@@ -302,7 +304,7 @@ export default function Profile() {
                     disabled={!isEditing}
                     className={
                       !isEditing
-                        ? "bg-muted/40 text-muted-foreground"
+                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
                         : undefined
                     }
                   />
@@ -322,22 +324,33 @@ export default function Profile() {
                         60×60
                       </div>
                     )}
-                    <Input
-                      id="logo"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoChange}
-                      disabled={!isEditing}
-                      className={
-                        !isEditing
-                          ? "bg-muted/40 text-muted-foreground"
-                          : undefined
-                      }
-                    />
+                    {isEditing && (
+                      <>
+                        <input
+                          id="logo"
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg"
+                          onChange={handleLogoChange}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="inline-flex items-center gap-2"
+                        >
+                          <Upload className="h-4 w-4" />
+                          Choose file
+                        </Button>
+                      </>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Max 300KB. PNG or JPG recommended.
-                  </p>
+                  {isEditing && (
+                    <p className="text-xs text-muted-foreground">
+                      Max 300KB. PNG or JPG recommended.
+                    </p>
+                  )}
                 </div>
 
                 <div className="pt-2 flex gap-2">
