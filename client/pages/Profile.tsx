@@ -82,6 +82,10 @@ export default function Profile() {
   }, [isEditing]);
 
   React.useEffect(() => {
+    if (!confirmOpen) setConfirmText("");
+  }, [confirmOpen]);
+
+  React.useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
       setUser(u || null);
       if (unsubRef.current) {
