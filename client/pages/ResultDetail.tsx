@@ -2,16 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import {
-  examTypeLabels,
-  fetchAllResultsByType,
-  type ExamTypeSlug as ExamType,
-} from "@/lib/results";
+import { examTypeLabels, type ExamTypeSlug as ExamType } from "@/lib/results";
 import { Button } from "@/components/ui/button";
-import { Download, ArrowLeft } from "lucide-react";
+import { Download, ArrowLeft, Trash2 } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
 import { auth, db } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  where,
+  writeBatch,
+} from "firebase/firestore";
+import { toast } from "@/hooks/use-toast";
 
 function useInstituteHeader() {
   const [inst, setInst] = useState<{
@@ -44,19 +49,45 @@ export default function ResultDetail() {
   const type = (params.type as ExamType) || "mcqs";
   const label = examTypeLabels[type] || "Results";
   const [items, setItems] = useState<
-    Awaited<ReturnType<typeof fetchAllResultsByType>>
+    Array<{
+      id: string;
+      title?: string;
+      content: string;
+      ts: number;
+      downloadUrl?: string | null;
+    }>
   >([]);
   const header = useInstituteHeader();
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const res = await fetchAllResultsByType(type);
-      if (!cancelled) setItems(res);
-    })();
-    return () => {
-      cancelled = true;
-    };
+    const u = auth.currentUser;
+    if (!u?.uid) {
+      setItems([]);
+      return;
+    }
+    const col = collection(db, "users", u.uid, "results");
+    const qy = query(col, where("examTypeSlug", "==", type));
+    const unsub = onSnapshot(qy, (snap) => {
+      const next = snap.docs
+        .map((d) => {
+          const data = d.data() as any;
+          const ts =
+            (data.createdAt as any)?.toMillis?.() ||
+            Number(data.generatedDateTime || 0) ||
+            0;
+          return {
+            id: d.id,
+            title: String(data.title || ""),
+            content: String(data.resultData ?? data.content ?? ""),
+            ts,
+            downloadUrl:
+              typeof data.downloadUrl === "string" ? data.downloadUrl : null,
+          };
+        })
+        .sort((a, b) => b.ts - a.ts);
+      setItems(next);
+    });
+    return () => unsub();
   }, [type]);
 
   const handleDownload = async (content: string) => {
@@ -66,6 +97,30 @@ export default function ResultDetail() {
       filenameBase: label.toLowerCase().replace(/\s+/g, "_"),
       instituteHeader: header,
     });
+  };
+
+  const handleDelete = async (id: string) => {
+    const u = auth.currentUser;
+    if (!u?.uid) return;
+    try {
+      await deleteDoc(doc(db, "users", u.uid, "results", id));
+      toast({ title: "Deleted", description: "Result removed." });
+    } catch (e: any) {
+      toast({
+        title: "Delete failed",
+        description: e?.message || "Could not delete result.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteMany = async (ids: string[]) => {
+    if (!ids.length) return;
+    const u = auth.currentUser;
+    if (!u?.uid) return;
+    const batch = writeBatch(db);
+    ids.forEach((rid) => batch.delete(doc(db, "users", u.uid, "results", rid)));
+    await batch.commit();
   };
 
   return (
@@ -107,22 +162,24 @@ export default function ResultDetail() {
                 </div>
               )}
               {items.map((it) => {
-                const ts =
-                  (it.createdAt as any)?.toMillis?.() ||
-                  it.generatedDateTime ||
-                  0;
-                const date = ts ? new Date(ts).toLocaleString() : "";
+                const date = it.ts ? new Date(it.ts).toLocaleString() : "";
+                const title =
+                  it.title && it.title.trim().length > 0
+                    ? it.title
+                    : `${label}`;
                 return (
                   <div
                     key={it.id}
                     className="rounded-xl bg-white border border-input p-4 sm:p-5 card-yellow-shadow"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          Generated
+                      <div className="min-w-0">
+                        <div className="text-base font-extrabold truncate">
+                          {title}
                         </div>
-                        <div className="text-base font-semibold">{date}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {date}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -131,6 +188,13 @@ export default function ResultDetail() {
                           className="inline-flex items-center gap-2"
                         >
                           <Download className="h-4 w-4" /> Download PDF
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDelete(it.id)}
+                          className="inline-flex items-center gap-2"
+                        >
+                          <Trash2 className="h-4 w-4" /> Delete
                         </Button>
                       </div>
                     </div>

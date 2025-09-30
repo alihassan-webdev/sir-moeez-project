@@ -138,13 +138,9 @@ function AnimatedRoutes() {
           <Route
             path="/syllabus"
             element={
-              <RequireAuth>
-                <RequireProfileCompleted>
-                  <PageWrapper>
-                    <Syllabus />
-                  </PageWrapper>
-                </RequireProfileCompleted>
-              </RequireAuth>
+              <PageWrapper>
+                <Syllabus />
+              </PageWrapper>
             }
           />
           <Route
