@@ -1,167 +1,99 @@
-const crypto = require("crypto");
+export const handler = async (event, context) => {
+  // Netlify function proxy to forward requests to a configured backend API
+  // Environment variables:
+  // - TARGET_API_URL (required): full URL to forward requests to
+  // - TARGET_API_KEY (optional): API key to include in Authorization header
 
-// In-memory cache (per-function instance)
-const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 15 * 60_000);
-const cache = new Map(); // key -> { ts, status, headers, body, isBase64 }
+  const TARGET_API_URL =
+    process.env.TARGET_API_URL ||
+    process.env.GENERATE_API_URL ||
+    "http://localhost:8080/api/generate-questions";
+  const TARGET_API_KEY = process.env.TARGET_API_KEY || null;
 
-function hashBody(b) {
-  try {
-    if (!b) return "";
-    if (Buffer.isBuffer(b))
-      return crypto.createHash("sha256").update(b).digest("hex");
-    return crypto.createHash("sha256").update(String(b)).digest("hex");
-  } catch {
-    return "";
-  }
-}
+  const MAX_RETRIES = 3;
+  const TIMEOUT_MS = 5000; // per attempt
 
-exports.handler = async function (event) {
-  // CORS preflight
-  if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "*",
-      },
-      body: "",
-    };
-  }
-
-  const BASE = process.env.PREDICT_ENDPOINT || "https://api-va5v.onrender.com";
-  const EXTERNAL = (() => {
-    try {
-      const u = new URL(BASE);
-      const path = u.pathname.replace(/\/+$/, "");
-      if (!/\/generate-questions$/.test(path))
-        u.pathname = `${path}/generate-questions`;
-      return u.toString();
-    } catch {
-      const b = String(BASE).replace(/\/+$/, "");
-      return `${b}/generate-questions`;
-    }
-  })();
-
-  // Build upstream URL including query string
-  const url = new URL(EXTERNAL);
-  if (event.queryStringParameters) {
-    for (const [k, v] of Object.entries(event.queryStringParameters)) {
-      if (v != null) url.searchParams.set(k, String(v));
-    }
-  }
-
-  // Reconstruct headers
-  const headers = { ...(event.headers || {}) };
-  delete headers.host;
-  // Inject API key from env if provided
-  const apiKey = process.env.PREDICT_API_KEY;
-  const authHeader = process.env.PREDICT_AUTH_HEADER || "authorization";
-  if (apiKey) headers[authHeader] = apiKey;
-  headers["accept"] = headers["accept"] || "application/json";
-
-  // Decode body if base64 encoded
-  let body = event.body || null;
-  if (event.isBase64Encoded && body) body = Buffer.from(body, "base64");
-
-  // Build cache key
-  const keyBase = `${event.httpMethod || "GET"}|${url.toString()}|${hashBody(body)}`;
-  const cached = cache.get(keyBase);
-  const now = Date.now();
-  if (cached && now - cached.ts < CACHE_TTL_MS) {
-    return {
-      statusCode: cached.status,
-      headers: {
-        ...cached.headers,
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "*",
-      },
-      body: cached.body,
-      isBase64Encoded: cached.isBase64,
-    };
-  }
-
-  // Retry policy
-  const attempts = Number(process.env.PROXY_RETRIES || 3);
-  const baseTimeout = Number(process.env.PROXY_TIMEOUT_MS || 25_000);
-
-  const tryOnce = async (timeoutMs) => {
+  const makeRequest = async (attempt) => {
     const controller = new AbortController();
-    const t = setTimeout(() => controller.abort(), timeoutMs);
+    const id = setTimeout(() => controller.abort(), TIMEOUT_MS);
     try {
-      const resp = await fetch(url.toString(), {
-        method: event.httpMethod || "GET",
+      // Reconstruct fetch options from incoming Netlify event
+      const headers = {};
+      // Forward JSON content-type or accept
+      if (event.headers) {
+        for (const k of Object.keys(event.headers)) {
+          headers[k] = event.headers[k];
+        }
+      }
+      // Overwrite host related headers
+      delete headers.host;
+
+      // Add server-side API key if configured
+      if (TARGET_API_KEY) {
+        headers["Authorization"] = `Bearer ${TARGET_API_KEY}`;
+      }
+
+      const isBase64 = !!event.isBase64Encoded;
+      let body = null;
+      let fetchOptions = {
+        method: event.httpMethod || "POST",
         headers,
-        body,
         signal: controller.signal,
-      });
-      const contentType =
-        resp.headers.get("content-type") || "application/octet-stream";
-      const arrayBuffer = await resp.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const isText =
-        contentType.includes("application/json") ||
-        contentType.startsWith("text/");
-      const responseBody = isText
-        ? buffer.toString("utf-8")
-        : buffer.toString("base64");
-      const responseHeaders = {
-        "Content-Type": contentType,
-        "Cache-Control": isText ? "no-store" : "no-store",
       };
-      return {
-        status: resp.status,
-        headers: responseHeaders,
-        body: responseBody,
-        isBase64: !isText,
-      };
-    } finally {
-      clearTimeout(t);
+
+      if (event.body) {
+        if (isBase64) {
+          // Pass through binary body as-is; convert to Buffer
+          body = Buffer.from(event.body, "base64");
+          fetchOptions.body = body;
+        } else {
+          // If content-type is application/json, pass JSON string
+          fetchOptions.body = event.body;
+        }
+      }
+
+      const res = await fetch(TARGET_API_URL, fetchOptions);
+      clearTimeout(id);
+      const contentType = res.headers.get("content-type") || "";
+      const status = res.status;
+      let payload;
+      if (contentType.includes("application/json")) {
+        payload = await res.json();
+      } else {
+        payload = await res.text();
+      }
+      return { ok: res.ok, status, payload, contentType };
+    } catch (err) {
+      clearTimeout(id);
+      return { ok: false, error: String(err) };
     }
   };
 
+  // Try up to MAX_RETRIES attempts
   let lastError = null;
-  for (let i = 0; i < attempts; i++) {
-    const timeoutMs = baseTimeout + i * 8000; // incremental backoff
-    try {
-      const res = await tryOnce(timeoutMs);
-      // Cache success
-      cache.set(keyBase, { ts: Date.now(), ...res });
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    const res = await makeRequest(i + 1);
+    if (res.ok) {
+      // Successful response -> return it
+      const isJson =
+        res.contentType && res.contentType.includes("application/json");
       return {
-        statusCode: res.status,
-        headers: {
-          ...res.headers,
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-          "Access-Control-Allow-Headers": "*",
-        },
-        body: res.body,
-        isBase64Encoded: res.isBase64,
+        statusCode: 200,
+        headers: { "Content-Type": isJson ? "application/json" : "text/plain" },
+        body: isJson ? JSON.stringify(res.payload) : String(res.payload),
       };
-    } catch (e) {
-      lastError = e;
     }
+    lastError = res.error || `status:${res.status}`;
+    // silent retry immediately
   }
 
-  // Fallback to last cached value even if stale
-  if (cached) {
-    return {
-      statusCode: 200,
-      headers: {
-        ...cached.headers,
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "*",
-      },
-      body: cached.body,
-      isBase64Encoded: cached.isBase64,
-    };
-  }
-
+  // All attempts failed
   return {
-    statusCode: 200,
-    headers: { "Access-Control-Allow-Origin": "*" },
-    body: JSON.stringify({ result: "" }),
+    statusCode: 502,
+    body: JSON.stringify({
+      error: true,
+      message: "Upstream request failed",
+      detail: lastError,
+    }),
   };
 };

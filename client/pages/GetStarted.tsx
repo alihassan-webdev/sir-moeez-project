@@ -67,32 +67,7 @@ export default function GetStarted() {
 
           {/* Main column */}
           <div>
-            {/* Stats (mobile) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:hidden">
-              <div className="rounded-xl bg-white border border-input px-5 py-4 card-yellow-shadow flex items-center gap-3">
-                <Layers className="h-5 w-5 text-primary" aria-hidden="true" />
-                <div>
-                  <div className="text-sm font-semibold">Classes</div>
-                  <div className="text-lg font-extrabold">{classes.length}</div>
-                </div>
-              </div>
-              <div className="rounded-xl bg-white border border-input px-5 py-4 card-yellow-shadow flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
-                <div>
-                  <div className="text-sm font-semibold">Subjects</div>
-                  <div className="text-lg font-extrabold">
-                    {subjects.length}
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-xl bg-white border border-input px-5 py-4 card-yellow-shadow flex items-center gap-3">
-                <Folder className="h-5 w-5 text-primary" aria-hidden="true" />
-                <div>
-                  <div className="text-sm font-semibold">Chapters (PDF)</div>
-                  <div className="text-lg font-extrabold">{chaptersCount}</div>
-                </div>
-              </div>
-            </div>
+            {/* Stats removed per request */}
 
             {/* Welcome text */}
             <div className="mt-4 rounded-xl bg-white p-6 border border-input card-yellow-shadow">

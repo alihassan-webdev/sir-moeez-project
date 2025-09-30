@@ -20,42 +20,6 @@ export default function Landing() {
       navigate("/#pricing");
     }
   };
-  // Shared duration for all counters so they finish together and faster
-  const sharedDuration = 1200; // milliseconds
-
-  const CountUp = ({
-    end,
-    duration = sharedDuration,
-    format,
-  }: {
-    end: number;
-    duration?: number;
-    format?: "comma" | "percent";
-  }) => {
-    const [value, setValue] = React.useState(0);
-    React.useEffect(() => {
-      let raf = 0;
-      const start = performance.now();
-      const from = 0;
-      const to = end;
-      // easeOutCubic for a snappier finish
-      const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
-      const step = (now: number) => {
-        const elapsed = now - start;
-        const tRaw = Math.min(1, elapsed / duration);
-        const t = easeOutCubic(tRaw);
-        const current = Math.floor(from + (to - from) * t);
-        setValue(current);
-        if (tRaw < 1) raf = requestAnimationFrame(step);
-      };
-      raf = requestAnimationFrame(step);
-      return () => cancelAnimationFrame(raf);
-    }, [end, duration]);
-
-    if (format === "percent") return <>{value}%</>;
-    // default: comma formatting with + suffix
-    return <>{value.toLocaleString()}+</>;
-  };
   return (
     <div className="min-h-svh flex flex-col">
       <Header />
@@ -75,31 +39,20 @@ export default function Landing() {
               seconds. Simple, fast, and built for teachers and institutes.
             </p>
 
-            <div className="mt-5 flex items-end justify-center gap-4 sm:gap-6">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={1200} format="comma" />
-                </div>
-                <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                  Teachers using PaperGen
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={35000} format="comma" />
-                </div>
-                <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                  Papers generated
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-extrabold leading-none tabular-nums h-9 sm:h-10 flex items-center justify-center whitespace-nowrap">
-                  <CountUp end={99} format="percent" />
-                </div>
-                <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                  Satisfaction rating
-                </div>
-              </div>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild size="lg">
+                <Link to="/login">Get started</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="bg-primary/10 border-primary/60"
+              >
+                <a href="#pricing" onClick={scrollToPricing}>
+                  View pricing
+                </a>
+              </Button>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

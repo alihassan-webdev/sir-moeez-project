@@ -11,6 +11,9 @@ import {
   type User,
   signOut,
   deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword,
 } from "firebase/auth";
 import {
   doc,
@@ -30,6 +33,7 @@ import {
   type Institute,
 } from "@/lib/account";
 import { Upload, Trash2 } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,11 +55,14 @@ export default function Profile() {
   const [deleting, setDeleting] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const navigate = useNavigate();
 
   const canConfirmDelete = React.useMemo(
-    () => confirmText.trim().toUpperCase() === "DELETE",
-    [confirmText],
+    () =>
+      confirmText.trim().toUpperCase() === "DELETE" &&
+      password.trim().length > 0,
+    [confirmText, password],
   );
 
   const [form, setForm] = React.useState({
@@ -88,7 +95,10 @@ export default function Profile() {
   }, [isEditing]);
 
   React.useEffect(() => {
-    if (!confirmOpen) setConfirmText("");
+    if (!confirmOpen) {
+      setConfirmText("");
+      setPassword("");
+    }
   }, [confirmOpen]);
 
   React.useEffect(() => {
@@ -231,6 +241,70 @@ export default function Profile() {
     }
   };
 
+  // Change password states
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [changingPassword, setChangingPassword] = React.useState(false);
+
+  const validatePasswordForm = () => {
+    if (!currentPassword || !newPassword) {
+      toast({ title: "All fields are required", variant: "destructive" });
+      return false;
+    }
+    if (newPassword.length < 6) {
+      toast({
+        title: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleChangePassword = async () => {
+    if (!user?.uid || !auth.currentUser) {
+      toast({ title: "Not authenticated", variant: "destructive" });
+      return;
+    }
+    if (!validatePasswordForm()) return;
+    setChangingPassword(true);
+    try {
+      const email = auth.currentUser.email;
+      if (!email) throw new Error("Missing email on account");
+      const cred = EmailAuthProvider.credential(email, currentPassword);
+      await reauthenticateWithCredential(auth.currentUser, cred);
+      await updatePassword(auth.currentUser, newPassword);
+      toast({ title: "Password updated successfully" });
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err: any) {
+      console.error(err);
+      const msg = err?.code || err?.message || "";
+      if (
+        String(msg).includes("auth/wrong-password") ||
+        String(msg).toLowerCase().includes("incorrect")
+      ) {
+        toast({ title: "Incorrect current password", variant: "destructive" });
+      } else if (
+        String(msg).includes("recent") ||
+        String(msg).includes("auth/requires-recent-login")
+      ) {
+        toast({
+          title: "Session expired, please re-login and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Failed to update password",
+          description: err?.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const onCancel = () => {
     setForm(lastSavedRef.current);
     setIsEditing(false);
@@ -292,113 +366,142 @@ export default function Profile() {
 
           <div>
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
-              <h2 className="text-2xl font-bold">My Profile</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {exists ? "Your saved details." : "Set up your profile."}
-              </p>
-
-              <form
-                className="mt-4 space-y-4 max-w-xl"
-                onSubmit={(e) => e.preventDefault()}
-              >
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Full name</Label>
-                  <Input
-                    id="name"
-                    value={form.name}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, name: e.target.value }))
-                    }
-                    placeholder="Your name"
-                    disabled={!isEditing}
-                    className={
-                      !isEditing
-                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
-                        : undefined
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={form.phone}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, phone: e.target.value }))
-                    }
-                    placeholder="03XX-XXXXXXX"
-                    disabled={!isEditing}
-                    className={
-                      !isEditing
-                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
-                        : undefined
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="institute">Institute name</Label>
-                  <Input
-                    id="institute"
-                    value={form.instituteName}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, instituteName: e.target.value }))
-                    }
-                    placeholder="Your institute name"
-                    disabled={!isEditing}
-                    className={
-                      !isEditing
-                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
-                        : undefined
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="logo">Institute Logo</Label>
-                  <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
                     {form.instituteLogo ? (
-                      <img
+                      <AvatarImage
                         src={form.instituteLogo}
-                        alt="Institute Logo Preview"
-                        className="h-16 w-16 rounded-md border border-input object-contain bg-white"
+                        alt={form.name || "avatar"}
                       />
                     ) : (
-                      <div className="h-16 w-16 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">
-                        60×60
-                      </div>
+                      <AvatarFallback>
+                        {(form.name || user?.email || "")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </AvatarFallback>
                     )}
-                    {isEditing && (
-                      <>
-                        <input
-                          id="logo"
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/png,image/jpeg"
-                          onChange={handleLogoChange}
-                          className="hidden"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="inline-flex items-center gap-2"
-                        >
-                          <Upload className="h-4 w-4" />
-                          Choose file
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                  {isEditing && (
-                    <p className="text-xs text-muted-foreground">
-                      Max 300KB. PNG or JPG recommended.
+                  </Avatar>
+                  <div>
+                    <h2 className="text-2xl font-semibold">
+                      {form.name || user?.displayName || "My Profile"}
+                    </h2>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {user?.email}
                     </p>
-                  )}
+                  </div>
+                </div>
+                {/* header Edit Profile button moved to bottom */}
+              </div>
+
+              <form
+                className="mt-6 grid gap-6 max-w-2xl"
+                onSubmit={(e) => e.preventDefault()}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Full name</Label>
+                    <Input
+                      id="name"
+                      value={form.name}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, name: e.target.value }))
+                      }
+                      placeholder="Your name"
+                      disabled={!isEditing}
+                      className={
+                        !isEditing
+                          ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
+                          : undefined
+                      }
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      value={form.phone}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, phone: e.target.value }))
+                      }
+                      placeholder="03XX-XXXXXXX"
+                      disabled={!isEditing}
+                      className={
+                        !isEditing
+                          ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
+                          : undefined
+                      }
+                    />
+                  </div>
                 </div>
 
-                <div className="pt-2 flex gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                  <div className="grid gap-2">
+                    <Label htmlFor="institute">Institute name</Label>
+                    <Input
+                      id="institute"
+                      value={form.instituteName}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          instituteName: e.target.value,
+                        }))
+                      }
+                      placeholder="Your institute name"
+                      disabled={!isEditing}
+                      className={
+                        !isEditing
+                          ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
+                          : undefined
+                      }
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="logo">Institute Logo</Label>
+                    <div className="flex items-center gap-4">
+                      {form.instituteLogo ? (
+                        <img
+                          src={form.instituteLogo}
+                          alt="Institute Logo Preview"
+                          className="h-20 w-20 rounded-md border border-input object-contain bg-white"
+                        />
+                      ) : (
+                        <div className="h-20 w-20 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">
+                          60×60
+                        </div>
+                      )}
+                      {isEditing && (
+                        <>
+                          <input
+                            id="logo"
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg"
+                            onChange={handleLogoChange}
+                            className="hidden"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="inline-flex items-center gap-2"
+                          >
+                            <Upload className="h-4 w-4" /> Choose file
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    {isEditing && (
+                      <p className="text-xs text-muted-foreground">
+                        Max 300KB. PNG or JPG recommended.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-2 flex gap-3">
                   {isEditing ? (
                     <>
                       <Button
@@ -406,14 +509,15 @@ export default function Profile() {
                         onClick={onSave}
                         disabled={saving || !isFormValid}
                         variant="default"
+                        className="px-6"
                       >
                         {saving ? (
                           <span className="inline-flex items-center gap-2">
-                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />{" "}
                             Saving...
                           </span>
                         ) : (
-                          "Save"
+                          "Save Changes"
                         )}
                       </Button>
                       <Button
@@ -426,58 +530,165 @@ export default function Profile() {
                       </Button>
                     </>
                   ) : (
-                    <Button type="button" variant="default" onClick={onEdit}>
-                      Edit
+                    <Button
+                      type="button"
+                      variant="default"
+                      onClick={onEdit}
+                      className="px-6"
+                    >
+                      Edit Profile
                     </Button>
                   )}
                 </div>
               </form>
             </div>
 
+            {/* Change Password */}
+            <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-muted rounded-md">
+                  {/* decorative lock icon */}
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
+                    <path d="M17 8V7a5 5 0 0 0-10 0v1" />
+                    <rect x="3" y="8" width="18" height="13" rx="2" ry="2" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Change Password</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Secure your account by updating your password. You will be
+                    asked to confirm your current password.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 max-w-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-1">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input
+                      id="current-password"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter current password"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Required to confirm your identity.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-1">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Minimum 6 characters"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Use 6 or more characters. Avoid common words.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-start">
+                  <Button
+                    variant="default"
+                    onClick={handleChangePassword}
+                    disabled={changingPassword}
+                    className="px-6"
+                  >
+                    {changingPassword ? (
+                      <span className="inline-flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />{" "}
+                        Updating...
+                      </span>
+                    ) : (
+                      "Save Password"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             {/* Danger Zone */}
             <div className="rounded-xl bg-white p-6 border border-destructive/30 card-yellow-shadow mt-6">
               <h3 className="text-lg font-semibold text-destructive">
-                Delete Profile
+                Delete Account
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                This will permanently delete your profile and all your results.
-                This action cannot be undone.
+                This will permanently delete your profile, results history, and
+                login credentials. This action cannot be undone.
               </p>
               <div className="mt-3">
                 <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                   <AlertDialogTrigger asChild>
                     <Button
                       variant="destructive"
-                      className="inline-flex items-center gap-2"
+                      className="inline-flex items-center gap-2 w-full font-bold justify-center"
                     >
-                      <Trash2 className="h-4 w-4" /> Delete Profile
+                      <Trash2 className="h-4 w-4" /> Delete My Account
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete your profile?</AlertDialogTitle>
+                      <AlertDialogTitle>Delete Account?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will remove your profile and all generated results.
-                        This action cannot be undone. Type DELETE to confirm.
+                        This will permanently delete your profile, results
+                        history, and login credentials. This action cannot be
+                        undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <div className="mt-4">
-                      <Label
-                        htmlFor="profile-delete-confirm"
-                        className="sr-only"
-                      >
-                        Type DELETE to confirm
-                      </Label>
-                      <Input
-                        id="profile-delete-confirm"
-                        placeholder='Type "DELETE" to confirm'
-                        value={confirmText}
-                        onChange={(e) => setConfirmText(e.target.value)}
-                        autoComplete="off"
-                      />
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        Enter DELETE in uppercase to enable deletion.
-                      </p>
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <Label
+                          htmlFor="profile-delete-confirm"
+                          className="sr-only"
+                        >
+                          Type DELETE to confirm
+                        </Label>
+                        <Input
+                          id="profile-delete-confirm"
+                          placeholder='Type "DELETE" to confirm'
+                          value={confirmText}
+                          onChange={(e) => setConfirmText(e.target.value)}
+                          autoComplete="off"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Enter DELETE in uppercase to enable deletion.
+                        </p>
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="profile-delete-password"
+                          className="sr-only"
+                        >
+                          Confirm password
+                        </Label>
+                        <Input
+                          id="profile-delete-password"
+                          type="password"
+                          placeholder="Confirm your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          autoComplete="current-password"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Re-enter your account password to proceed.
+                        </p>
+                      </div>
                     </div>
                     <AlertDialogFooter>
                       <AlertDialogCancel disabled={deleting}>
@@ -498,30 +709,47 @@ export default function Profile() {
                           }
                           setDeleting(true);
                           try {
-                            // 1) Delete subcollection results in batches of 500
+                            const uid = user.uid;
+                            // Re-authenticate with password
+                            const email = user.email;
+                            if (!email)
+                              throw new Error("Missing email on user account");
+                            const cred = EmailAuthProvider.credential(
+                              email,
+                              password,
+                            );
+                            if (!auth.currentUser)
+                              throw new Error("Not authenticated");
+                            await reauthenticateWithCredential(
+                              auth.currentUser,
+                              cred,
+                            );
+
+                            // Delete subcollection results in batches
                             const colRef = collection(
                               db,
                               "users",
-                              user.uid,
+                              uid,
                               "results",
                             );
                             let snap = await getDocs(colRef);
                             while (!snap.empty) {
                               const batch = writeBatch(db);
-                              let count = 0;
-                              snap.docs.forEach((d) => {
-                                batch.delete(d.ref);
-                                count++;
-                              });
+                              snap.docs.forEach((d) => batch.delete(d.ref));
                               await batch.commit();
-                              if (count < 500) break;
                               snap = await getDocs(colRef);
                             }
-                            // 2) Delete user document
-                            await deleteDoc(doc(db, "users", user.uid));
-                            // 3) Clear local cached data
-                            clearProfile(user.uid);
-                            clearInstitute(user.uid);
+                            // Delete user document
+                            await deleteDoc(doc(db, "users", uid));
+
+                            // Delete Firebase Auth user account
+                            if (auth.currentUser) {
+                              await deleteUser(auth.currentUser);
+                            }
+
+                            // Clear local cached data
+                            clearProfile(uid);
+                            clearInstitute(uid);
                             lastSavedRef.current = {
                               name: "",
                               phone: "",
@@ -535,27 +763,42 @@ export default function Profile() {
                               instituteLogo: undefined,
                             });
                             setExists(false);
-                            // 4) Try to delete auth user (may require re-auth)
-                            try {
-                              if (auth.currentUser)
-                                await deleteUser(auth.currentUser);
-                            } catch {}
-                            // 5) Sign out and redirect
+
+                            // Sign out and redirect with success toast
                             try {
                               await signOut(auth);
                             } catch {}
+                            toast({
+                              title:
+                                "Your account and all data have been deleted successfully.",
+                            });
                             navigate("/login", { replace: true });
                           } catch (e: any) {
                             console.error(e);
-                            toast({
-                              title: "Delete failed",
-                              description: e?.message || "Please try again.",
-                              variant: "destructive",
-                            });
+                            const code = e?.code || e?.message || "";
+                            if (
+                              String(code).includes("recent") ||
+                              String(code).includes(
+                                "auth/requires-recent-login",
+                              )
+                            ) {
+                              toast({
+                                title:
+                                  "Session expired, please re-login and try again.",
+                                variant: "destructive",
+                              });
+                            } else {
+                              toast({
+                                title: "Delete failed",
+                                description: e?.message || "Please try again.",
+                                variant: "destructive",
+                              });
+                            }
                           } finally {
                             setDeleting(false);
                             setConfirmOpen(false);
                             setConfirmText("");
+                            setPassword("");
                           }
                         }}
                       >
