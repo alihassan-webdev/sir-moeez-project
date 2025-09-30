@@ -25,7 +25,7 @@ export function ToolLock({
             <Button
               asChild
               size="sm"
-              className="h-9 rounded-full bg-[#2563eb] px-4 text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)] transition hover:bg-[#1d4ed8]"
+              className="h-9 rounded-full bg-[#2563eb] px-4 text-white transition hover:bg-[#1d4ed8]"
             >
               <Link to="/my-profile">Go to Profile</Link>
             </Button>
