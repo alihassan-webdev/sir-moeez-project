@@ -145,7 +145,10 @@ export default function SubscriptionPage() {
                     <div className="h-12">
                       {typeof price === "number" ? (
                         <>
-                          <AnimatedPrice value={price} className="text-4xl font-extrabold text-primary" />
+                          <AnimatedPrice
+                            value={price}
+                            className="text-4xl font-extrabold text-primary"
+                          />
                           <p className="-mt-1 text-xs font-medium text-muted-foreground">
                             Per user/month
                           </p>

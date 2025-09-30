@@ -165,7 +165,14 @@ export default function ResultDetail() {
                 const formatDate = (ts?: number) => {
                   if (!ts) return "";
                   try {
-                    return new Date(ts).toLocaleString(undefined, { hour12: true, hour: "numeric", minute: "2-digit", year: "numeric", month: "short", day: "numeric" });
+                    return new Date(ts).toLocaleString(undefined, {
+                      hour12: true,
+                      hour: "numeric",
+                      minute: "2-digit",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    });
                   } catch {
                     return new Date(ts).toLocaleString();
                   }

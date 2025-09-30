@@ -287,17 +287,24 @@ export default function QnA() {
     setLoading(true);
     try {
       if (!file) {
-        toast({ title: "Attach a PDF", description: "Please select a chapter." });
+        toast({
+          title: "Attach a PDF",
+          description: "Please select a chapter.",
+        });
         setLoading(false);
         return;
       }
       if (!qaCount || qaCount < 1 || qaCount > 200) {
-        toast({ title: "Invalid count", description: "Enter 1–200 Q&A pairs." });
+        toast({
+          title: "Invalid count",
+          description: "Enter 1–200 Q&A pairs.",
+        });
         setLoading(false);
         return;
       }
 
-      const { makeKey, getCached, setCached, getLatest, setLatest } = await import("@/lib/cache");
+      const { makeKey, getCached, setCached, getLatest, setLatest } =
+        await import("@/lib/cache");
       const uid = "anon";
 
       const cacheKey = makeKey([
@@ -320,13 +327,20 @@ export default function QnA() {
           form.append("query", q);
           try {
             const res = await withTimeout(
-              fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+              fetch("/.netlify/functions/proxy", {
+                method: "POST",
+                body: form,
+                headers: { Accept: "application/json" },
+              }),
               7000,
             );
             if (res && res.ok) {
               const ct = res.headers.get("content-type") || "";
               const txt = ct.includes("application/json")
-                ? String((await res.json().catch(async () => await res.text())) ?? "")
+                ? String(
+                    (await res.json().catch(async () => await res.text())) ??
+                      "",
+                  )
                 : await res.text();
               setResult(txt);
               setCached(cacheKey, txt);
@@ -347,7 +361,11 @@ export default function QnA() {
       form.append("query", q);
 
       const attempt = await withTimeout(
-        fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+        fetch("/.netlify/functions/proxy", {
+          method: "POST",
+          body: form,
+          headers: { Accept: "application/json" },
+        }),
         10000,
       ).catch(() => null as any);
 
@@ -355,10 +373,21 @@ export default function QnA() {
       if (!attempt.ok) return;
 
       const contentType = attempt.headers.get("content-type") || "";
-      const stripAnswers = (s: string) => s.replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "").replace(/\n{3,}/g, "\n\n");
+      const stripAnswers = (s: string) =>
+        s
+          .replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "")
+          .replace(/\n{3,}/g, "\n\n");
       if (contentType.includes("application/json")) {
-        const json = await attempt.json().catch(async () => await attempt.text());
-        const text = typeof json === "string" ? json : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+        const json = await attempt
+          .json()
+          .catch(async () => await attempt.text());
+        const text =
+          typeof json === "string"
+            ? json
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         const finalText = stripAnswers(String(text));
         setResult(finalText);
         setCached(cacheKey, finalText);

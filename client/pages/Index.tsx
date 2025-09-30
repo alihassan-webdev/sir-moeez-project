@@ -808,9 +808,8 @@ export default function Index() {
     }
 
     // Compute a stable cache key based on the file content and query
-    const [{ makeKey, getCached, setCached, getLatest, setLatest }] = await Promise.all([
-      import("@/lib/cache"),
-    ]);
+    const [{ makeKey, getCached, setCached, getLatest, setLatest }] =
+      await Promise.all([import("@/lib/cache")]);
     const buffer = await theFile.arrayBuffer();
     const hashBuf = await crypto.subtle.digest("SHA-256", buffer);
     const hashArr = Array.from(new Uint8Array(hashBuf));
@@ -830,13 +829,19 @@ export default function Index() {
         form.append("query", q);
         try {
           const res = await withTimeout(
-            fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+            fetch("/.netlify/functions/proxy", {
+              method: "POST",
+              body: form,
+              headers: { Accept: "application/json" },
+            }),
             10000,
           );
           if (res && res.ok) {
             const ct = res.headers.get("content-type") || "";
             const txt = ct.includes("application/json")
-              ? String((await res.json().catch(async () => await res.text())) ?? "")
+              ? String(
+                  (await res.json().catch(async () => await res.text())) ?? "",
+                )
               : await res.text();
             setResult(txt);
             setCached(cacheKey, txt);
@@ -859,7 +864,11 @@ export default function Index() {
       setLoading(true);
 
       const attempt = await withTimeout(
-        fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+        fetch("/.netlify/functions/proxy", {
+          method: "POST",
+          body: form,
+          headers: { Accept: "application/json" },
+        }),
         15000,
       ).catch(() => null as any);
 
@@ -873,11 +882,16 @@ export default function Index() {
       const contentType = attempt.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         try {
-          const json = await attempt.json().catch(async () => await attempt.text());
+          const json = await attempt
+            .json()
+            .catch(async () => await attempt.text());
           const text =
             typeof json === "string"
               ? json
-              : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json, null, 2));
+              : (json?.questions ??
+                json?.result ??
+                json?.message ??
+                JSON.stringify(json, null, 2));
           const out = String(text);
           setResult(out);
           setCached(cacheKey, out);

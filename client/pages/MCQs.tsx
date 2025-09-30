@@ -339,7 +339,10 @@ Use concise, exam-style wording suitable for classroom tests.`;
     setLoading(true);
     try {
       if (!file) {
-        toast({ title: "Attach a PDF", description: "Please select or upload a PDF chapter." });
+        toast({
+          title: "Attach a PDF",
+          description: "Please select or upload a PDF chapter.",
+        });
         setLoading(false);
         return;
       }
@@ -349,7 +352,8 @@ Use concise, exam-style wording suitable for classroom tests.`;
         return;
       }
 
-      const { makeKey, getCached, setCached, getLatest, setLatest } = await import("@/lib/cache");
+      const { makeKey, getCached, setCached, getLatest, setLatest } =
+        await import("@/lib/cache");
       const uid = (auth.currentUser && auth.currentUser.uid) || "anon";
       const cacheKey = makeKey([
         "v1",
@@ -373,7 +377,11 @@ Use concise, exam-style wording suitable for classroom tests.`;
           form.append("query", q);
           try {
             const res = await withTimeout(
-              fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+              fetch("/.netlify/functions/proxy", {
+                method: "POST",
+                body: form,
+                headers: { Accept: "application/json" },
+              }),
               7000,
             );
             if (res && res.ok) {
@@ -402,7 +410,11 @@ Use concise, exam-style wording suitable for classroom tests.`;
       form.append("query", q);
 
       const attempt = await withTimeout(
-        fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+        fetch("/.netlify/functions/proxy", {
+          method: "POST",
+          body: form,
+          headers: { Accept: "application/json" },
+        }),
         10000,
       ).catch(() => null as any);
 
@@ -417,11 +429,16 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
       const contentType = attempt.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
-        const json = await attempt.json().catch(async () => await attempt.text());
+        const json = await attempt
+          .json()
+          .catch(async () => await attempt.text());
         const text =
           typeof json === "string"
             ? json
-            : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json));
+            : (json?.questions ??
+              json?.result ??
+              json?.message ??
+              JSON.stringify(json));
         const finalText = String(text);
         setResult(finalText);
         setCached(cacheKey, finalText);

@@ -53,7 +53,8 @@ export const handler = async (event) => {
     try {
       const headers = {};
       if (event.headers) {
-        for (const k of Object.keys(event.headers)) headers[k] = event.headers[k];
+        for (const k of Object.keys(event.headers))
+          headers[k] = event.headers[k];
       }
       delete headers.host;
       delete headers["content-length"];
@@ -91,7 +92,8 @@ export const handler = async (event) => {
       try {
         const u = new URL(base);
         const path = u.pathname.replace(/\/+$/, "");
-        if (!/\/generate-questions$/.test(path)) u.pathname = `${path}/generate-questions`;
+        if (!/\/generate-questions$/.test(path))
+          u.pathname = `${path}/generate-questions`;
         url = u.toString();
       } catch {
         url = String(base).replace(/\/+$/, "") + "/generate-questions";
