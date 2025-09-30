@@ -17,7 +17,7 @@ export function ToolLock({
   return (
     <div className={cn("relative", className)}>
       {locked && (
-        <div className="mb-3 rounded-2xl border border-[#f4d87b] bg-[#fff7dc] px-4 sm:px-5 py-2.5 shadow-[0_8px_18px_rgba(231,176,22,0.18)]">
+        <div className="mb-3 rounded-2xl border border-[#f4d87b] bg-[#fff7dc] px-4 sm:px-5 py-2.5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-[#8a6d1a]">
               Please complete your profile (name, phone, institute name, and logo) before generating exams.
