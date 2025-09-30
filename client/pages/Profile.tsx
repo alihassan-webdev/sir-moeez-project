@@ -453,9 +453,7 @@ export default function Profile() {
                         Cancel
                       </Button>
                     </>
-                  ) : (
-                    <Button type="button" variant="default" onClick={onEdit} className="px-6">Edit</Button>
-                  )}
+                  ) : null}
                 </div>
               </form>
             </div>
