@@ -690,32 +690,6 @@ export default function Index() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
   const [latestTitle, setLatestTitle] = useState<string>("");
-
-  const canReset = useMemo(
-    () =>
-      Boolean(
-        selectedClass ||
-          selectedSubjectName ||
-          selectedSubjectPath ||
-          selectedChapterPaths.length ||
-          totalMarks != null ||
-          promptText ||
-          query ||
-          file ||
-          result,
-      ),
-    [
-      selectedClass,
-      selectedSubjectName,
-      selectedSubjectPath,
-      selectedChapterPaths,
-      totalMarks,
-      promptText,
-      query,
-      file,
-      result,
-    ],
-  );
   const lastSavedRef = useRef<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
