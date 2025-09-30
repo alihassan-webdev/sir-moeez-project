@@ -368,11 +368,7 @@ export default function Profile() {
                     <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
-                <div>
-                  <Button type="button" variant="outline" onClick={onEdit} className="px-4">
-                    Edit Profile
-                  </Button>
-                </div>
+                {/* header Edit Profile button moved to bottom */}
               </div>
 
               <form
