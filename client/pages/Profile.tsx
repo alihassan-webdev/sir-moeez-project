@@ -480,7 +480,7 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex justify-end">
+                <div className="mt-6 flex justify-start">
                   <Button variant="default" onClick={handleChangePassword} disabled={changingPassword} className="px-6">
                     {changingPassword ? (
                       <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" /> Updating...</span>
