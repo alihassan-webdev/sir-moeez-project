@@ -119,3 +119,15 @@ export function saveInstitute(inst: Institute) {
   const id = getUserId();
   localStorage.setItem(INSTITUTE_KEY_PREFIX + id, JSON.stringify(inst));
 }
+
+export function clearProfile(userId?: string) {
+  const id = userId ?? getUserId();
+  if (!id || id === "anonymous") return;
+  localStorage.removeItem(PROFILE_KEY_PREFIX + id);
+}
+
+export function clearInstitute(userId?: string) {
+  const id = userId ?? getUserId();
+  if (!id || id === "anonymous") return;
+  localStorage.removeItem(INSTITUTE_KEY_PREFIX + id);
+}

@@ -58,12 +58,14 @@ function ExternalPdfSelector({
   onGenerate,
   onReset,
   loading,
+  onResultTitle,
 }: {
   onLoadFile: (f: File | null) => void;
   onSetPrompt: (p: string) => void;
   onGenerate: (prompt?: string) => Promise<void> | void;
   onReset: () => void;
   loading?: boolean;
+  onResultTitle?: (title: string) => void;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -103,6 +105,26 @@ function ExternalPdfSelector({
   const [isMerging, setIsMerging] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const pdfBytesCache = useRef<Map<string, ArrayBuffer>>(new Map());
+
+  const canReset = useMemo(
+    () =>
+      Boolean(
+        selectedClass ||
+          selectedSubjectName ||
+          selectedSubjectPath ||
+          selectedChapterPaths.length ||
+          totalMarks != null ||
+          promptText,
+      ),
+    [
+      selectedClass,
+      selectedSubjectName,
+      selectedSubjectPath,
+      selectedChapterPaths,
+      totalMarks,
+      promptText,
+    ],
+  );
 
   const chapterOptionsForSubject = useMemo(
     () =>
@@ -614,9 +636,15 @@ function ExternalPdfSelector({
                 selectedClass || "",
                 marks,
               );
+              const shortTitle = `${selectedClass ? selectedClass + " • " : ""}${subjectName || "Exam"} — Exam`;
+              onResultTitle?.(shortTitle.slice(0, 80));
               onSetPrompt(generated);
-              setIsLocked(true); // lock all fields
-              await onGenerate(generated);
+              setIsLocked(true);
+              try {
+                await onGenerate(generated);
+              } finally {
+                setIsLocked(false);
+              }
             }}
             className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
           >
@@ -634,7 +662,7 @@ function ExternalPdfSelector({
 
           <Button
             className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={!isLocked}
+            disabled={!canReset || loading || isLocked}
             onClick={() => {
               setSelectedClass("");
               setSelectedSubjectPath("");
@@ -661,6 +689,7 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
+  const [latestTitle, setLatestTitle] = useState<string>("");
   const lastSavedRef = useRef<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -676,7 +705,11 @@ export default function Index() {
           import("@/lib/account"),
         ]);
         const inst = getInstitute();
-        const title = (query || "Exam Paper").slice(0, 80);
+        const fallbackTitle = (query || "Exam Paper").trim();
+        const title = (latestTitle || fallbackTitle || "Exam Paper").slice(
+          0,
+          80,
+        );
         void saveUserResult({
           examType: "exam",
           title,
@@ -688,7 +721,7 @@ export default function Index() {
         });
       } catch {}
     })();
-  }, [result, query]);
+  }, [result, query, latestTitle]);
 
   useEffect(() => {
     try {
@@ -739,6 +772,7 @@ export default function Index() {
     setQuery("");
     setError(null);
     setResult(null);
+    setLatestTitle("");
     const el = fileInputRef.current;
     if (el) el.value = "";
   };
@@ -1055,6 +1089,7 @@ export default function Index() {
                     }
                     onReset={onReset}
                     loading={loading}
+                    onResultTitle={(title) => setLatestTitle(title)}
                   />
                 </div>
 

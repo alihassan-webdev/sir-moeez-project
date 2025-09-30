@@ -22,7 +22,13 @@ import {
   writeBatch,
   deleteDoc,
 } from "firebase/firestore";
-import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
+import {
+  getInstitute,
+  saveInstitute,
+  clearInstitute,
+  clearProfile,
+  type Institute,
+} from "@/lib/account";
 import { Upload, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -513,12 +519,28 @@ export default function Profile() {
                             }
                             // 2) Delete user document
                             await deleteDoc(doc(db, "users", user.uid));
-                            // 3) Try to delete auth user (may require re-auth)
+                            // 3) Clear local cached data
+                            clearProfile(user.uid);
+                            clearInstitute(user.uid);
+                            lastSavedRef.current = {
+                              name: "",
+                              phone: "",
+                              instituteName: "",
+                              instituteLogo: undefined,
+                            };
+                            setForm({
+                              name: "",
+                              phone: "",
+                              instituteName: "",
+                              instituteLogo: undefined,
+                            });
+                            setExists(false);
+                            // 4) Try to delete auth user (may require re-auth)
                             try {
                               if (auth.currentUser)
                                 await deleteUser(auth.currentUser);
                             } catch {}
-                            // 4) Sign out and redirect
+                            // 5) Sign out and redirect
                             try {
                               await signOut(auth);
                             } catch {}
