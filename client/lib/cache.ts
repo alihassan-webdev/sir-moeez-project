@@ -35,3 +35,25 @@ export function setCached(key: string, value: string): void {
     localStorage.setItem(key, JSON.stringify(obj));
   } catch {}
 }
+
+// Latest-success helpers per user + tool type
+export function latestKey(type: "mcqs" | "qna" | "exam", userId?: string) {
+  const uid = (userId || "anon").trim() || "anon";
+  return makeKey(["latest", type, uid]);
+}
+
+export function getLatest(
+  type: "mcqs" | "qna" | "exam",
+  userId?: string,
+  maxAgeMs = DEFAULT_TTL_MS,
+): string | null {
+  return getCached(latestKey(type, userId), maxAgeMs);
+}
+
+export function setLatest(
+  type: "mcqs" | "qna" | "exam",
+  value: string,
+  userId?: string,
+): void {
+  setCached(latestKey(type, userId), value);
+}
