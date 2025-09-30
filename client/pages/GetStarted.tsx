@@ -193,11 +193,9 @@ export default function GetStarted() {
                         aria-hidden="true"
                       />
                     </div>
-                    <div className="text-base font-semibold">
-                      Result History
-                    </div>
+                    <div className="text-base font-semibold">Results</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      Review and download your past results
+                      View and download your exam results
                     </div>
                   </div>
                 </Link>
