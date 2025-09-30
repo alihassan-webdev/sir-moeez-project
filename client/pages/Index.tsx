@@ -49,7 +49,7 @@ const MAX_SIZE = 15 * 1024 * 1024; // 15MB
 // API endpoint selection: env override -> Netlify serverless proxy (always)
 const API_URL = (() => {
   const env = import.meta.env.VITE_PREDICT_ENDPOINT as string | undefined;
-  return env && env.trim() ? env : "/.netlify/functions/proxy";
+  return env && env.trim() ? env : "/api/proxy";
 })();
 
 function ExternalPdfSelector({
@@ -829,7 +829,7 @@ export default function Index() {
         form.append("query", q);
         try {
           const res = await withTimeout(
-            fetch("/.netlify/functions/proxy", {
+            fetch("/api/proxy", {
               method: "POST",
               body: form,
               headers: { Accept: "application/json" },
