@@ -162,7 +162,22 @@ export default function ResultDetail() {
                 </div>
               )}
               {items.map((it) => {
-                const date = it.ts ? new Date(it.ts).toLocaleString() : "";
+                const formatDate = (ts?: number) => {
+                  if (!ts) return "";
+                  try {
+                    return new Date(ts).toLocaleString(undefined, {
+                      hour12: true,
+                      hour: "numeric",
+                      minute: "2-digit",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    });
+                  } catch {
+                    return new Date(ts).toLocaleString();
+                  }
+                };
+                const date = formatDate(it.ts);
                 const title =
                   it.title && it.title.trim().length > 0
                     ? it.title

@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import AnimatedPrice from "@/components/ui/animated-price";
 
 export default function SubscriptionPage() {
   const [sub, setSub] = React.useState(getSubscription());
@@ -144,9 +145,10 @@ export default function SubscriptionPage() {
                     <div className="h-12">
                       {typeof price === "number" ? (
                         <>
-                          <div className="text-3xl font-extrabold text-primary">
-                            {formatPKR(price)}
-                          </div>
+                          <AnimatedPrice
+                            value={price}
+                            className="text-4xl font-extrabold text-primary"
+                          />
                           <p className="-mt-1 text-xs font-medium text-muted-foreground">
                             Per user/month
                           </p>

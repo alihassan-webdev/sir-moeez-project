@@ -336,7 +336,6 @@ Use concise, exam-style wording suitable for classroom tests.`;
   };
 
   const runSubmit = async () => {
-    setResult(null);
     setLoading(true);
     try {
       if (!file) {
@@ -353,7 +352,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
         return;
       }
 
-      const { makeKey, getCached, setCached } = await import("@/lib/cache");
+      const { makeKey, getCached, setCached, getLatest, setLatest } =
+        await import("@/lib/cache");
+      const uid = (auth.currentUser && auth.currentUser.uid) || "anon";
       const cacheKey = makeKey([
         "v1",
         "mcqs",
@@ -362,76 +363,75 @@ Use concise, exam-style wording suitable for classroom tests.`;
         [...selectedChapterPaths].sort().join(";"),
         mcqCount,
       ]);
+      const latestKeyVal = getLatest("mcqs", uid);
       const cached = getCached(cacheKey);
+
       if (cached) {
         setResult(cached);
         setLoading(false);
+        // Background refresh
+        void (async () => {
+          const q = buildMcqPrompt(mcqCount);
+          const form = new FormData();
+          form.append("pdf", file);
+          form.append("query", q);
+          try {
+            const res = await withTimeout(
+              fetch("/.netlify/functions/proxy", {
+                method: "POST",
+                body: form,
+                headers: { Accept: "application/json" },
+              }),
+              7000,
+            );
+            if (res && res.ok) {
+              const ct = res.headers.get("content-type") || "";
+              const txt = ct.includes("application/json")
+                ? String(
+                    (await res.json().catch(async () => await res.text())) ??
+                      "",
+                  )
+                : await res.text();
+              setResult(txt);
+              setCached(cacheKey, txt);
+              setLatest("mcqs", txt, uid);
+            }
+          } catch {}
+        })();
         return;
       }
+
+      // No exact cache → use latest per type immediately if available
+      if (latestKeyVal) setResult(latestKeyVal);
 
       const q = buildMcqPrompt(mcqCount);
       const form = new FormData();
       form.append("pdf", file);
       form.append("query", q);
 
-      const initialTimeoutMs = 45000;
-      const retryTimeoutMs = 65000;
-      const sendTo = async (urlStr: string, timeoutMs: number) => {
-        try {
-          const res = await withTimeout(
-            fetch(urlStr, {
-              method: "POST",
-              body: form,
-              headers: { Accept: "application/json" },
-            }),
-            timeoutMs,
-          );
-          return res;
-        } catch {
-          return null;
-        }
-      };
+      const attempt = await withTimeout(
+        fetch("/.netlify/functions/proxy", {
+          method: "POST",
+          body: form,
+          headers: { Accept: "application/json" },
+        }),
+        10000,
+      ).catch(() => null as any);
 
-      let res: Response | null = null;
-      const tried: string[] = [];
-
-      // Try Netlify function proxy first (if available), then direct server endpoint(s)
-      const proxies = ["/.netlify/functions/proxy"];
-      for (const p of proxies) {
-        tried.push(p);
-        const attempt = await sendTo(p, retryTimeoutMs);
-        if (attempt && attempt.ok) {
-          res = attempt;
-          break;
-        }
+      if (!attempt) {
+        // Keep whatever cached/latest was shown
+        return;
+      }
+      if (!attempt.ok) {
+        // Keep cached/latest
+        return;
       }
 
-      // If proxy failed, try configured API_URL (VITE_PREDICT_ENDPOINT) and then direct server path
-      if (!res) {
-        const directCandidates = [API_URL, "/api/generate-questions"];
-        for (const d of directCandidates) {
-          if (!d) continue;
-          tried.push(d);
-          const attempt = await sendTo(d, retryTimeoutMs);
-          if (attempt && attempt.ok) {
-            res = attempt;
-            break;
-          }
-        }
-      }
-
-      if (!res) {
-        console.warn("All generate attempts failed:", tried);
-        throw new Error("Network error. Please try again.");
-      }
-
-      if (!res.ok) {
-        const t = await res.text().catch(() => "");
-        throw new Error(t || `HTTP ${res.status}`);
-      }
-      const contentType = res.headers.get("content-type") || "";
+      const contentType = attempt.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
-        const json = await res.json().catch(async () => await res.text());
+        const json = await attempt
+          .json()
+          .catch(async () => await attempt.text());
         const text =
           typeof json === "string"
             ? json
@@ -442,14 +442,13 @@ Use concise, exam-style wording suitable for classroom tests.`;
         const finalText = String(text);
         setResult(finalText);
         setCached(cacheKey, finalText);
+        setLatest("mcqs", finalText, uid);
       } else {
-        const text = await res.text();
+        const text = await attempt.text();
         setResult(text);
         setCached(cacheKey, text);
+        setLatest("mcqs", text, uid);
       }
-    } catch (_err: any) {
-      // Silent failure; background retries already attempted via fallbacks
-      setResult(null);
     } finally {
       setLoading(false);
     }
