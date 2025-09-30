@@ -452,9 +452,27 @@ export default function Profile() {
                       <AlertDialogTitle>Delete your profile?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This will remove your profile and all generated results.
-                        This action cannot be undone.
+                        This action cannot be undone. Type DELETE to confirm.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+                    <div className="mt-4">
+                      <Label
+                        htmlFor="profile-delete-confirm"
+                        className="sr-only"
+                      >
+                        Type DELETE to confirm
+                      </Label>
+                      <Input
+                        id="profile-delete-confirm"
+                        placeholder='Type "DELETE" to confirm'
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        autoComplete="off"
+                      />
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Enter DELETE in uppercase to enable deletion.
+                      </p>
+                    </div>
                     <AlertDialogFooter>
                       <AlertDialogCancel disabled={deleting}>
                         Cancel
