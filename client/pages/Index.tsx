@@ -780,7 +780,9 @@ export default function Index() {
     const buffer = await theFile.arrayBuffer();
     const hashBuf = await crypto.subtle.digest("SHA-256", buffer);
     const hashArr = Array.from(new Uint8Array(hashBuf));
-    const fileHash = hashArr.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const fileHash = hashArr
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
     const cacheKey = makeKey(["v1", "exam", fileHash, q]);
     const cached = getCached(cacheKey);
     if (cached) {

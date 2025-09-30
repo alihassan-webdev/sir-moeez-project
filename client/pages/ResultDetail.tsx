@@ -2,10 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import {
-  examTypeLabels,
-  type ExamTypeSlug as ExamType,
-} from "@/lib/results";
+import { examTypeLabels, type ExamTypeSlug as ExamType } from "@/lib/results";
 import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft, Trash2 } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
@@ -166,7 +163,10 @@ export default function ResultDetail() {
               )}
               {items.map((it) => {
                 const date = it.ts ? new Date(it.ts).toLocaleString() : "";
-                const title = it.title && it.title.trim().length > 0 ? it.title : `${label}`;
+                const title =
+                  it.title && it.title.trim().length > 0
+                    ? it.title
+                    : `${label}`;
                 return (
                   <div
                     key={it.id}
@@ -174,8 +174,12 @@ export default function ResultDetail() {
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="text-base font-extrabold truncate">{title}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{date}</div>
+                        <div className="text-base font-extrabold truncate">
+                          {title}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {date}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button

@@ -6,8 +6,22 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
-import { onAuthStateChanged, type User, signOut, deleteUser } from "firebase/auth";
-import { doc, onSnapshot, setDoc, getDoc, collection, getDocs, writeBatch, deleteDoc } from "firebase/firestore";
+import {
+  onAuthStateChanged,
+  type User,
+  signOut,
+  deleteUser,
+} from "firebase/auth";
+import {
+  doc,
+  onSnapshot,
+  setDoc,
+  getDoc,
+  collection,
+  getDocs,
+  writeBatch,
+  deleteDoc,
+} from "firebase/firestore";
 import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
 import { Upload, Trash2 } from "lucide-react";
 import {
@@ -406,14 +420,20 @@ export default function Profile() {
 
             {/* Danger Zone */}
             <div className="rounded-xl bg-white p-6 border border-destructive/30 card-yellow-shadow mt-6">
-              <h3 className="text-lg font-semibold text-destructive">Delete Profile</h3>
+              <h3 className="text-lg font-semibold text-destructive">
+                Delete Profile
+              </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                This will permanently delete your profile and all your results. This action cannot be undone.
+                This will permanently delete your profile and all your results.
+                This action cannot be undone.
               </p>
               <div className="mt-3">
                 <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="inline-flex items-center gap-2">
+                    <Button
+                      variant="destructive"
+                      className="inline-flex items-center gap-2"
+                    >
                       <Trash2 className="h-4 w-4" /> Delete Profile
                     </Button>
                   </AlertDialogTrigger>
@@ -421,22 +441,33 @@ export default function Profile() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete your profile?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will remove your profile and all generated results. This action cannot be undone.
+                        This will remove your profile and all generated results.
+                        This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel disabled={deleting}>
+                        Cancel
+                      </AlertDialogCancel>
                       <AlertDialogAction
                         disabled={deleting}
                         onClick={async () => {
                           if (!user?.uid) {
-                            toast({ title: "Not authenticated", variant: "destructive" });
+                            toast({
+                              title: "Not authenticated",
+                              variant: "destructive",
+                            });
                             return;
                           }
                           setDeleting(true);
                           try {
                             // 1) Delete subcollection results in batches of 500
-                            const colRef = collection(db, "users", user.uid, "results");
+                            const colRef = collection(
+                              db,
+                              "users",
+                              user.uid,
+                              "results",
+                            );
                             let snap = await getDocs(colRef);
                             while (!snap.empty) {
                               const batch = writeBatch(db);
@@ -453,10 +484,13 @@ export default function Profile() {
                             await deleteDoc(doc(db, "users", user.uid));
                             // 3) Try to delete auth user (may require re-auth)
                             try {
-                              if (auth.currentUser) await deleteUser(auth.currentUser);
+                              if (auth.currentUser)
+                                await deleteUser(auth.currentUser);
                             } catch {}
                             // 4) Sign out and redirect
-                            try { await signOut(auth); } catch {}
+                            try {
+                              await signOut(auth);
+                            } catch {}
                             navigate("/login", { replace: true });
                           } catch (e: any) {
                             console.error(e);
