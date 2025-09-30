@@ -25,6 +25,17 @@ export default function Login() {
     return () => unsub();
   }, [navigate]);
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    const previousHeight = document.body.style.height;
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.height = previousHeight;
+    };
+  }, []);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -55,7 +66,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-transparent flex items-start justify-center px-4 pt-14 sm:pt-20">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-primary/10 to-transparent flex items-start justify-center px-4 pt-20 sm:pt-24">
       <div className="w-full max-w-md space-y-3">
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold">Log in</h1>
