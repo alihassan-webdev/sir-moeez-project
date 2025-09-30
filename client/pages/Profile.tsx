@@ -533,6 +533,7 @@ export default function Profile() {
                           } finally {
                             setDeleting(false);
                             setConfirmOpen(false);
+                            setConfirmText("");
                           }
                         }}
                       >
