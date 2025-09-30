@@ -33,6 +33,8 @@ import {
   type Institute,
 } from "@/lib/account";
 import { Upload, Trash2 } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -353,10 +355,30 @@ export default function Profile() {
 
           <div>
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
-              <h2 className="text-2xl font-bold">My Profile</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {exists ? "Your saved details." : "Set up your profile."}
-              </p>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    {form.instituteLogo ? (
+                      <AvatarImage src={form.instituteLogo} alt={form.name || "avatar"} />
+                    ) : (
+                      <AvatarFallback>{(form.name || user?.email || "").slice(0,2).toUpperCase()}</AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div>
+                    <h2 className="text-2xl font-semibold">{form.name || user?.displayName || "My Profile"}</h2>
+                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <Badge variant="outline">Member</Badge>
+                      <span className="text-xs text-muted-foreground">Profile updated {new Date(Number(lastSavedRef.current?.updatedAt ?? Date.now())).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Button type="button" variant="outline" onClick={onEdit} className="px-4">
+                    Edit Profile
+                  </Button>
+                </div>
+              </div>
 
               <form
                 className="mt-6 grid gap-6 max-w-2xl"
