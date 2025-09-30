@@ -359,137 +359,85 @@ export default function Profile() {
               </p>
 
               <form
-                className="mt-4 space-y-4 max-w-xl"
+                className="mt-6 grid gap-6 max-w-2xl"
                 onSubmit={(e) => e.preventDefault()}
               >
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Full name</Label>
-                  <Input
-                    id="name"
-                    value={form.name}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, name: e.target.value }))
-                    }
-                    placeholder="Your name"
-                    disabled={!isEditing}
-                    className={
-                      !isEditing
-                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
-                        : undefined
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={form.phone}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, phone: e.target.value }))
-                    }
-                    placeholder="03XX-XXXXXXX"
-                    disabled={!isEditing}
-                    className={
-                      !isEditing
-                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
-                        : undefined
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="institute">Institute name</Label>
-                  <Input
-                    id="institute"
-                    value={form.instituteName}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, instituteName: e.target.value }))
-                    }
-                    placeholder="Your institute name"
-                    disabled={!isEditing}
-                    className={
-                      !isEditing
-                        ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
-                        : undefined
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="logo">Institute Logo</Label>
-                  <div className="flex items-center gap-4">
-                    {form.instituteLogo ? (
-                      <img
-                        src={form.instituteLogo}
-                        alt="Institute Logo Preview"
-                        className="h-16 w-16 rounded-md border border-input object-contain bg-white"
-                      />
-                    ) : (
-                      <div className="h-16 w-16 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">
-                        60×60
-                      </div>
-                    )}
-                    {isEditing && (
-                      <>
-                        <input
-                          id="logo"
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/png,image/jpeg"
-                          onChange={handleLogoChange}
-                          className="hidden"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="inline-flex items-center gap-2"
-                        >
-                          <Upload className="h-4 w-4" />
-                          Choose file
-                        </Button>
-                      </>
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Full name</Label>
+                    <Input
+                      id="name"
+                      value={form.name}
+                      onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                      placeholder="Your name"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text" : undefined}
+                    />
                   </div>
-                  {isEditing && (
-                    <p className="text-xs text-muted-foreground">
-                      Max 300KB. PNG or JPG recommended.
-                    </p>
-                  )}
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      value={form.phone}
+                      onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                      placeholder="03XX-XXXXXXX"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text" : undefined}
+                    />
+                  </div>
                 </div>
 
-                <div className="pt-2 flex gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                  <div className="grid gap-2">
+                    <Label htmlFor="institute">Institute name</Label>
+                    <Input
+                      id="institute"
+                      value={form.instituteName}
+                      onChange={(e) => setForm((p) => ({ ...p, instituteName: e.target.value }))}
+                      placeholder="Your institute name"
+                      disabled={!isEditing}
+                      className={!isEditing ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text" : undefined}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="logo">Institute Logo</Label>
+                    <div className="flex items-center gap-4">
+                      {form.instituteLogo ? (
+                        <img src={form.instituteLogo} alt="Institute Logo Preview" className="h-20 w-20 rounded-md border border-input object-contain bg-white" />
+                      ) : (
+                        <div className="h-20 w-20 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">60×60</div>
+                      )}
+                      {isEditing && (
+                        <>
+                          <input id="logo" ref={fileInputRef} type="file" accept="image/png,image/jpeg" onChange={handleLogoChange} className="hidden" />
+                          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="inline-flex items-center gap-2">
+                            <Upload className="h-4 w-4" /> Choose file
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    {isEditing && <p className="text-xs text-muted-foreground">Max 300KB. PNG or JPG recommended.</p>}
+                  </div>
+                </div>
+
+                <div className="pt-2 flex gap-3">
                   {isEditing ? (
                     <>
-                      <Button
-                        type="button"
-                        onClick={onSave}
-                        disabled={saving || !isFormValid}
-                        variant="default"
-                      >
+                      <Button type="button" onClick={onSave} disabled={saving || !isFormValid} variant="default" className="px-6">
                         {saving ? (
-                          <span className="inline-flex items-center gap-2">
-                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
-                            Saving...
-                          </span>
+                          <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" /> Saving...</span>
                         ) : (
-                          "Save"
+                          "Save Changes"
                         )}
                       </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                        disabled={saving}
-                      >
+                      <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
                         Cancel
                       </Button>
                     </>
                   ) : (
-                    <Button type="button" variant="default" onClick={onEdit}>
-                      Edit
-                    </Button>
+                    <Button type="button" variant="default" onClick={onEdit} className="px-6">Edit</Button>
                   )}
                 </div>
               </form>
@@ -497,22 +445,32 @@ export default function Profile() {
 
             {/* Change Password */}
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-6">
-              <h3 className="text-lg font-semibold">Change Password</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Update your account password. You will need to enter your current password to confirm.</p>
-              <div className="mt-4 max-w-xl">
-                <div className="grid gap-2">
-                  <Label htmlFor="current-password">Current Password</Label>
-                  <Input id="current-password" type="password" value={currentPassword} onChange={(e)=>setCurrentPassword(e.target.value)} placeholder="••••••••" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Change Password</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Update your account password. You will need to enter your current password to confirm.</p>
                 </div>
-                <div className="grid gap-2 mt-3">
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
+              </div>
+
+              <div className="mt-5 max-w-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input id="current-password" type="password" value={currentPassword} onChange={(e)=>setCurrentPassword(e.target.value)} placeholder="••••••••" />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
+                  </div>
                 </div>
-                <div className="grid gap-2 mt-3">
+
+                <div className="grid gap-2 mt-4 max-w-md">
                   <Label htmlFor="confirm-password">Confirm New Password</Label>
                   <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
                 </div>
-                <div className="mt-4">
+
+                <div className="mt-5 flex justify-end">
                   <Button variant="default" onClick={handleChangePassword} disabled={changingPassword}>
                     {changingPassword ? 'Saving...' : 'Save Password'}
                   </Button>
