@@ -4,7 +4,10 @@ export const handler = async (event, context) => {
   // - TARGET_API_URL (required): full URL to forward requests to
   // - TARGET_API_KEY (optional): API key to include in Authorization header
 
-  const TARGET_API_URL = process.env.TARGET_API_URL || process.env.GENERATE_API_URL || "http://localhost:8080/api/generate-questions";
+  const TARGET_API_URL =
+    process.env.TARGET_API_URL ||
+    process.env.GENERATE_API_URL ||
+    "http://localhost:8080/api/generate-questions";
   const TARGET_API_KEY = process.env.TARGET_API_KEY || null;
 
   const MAX_RETRIES = 3;
@@ -32,7 +35,11 @@ export const handler = async (event, context) => {
 
       const isBase64 = !!event.isBase64Encoded;
       let body = null;
-      let fetchOptions = { method: event.httpMethod || "POST", headers, signal: controller.signal };
+      let fetchOptions = {
+        method: event.httpMethod || "POST",
+        headers,
+        signal: controller.signal,
+      };
 
       if (event.body) {
         if (isBase64) {
@@ -68,7 +75,8 @@ export const handler = async (event, context) => {
     const res = await makeRequest(i + 1);
     if (res.ok) {
       // Successful response -> return it
-      const isJson = res.contentType && res.contentType.includes("application/json");
+      const isJson =
+        res.contentType && res.contentType.includes("application/json");
       return {
         statusCode: 200,
         headers: { "Content-Type": isJson ? "application/json" : "text/plain" },
@@ -82,6 +90,10 @@ export const handler = async (event, context) => {
   // All attempts failed
   return {
     statusCode: 502,
-    body: JSON.stringify({ error: true, message: "Upstream request failed", detail: lastError }),
+    body: JSON.stringify({
+      error: true,
+      message: "Upstream request failed",
+      detail: lastError,
+    }),
   };
 };

@@ -59,7 +59,9 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const canConfirmDelete = React.useMemo(
-    () => confirmText.trim().toUpperCase() === "DELETE" && password.trim().length > 0,
+    () =>
+      confirmText.trim().toUpperCase() === "DELETE" &&
+      password.trim().length > 0,
     [confirmText, password],
   );
 
@@ -250,7 +252,10 @@ export default function Profile() {
       return false;
     }
     if (newPassword.length < 6) {
-      toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+      toast({
+        title: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
       return false;
     }
     return true;
@@ -275,12 +280,25 @@ export default function Profile() {
     } catch (err: any) {
       console.error(err);
       const msg = err?.code || err?.message || "";
-      if (String(msg).includes("auth/wrong-password") || String(msg).toLowerCase().includes("incorrect")) {
+      if (
+        String(msg).includes("auth/wrong-password") ||
+        String(msg).toLowerCase().includes("incorrect")
+      ) {
         toast({ title: "Incorrect current password", variant: "destructive" });
-      } else if (String(msg).includes("recent") || String(msg).includes("auth/requires-recent-login")) {
-        toast({ title: "Session expired, please re-login and try again.", variant: "destructive" });
+      } else if (
+        String(msg).includes("recent") ||
+        String(msg).includes("auth/requires-recent-login")
+      ) {
+        toast({
+          title: "Session expired, please re-login and try again.",
+          variant: "destructive",
+        });
       } else {
-        toast({ title: "Failed to update password", description: err?.message || "Please try again.", variant: "destructive" });
+        toast({
+          title: "Failed to update password",
+          description: err?.message || "Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setChangingPassword(false);
@@ -352,14 +370,25 @@ export default function Profile() {
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
                     {form.instituteLogo ? (
-                      <AvatarImage src={form.instituteLogo} alt={form.name || "avatar"} />
+                      <AvatarImage
+                        src={form.instituteLogo}
+                        alt={form.name || "avatar"}
+                      />
                     ) : (
-                      <AvatarFallback>{(form.name || user?.email || "").slice(0,2).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>
+                        {(form.name || user?.email || "")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </AvatarFallback>
                     )}
                   </Avatar>
                   <div>
-                    <h2 className="text-2xl font-semibold">{form.name || user?.displayName || "My Profile"}</h2>
-                    <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
+                    <h2 className="text-2xl font-semibold">
+                      {form.name || user?.displayName || "My Profile"}
+                    </h2>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {user?.email}
+                    </p>
                   </div>
                 </div>
                 {/* header Edit Profile button moved to bottom */}
@@ -375,10 +404,16 @@ export default function Profile() {
                     <Input
                       id="name"
                       value={form.name}
-                      onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, name: e.target.value }))
+                      }
                       placeholder="Your name"
                       disabled={!isEditing}
-                      className={!isEditing ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text" : undefined}
+                      className={
+                        !isEditing
+                          ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
+                          : undefined
+                      }
                     />
                   </div>
 
@@ -387,10 +422,16 @@ export default function Profile() {
                     <Input
                       id="phone"
                       value={form.phone}
-                      onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, phone: e.target.value }))
+                      }
                       placeholder="03XX-XXXXXXX"
                       disabled={!isEditing}
-                      className={!isEditing ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text" : undefined}
+                      className={
+                        !isEditing
+                          ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
+                          : undefined
+                      }
                     />
                   </div>
                 </div>
@@ -401,10 +442,19 @@ export default function Profile() {
                     <Input
                       id="institute"
                       value={form.instituteName}
-                      onChange={(e) => setForm((p) => ({ ...p, instituteName: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          instituteName: e.target.value,
+                        }))
+                      }
                       placeholder="Your institute name"
                       disabled={!isEditing}
-                      className={!isEditing ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text" : undefined}
+                      className={
+                        !isEditing
+                          ? "bg-white text-foreground disabled:!opacity-100 disabled:cursor-text"
+                          : undefined
+                      }
                     />
                   </div>
 
@@ -412,39 +462,80 @@ export default function Profile() {
                     <Label htmlFor="logo">Institute Logo</Label>
                     <div className="flex items-center gap-4">
                       {form.instituteLogo ? (
-                        <img src={form.instituteLogo} alt="Institute Logo Preview" className="h-20 w-20 rounded-md border border-input object-contain bg-white" />
+                        <img
+                          src={form.instituteLogo}
+                          alt="Institute Logo Preview"
+                          className="h-20 w-20 rounded-md border border-input object-contain bg-white"
+                        />
                       ) : (
-                        <div className="h-20 w-20 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">60×60</div>
+                        <div className="h-20 w-20 rounded-md border border-dashed border-input flex items-center justify-center text-xs text-muted-foreground select-none">
+                          60×60
+                        </div>
                       )}
                       {isEditing && (
                         <>
-                          <input id="logo" ref={fileInputRef} type="file" accept="image/png,image/jpeg" onChange={handleLogoChange} className="hidden" />
-                          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="inline-flex items-center gap-2">
+                          <input
+                            id="logo"
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg"
+                            onChange={handleLogoChange}
+                            className="hidden"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="inline-flex items-center gap-2"
+                          >
                             <Upload className="h-4 w-4" /> Choose file
                           </Button>
                         </>
                       )}
                     </div>
-                    {isEditing && <p className="text-xs text-muted-foreground">Max 300KB. PNG or JPG recommended.</p>}
+                    {isEditing && (
+                      <p className="text-xs text-muted-foreground">
+                        Max 300KB. PNG or JPG recommended.
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="pt-2 flex gap-3">
                   {isEditing ? (
                     <>
-                      <Button type="button" onClick={onSave} disabled={saving || !isFormValid} variant="default" className="px-6">
+                      <Button
+                        type="button"
+                        onClick={onSave}
+                        disabled={saving || !isFormValid}
+                        variant="default"
+                        className="px-6"
+                      >
                         {saving ? (
-                          <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" /> Saving...</span>
+                          <span className="inline-flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />{" "}
+                            Saving...
+                          </span>
                         ) : (
                           "Save Changes"
                         )}
                       </Button>
-                      <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onCancel}
+                        disabled={saving}
+                      >
                         Cancel
                       </Button>
                     </>
                   ) : (
-                    <Button type="button" variant="default" onClick={onEdit} className="px-6">
+                    <Button
+                      type="button"
+                      variant="default"
+                      onClick={onEdit}
+                      className="px-6"
+                    >
                       Edit Profile
                     </Button>
                   )}
@@ -457,11 +548,27 @@ export default function Profile() {
               <div className="flex items-center gap-4">
                 <div className="p-2 bg-muted rounded-md">
                   {/* decorative lock icon */}
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M17 8V7a5 5 0 0 0-10 0v1"/><rect x="3" y="8" width="18" height="13" rx="2" ry="2"/></svg>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
+                    <path d="M17 8V7a5 5 0 0 0-10 0v1" />
+                    <rect x="3" y="8" width="18" height="13" rx="2" ry="2" />
+                  </svg>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Change Password</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Secure your account by updating your password. You will be asked to confirm your current password.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Secure your account by updating your password. You will be
+                    asked to confirm your current password.
+                  </p>
                 </div>
               </div>
 
@@ -469,23 +576,47 @@ export default function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="grid gap-1">
                     <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" value={currentPassword} onChange={(e)=>setCurrentPassword(e.target.value)} placeholder="Enter current password" />
-                    <p className="text-xs text-muted-foreground mt-1">Required to confirm your identity.</p>
+                    <Input
+                      id="current-password"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter current password"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Required to confirm your identity.
+                    </p>
                   </div>
 
                   <div className="grid gap-1">
                     <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
-                    <p className="text-xs text-muted-foreground mt-1">Use 6 or more characters. Avoid common words.</p>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Minimum 6 characters"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Use 6 or more characters. Avoid common words.
+                    </p>
                   </div>
                 </div>
 
                 <div className="mt-6 flex justify-start">
-                  <Button variant="default" onClick={handleChangePassword} disabled={changingPassword} className="px-6">
+                  <Button
+                    variant="default"
+                    onClick={handleChangePassword}
+                    disabled={changingPassword}
+                    className="px-6"
+                  >
                     {changingPassword ? (
-                      <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" /> Updating...</span>
+                      <span className="inline-flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />{" "}
+                        Updating...
+                      </span>
                     ) : (
-                      'Save Password'
+                      "Save Password"
                     )}
                   </Button>
                 </div>
@@ -494,9 +625,12 @@ export default function Profile() {
 
             {/* Danger Zone */}
             <div className="rounded-xl bg-white p-6 border border-destructive/30 card-yellow-shadow mt-6">
-              <h3 className="text-lg font-semibold text-destructive">Delete Account</h3>
+              <h3 className="text-lg font-semibold text-destructive">
+                Delete Account
+              </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                This will permanently delete your profile, results history, and login credentials. This action cannot be undone.
+                This will permanently delete your profile, results history, and
+                login credentials. This action cannot be undone.
               </p>
               <div className="mt-3">
                 <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
@@ -512,7 +646,9 @@ export default function Profile() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Account?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will permanently delete your profile, results history, and login credentials. This action cannot be undone.
+                        This will permanently delete your profile, results
+                        history, and login credentials. This action cannot be
+                        undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <div className="mt-4 space-y-3">
@@ -535,7 +671,10 @@ export default function Profile() {
                         </p>
                       </div>
                       <div>
-                        <Label htmlFor="profile-delete-password" className="sr-only">
+                        <Label
+                          htmlFor="profile-delete-password"
+                          className="sr-only"
+                        >
                           Confirm password
                         </Label>
                         <Input
@@ -573,13 +712,26 @@ export default function Profile() {
                             const uid = user.uid;
                             // Re-authenticate with password
                             const email = user.email;
-                            if (!email) throw new Error("Missing email on user account");
-                            const cred = EmailAuthProvider.credential(email, password);
-                            if (!auth.currentUser) throw new Error("Not authenticated");
-                            await reauthenticateWithCredential(auth.currentUser, cred);
+                            if (!email)
+                              throw new Error("Missing email on user account");
+                            const cred = EmailAuthProvider.credential(
+                              email,
+                              password,
+                            );
+                            if (!auth.currentUser)
+                              throw new Error("Not authenticated");
+                            await reauthenticateWithCredential(
+                              auth.currentUser,
+                              cred,
+                            );
 
                             // Delete subcollection results in batches
-                            const colRef = collection(db, "users", uid, "results");
+                            const colRef = collection(
+                              db,
+                              "users",
+                              uid,
+                              "results",
+                            );
                             let snap = await getDocs(colRef);
                             while (!snap.empty) {
                               const batch = writeBatch(db);
@@ -613,16 +765,34 @@ export default function Profile() {
                             setExists(false);
 
                             // Sign out and redirect with success toast
-                            try { await signOut(auth); } catch {}
-                            toast({ title: "Your account and all data have been deleted successfully." });
+                            try {
+                              await signOut(auth);
+                            } catch {}
+                            toast({
+                              title:
+                                "Your account and all data have been deleted successfully.",
+                            });
                             navigate("/login", { replace: true });
                           } catch (e: any) {
                             console.error(e);
                             const code = e?.code || e?.message || "";
-                            if (String(code).includes("recent") || String(code).includes("auth/requires-recent-login")) {
-                              toast({ title: "Session expired, please re-login and try again.", variant: "destructive" });
+                            if (
+                              String(code).includes("recent") ||
+                              String(code).includes(
+                                "auth/requires-recent-login",
+                              )
+                            ) {
+                              toast({
+                                title:
+                                  "Session expired, please re-login and try again.",
+                                variant: "destructive",
+                              });
                             } else {
-                              toast({ title: "Delete failed", description: e?.message || "Please try again.", variant: "destructive" });
+                              toast({
+                                title: "Delete failed",
+                                description: e?.message || "Please try again.",
+                                variant: "destructive",
+                              });
                             }
                           } finally {
                             setDeleting(false);
