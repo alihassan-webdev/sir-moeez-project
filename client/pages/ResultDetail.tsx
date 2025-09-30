@@ -53,19 +53,47 @@ export default function ResultDetail() {
   const type = (params.type as ExamType) || "mcqs";
   const label = examTypeLabels[type] || "Results";
   const [items, setItems] = useState<
-    Awaited<ReturnType<typeof fetchAllResultsByType>>
+    Array<{
+      id: string;
+      title?: string;
+      content: string;
+      ts: number;
+      downloadUrl?: string | null;
+    }>
   >([]);
   const header = useInstituteHeader();
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const res = await fetchAllResultsByType(type);
-      if (!cancelled) setItems(res);
-    })();
-    return () => {
-      cancelled = true;
-    };
+    const u = auth.currentUser;
+    if (!u?.uid) {
+      setItems([]);
+      return;
+    }
+    const col = collection(db, "users", u.uid, "results");
+    const qy = query(
+      col,
+      where("examTypeSlug", "==", type),
+      orderBy("createdAt", "desc"),
+    );
+    const unsub = onSnapshot(qy, (snap) => {
+      const next = snap.docs.map((d) => {
+        const data = d.data() as any;
+        const ts =
+          (data.createdAt as any)?.toMillis?.() ||
+          Number(data.generatedDateTime || 0) ||
+          0;
+        return {
+          id: d.id,
+          title: String(data.title || ""),
+          content: String(data.resultData ?? data.content ?? ""),
+          ts,
+          downloadUrl:
+            typeof data.downloadUrl === "string" ? data.downloadUrl : null,
+        };
+      });
+      setItems(next);
+    });
+    return () => unsub();
   }, [type]);
 
   const handleDownload = async (content: string) => {
@@ -116,22 +144,17 @@ export default function ResultDetail() {
                 </div>
               )}
               {items.map((it) => {
-                const ts =
-                  (it.createdAt as any)?.toMillis?.() ||
-                  it.generatedDateTime ||
-                  0;
-                const date = ts ? new Date(ts).toLocaleString() : "";
+                const date = it.ts ? new Date(it.ts).toLocaleString() : "";
+                const title = it.title && it.title.trim().length > 0 ? it.title : `${label}`;
                 return (
                   <div
                     key={it.id}
                     className="rounded-xl bg-white border border-input p-4 sm:p-5 card-yellow-shadow"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          Generated
-                        </div>
-                        <div className="text-base font-semibold">{date}</div>
+                      <div className="min-w-0">
+                        <div className="text-base font-extrabold truncate">{title}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{date}</div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -140,6 +163,13 @@ export default function ResultDetail() {
                           className="inline-flex items-center gap-2"
                         >
                           <Download className="h-4 w-4" /> Download PDF
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDelete(it.id)}
+                          className="inline-flex items-center gap-2"
+                        >
+                          <Trash2 className="h-4 w-4" /> Delete
                         </Button>
                       </div>
                     </div>
