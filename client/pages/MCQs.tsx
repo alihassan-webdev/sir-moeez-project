@@ -456,22 +456,6 @@ Use concise, exam-style wording suitable for classroom tests.`;
             </section>
 
             <section className="mx-auto mt-10 max-w-5xl space-y-6">
-              {!isProfileCompleteForPdf && (
-                <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-medium">
-                      Please complete your profile (name, phone, institute name,
-                      and logo) before generating exams.
-                    </p>
-                  </div>
-                  <Link
-                    to="/profile"
-                    className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:opacity-90"
-                  >
-                    Go to Profile
-                  </Link>
-                </div>
-              )}
               <ToolLock>
                 <div className="flex flex-col gap-4">
                   <div className="order-2 w-full max-w-4xl mx-auto rounded-xl card-yellow-shadow border border-muted/20 bg-white p-8 sm:p-10">

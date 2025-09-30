@@ -17,18 +17,15 @@ export function ToolLock({
   return (
     <div className={cn("relative", className)}>
       {locked && (
-        <div className="mb-3 rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white shadow-[0_6px_18px_rgba(16,24,40,0.16)] ring-1 ring-white/10">
-          <div className="px-4 sm:px-5 py-2.5 flex items-center justify-between gap-3">
-            <div className="flex items-center text-[13px] sm:text-sm font-semibold tracking-tight">
-              <span>
-                Please complete your profile setup to unlock this tool.
-              </span>
-            </div>
+        <div className="mb-3 rounded-2xl border border-[#f4d87b] bg-[#fff7dc] px-4 sm:px-5 py-2.5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-medium text-[#8a6d1a]">
+              Please complete your profile before using this tool.
+            </p>
             <Button
               asChild
               size="sm"
-              variant="elevated"
-              className="border-none bg-white text-red-600 shadow-md shadow-black/10"
+              className="h-9 rounded-md bg-[#2563eb] px-4 text-white transition hover:bg-[#1d4ed8]"
             >
               <Link to="/my-profile">Go to Profile</Link>
             </Button>

@@ -44,7 +44,13 @@ export default function Profile() {
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [confirmText, setConfirmText] = React.useState("");
   const navigate = useNavigate();
+
+  const canConfirmDelete = React.useMemo(
+    () => confirmText.trim().toUpperCase() === "DELETE",
+    [confirmText],
+  );
 
   const [form, setForm] = React.useState({
     name: "",
@@ -74,6 +80,10 @@ export default function Profile() {
   React.useEffect(() => {
     isEditingRef.current = isEditing;
   }, [isEditing]);
+
+  React.useEffect(() => {
+    if (!confirmOpen) setConfirmText("");
+  }, [confirmOpen]);
 
   React.useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
@@ -442,21 +452,42 @@ export default function Profile() {
                       <AlertDialogTitle>Delete your profile?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This will remove your profile and all generated results.
-                        This action cannot be undone.
+                        This action cannot be undone. Type DELETE to confirm.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+                    <div className="mt-4">
+                      <Label
+                        htmlFor="profile-delete-confirm"
+                        className="sr-only"
+                      >
+                        Type DELETE to confirm
+                      </Label>
+                      <Input
+                        id="profile-delete-confirm"
+                        placeholder='Type "DELETE" to confirm'
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        autoComplete="off"
+                      />
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Enter DELETE in uppercase to enable deletion.
+                      </p>
+                    </div>
                     <AlertDialogFooter>
                       <AlertDialogCancel disabled={deleting}>
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
-                        disabled={deleting}
+                        disabled={deleting || !canConfirmDelete}
                         onClick={async () => {
                           if (!user?.uid) {
                             toast({
                               title: "Not authenticated",
                               variant: "destructive",
                             });
+                            return;
+                          }
+                          if (!canConfirmDelete) {
                             return;
                           }
                           setDeleting(true);
@@ -502,6 +533,7 @@ export default function Profile() {
                           } finally {
                             setDeleting(false);
                             setConfirmOpen(false);
+                            setConfirmText("");
                           }
                         }}
                       >
