@@ -6,16 +6,31 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
-import { onAuthStateChanged, type User } from "firebase/auth";
-import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged, type User, signOut, deleteUser } from "firebase/auth";
+import { doc, onSnapshot, setDoc, getDoc, collection, getDocs, writeBatch, deleteDoc } from "firebase/firestore";
 import { getInstitute, saveInstitute, type Institute } from "@/lib/account";
-import { Upload } from "lucide-react";
+import { Upload, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const [user, setUser] = React.useState<User | null>(auth.currentUser);
   const [exists, setExists] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const navigate = useNavigate();
 
   const [form, setForm] = React.useState({
     name: "",
@@ -387,6 +402,88 @@ export default function Profile() {
                   )}
                 </div>
               </form>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="rounded-xl bg-white p-6 border border-destructive/30 card-yellow-shadow mt-6">
+              <h3 className="text-lg font-semibold text-destructive">Delete Profile</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                This will permanently delete your profile and all your results. This action cannot be undone.
+              </p>
+              <div className="mt-3">
+                <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="inline-flex items-center gap-2">
+                      <Trash2 className="h-4 w-4" /> Delete Profile
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete your profile?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will remove your profile and all generated results. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={deleting}
+                        onClick={async () => {
+                          if (!user?.uid) {
+                            toast({ title: "Not authenticated", variant: "destructive" });
+                            return;
+                          }
+                          setDeleting(true);
+                          try {
+                            // 1) Delete subcollection results in batches of 500
+                            const colRef = collection(db, "users", user.uid, "results");
+                            let snap = await getDocs(colRef);
+                            while (!snap.empty) {
+                              const batch = writeBatch(db);
+                              let count = 0;
+                              snap.docs.forEach((d) => {
+                                batch.delete(d.ref);
+                                count++;
+                              });
+                              await batch.commit();
+                              if (count < 500) break;
+                              snap = await getDocs(colRef);
+                            }
+                            // 2) Delete user document
+                            await deleteDoc(doc(db, "users", user.uid));
+                            // 3) Try to delete auth user (may require re-auth)
+                            try {
+                              if (auth.currentUser) await deleteUser(auth.currentUser);
+                            } catch {}
+                            // 4) Sign out and redirect
+                            try { await signOut(auth); } catch {}
+                            navigate("/login", { replace: true });
+                          } catch (e: any) {
+                            console.error(e);
+                            toast({
+                              title: "Delete failed",
+                              description: e?.message || "Please try again.",
+                              variant: "destructive",
+                            });
+                          } finally {
+                            setDeleting(false);
+                            setConfirmOpen(false);
+                          }
+                        }}
+                      >
+                        {deleting ? (
+                          <span className="inline-flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                            Deleting...
+                          </span>
+                        ) : (
+                          "Delete"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           </div>
         </div>
