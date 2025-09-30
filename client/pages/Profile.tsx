@@ -11,6 +11,8 @@ import {
   type User,
   signOut,
   deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import {
   doc,
@@ -51,11 +53,12 @@ export default function Profile() {
   const [deleting, setDeleting] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const navigate = useNavigate();
 
   const canConfirmDelete = React.useMemo(
-    () => confirmText.trim().toUpperCase() === "DELETE",
-    [confirmText],
+    () => confirmText.trim().toUpperCase() === "DELETE" && password.trim().length > 0,
+    [confirmText, password],
   );
 
   const [form, setForm] = React.useState({
@@ -88,7 +91,10 @@ export default function Profile() {
   }, [isEditing]);
 
   React.useEffect(() => {
-    if (!confirmOpen) setConfirmText("");
+    if (!confirmOpen) {
+      setConfirmText("");
+      setPassword("");
+    }
   }, [confirmOpen]);
 
   React.useEffect(() => {
@@ -461,23 +467,41 @@ export default function Profile() {
                         This action cannot be undone. Type DELETE to confirm.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <div className="mt-4">
-                      <Label
-                        htmlFor="profile-delete-confirm"
-                        className="sr-only"
-                      >
-                        Type DELETE to confirm
-                      </Label>
-                      <Input
-                        id="profile-delete-confirm"
-                        placeholder='Type "DELETE" to confirm'
-                        value={confirmText}
-                        onChange={(e) => setConfirmText(e.target.value)}
-                        autoComplete="off"
-                      />
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        Enter DELETE in uppercase to enable deletion.
-                      </p>
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <Label
+                          htmlFor="profile-delete-confirm"
+                          className="sr-only"
+                        >
+                          Type DELETE to confirm
+                        </Label>
+                        <Input
+                          id="profile-delete-confirm"
+                          placeholder='Type "DELETE" to confirm'
+                          value={confirmText}
+                          onChange={(e) => setConfirmText(e.target.value)}
+                          autoComplete="off"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Enter DELETE in uppercase to enable deletion.
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="profile-delete-password" className="sr-only">
+                          Confirm password
+                        </Label>
+                        <Input
+                          id="profile-delete-password"
+                          type="password"
+                          placeholder="Confirm your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          autoComplete="current-password"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Re-enter your account password to proceed.
+                        </p>
+                      </div>
                     </div>
                     <AlertDialogFooter>
                       <AlertDialogCancel disabled={deleting}>
@@ -498,30 +522,36 @@ export default function Profile() {
                           }
                           setDeleting(true);
                           try {
-                            // 1) Delete subcollection results in batches of 500
-                            const colRef = collection(
-                              db,
-                              "users",
-                              user.uid,
-                              "results",
-                            );
+                            const uid = user.uid;
+                            // Re-authenticate with password
+                            const email = user.email;
+                            if (!email) throw new Error("Missing email on user account");
+                            const cred = EmailAuthProvider.credential(email, password);
+                            if (!auth.currentUser) throw new Error("Not authenticated");
+                            await reauthenticateWithCredential(auth.currentUser, cred);
+
+                            // Delete subcollection results in batches
+                            const colRef = collection(db, "users", uid, "results");
                             let snap = await getDocs(colRef);
                             while (!snap.empty) {
                               const batch = writeBatch(db);
-                              let count = 0;
-                              snap.docs.forEach((d) => {
-                                batch.delete(d.ref);
-                                count++;
-                              });
+                              snap.docs.forEach((d) => batch.delete(d.ref));
                               await batch.commit();
-                              if (count < 500) break;
                               snap = await getDocs(colRef);
                             }
-                            // 2) Delete user document
-                            await deleteDoc(doc(db, "users", user.uid));
-                            // 3) Clear local cached data
-                            clearProfile(user.uid);
-                            clearInstitute(user.uid);
+                            // Delete user document
+                            await deleteDoc(doc(db, "users", uid));
+
+                            // Delete Firebase Auth user account
+                            if (auth.currentUser?.delete) {
+                              await auth.currentUser.delete();
+                            } else if (auth.currentUser) {
+                              await deleteUser(auth.currentUser);
+                            }
+
+                            // Clear local cached data
+                            clearProfile(uid);
+                            clearInstitute(uid);
                             lastSavedRef.current = {
                               name: "",
                               phone: "",
@@ -535,15 +565,9 @@ export default function Profile() {
                               instituteLogo: undefined,
                             });
                             setExists(false);
-                            // 4) Try to delete auth user (may require re-auth)
-                            try {
-                              if (auth.currentUser)
-                                await deleteUser(auth.currentUser);
-                            } catch {}
-                            // 5) Sign out and redirect
-                            try {
-                              await signOut(auth);
-                            } catch {}
+
+                            // Sign out and redirect
+                            try { await signOut(auth); } catch {}
                             navigate("/login", { replace: true });
                           } catch (e: any) {
                             console.error(e);
@@ -556,6 +580,7 @@ export default function Profile() {
                             setDeleting(false);
                             setConfirmOpen(false);
                             setConfirmText("");
+                            setPassword("");
                           }
                         }}
                       >
