@@ -5,11 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { auth } from "@/lib/firebase";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
@@ -18,7 +14,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -26,6 +21,17 @@ export default function Login() {
     });
     return () => unsub();
   }, [navigate]);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    const previousHeight = document.body.style.height;
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.height = previousHeight;
+    };
+  }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +63,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-transparent flex items-start justify-center px-4 pt-6 sm:pt-10">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-primary/10 to-transparent flex items-start justify-center px-4 pt-20 sm:pt-24">
       <div className="w-full max-w-md space-y-3">
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold">Log in</h1>
@@ -112,40 +118,6 @@ export default function Login() {
               disabled={loading}
             >
               {loading ? "Logging in..." : "Log in"}
-            </Button>
-            <Button
-              type="button"
-              className="w-full bg-primary/10 border-primary/60 text-primary"
-              variant="outline"
-              disabled={resetting}
-              onClick={async () => {
-                const em = email.trim();
-                if (!em) {
-                  toast({
-                    title: "Enter email first",
-                    description:
-                      "Type your email above to receive a reset link.",
-                  });
-                  return;
-                }
-                try {
-                  setResetting(true);
-                  await sendPasswordResetEmail(auth, em);
-                  toast({
-                    title: "Reset email sent",
-                    description: `Check ${em} for the reset link.`,
-                  });
-                } catch (err: any) {
-                  const msg = err?.code
-                    ? String(err.code).replace("auth/", "").replace(/-/g, " ")
-                    : "Could not send reset email";
-                  toast({ title: "Reset error", description: msg });
-                } finally {
-                  setResetting(false);
-                }
-              }}
-            >
-              {resetting ? "Sending..." : "Forgot password?"}
             </Button>
           </form>
         </div>

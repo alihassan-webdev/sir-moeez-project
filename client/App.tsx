@@ -241,11 +241,22 @@ function AnimatedRoutes() {
   );
 }
 
+function ScrollToTopOnRouteChange() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
+
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <BrowserRouter>
+        <ScrollToTopOnRouteChange />
         <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>
