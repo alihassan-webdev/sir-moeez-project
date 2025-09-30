@@ -1088,9 +1088,9 @@ export default function Index() {
                       await runSubmit(undefined, p)
                     }
                     onReset={onReset}
-            loading={loading}
-            onResultTitle={(title) => setLatestTitle(title)}
-          />
+                    loading={loading}
+                    onResultTitle={(title) => setLatestTitle(title)}
+                  />
                 </div>
 
                 {result && (
