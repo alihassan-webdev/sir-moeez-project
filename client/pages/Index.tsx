@@ -665,6 +665,7 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
+  const [latestTitle, setLatestTitle] = useState<string>("");
   const lastSavedRef = useRef<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -680,7 +681,11 @@ export default function Index() {
           import("@/lib/account"),
         ]);
         const inst = getInstitute();
-        const title = (query || "Exam Paper").slice(0, 80);
+        const fallbackTitle = (query || "Exam Paper").trim();
+        const title = (latestTitle || fallbackTitle || "Exam Paper").slice(
+          0,
+          80,
+        );
         void saveUserResult({
           examType: "exam",
           title,
@@ -692,7 +697,7 @@ export default function Index() {
         });
       } catch {}
     })();
-  }, [result, query]);
+  }, [result, query, latestTitle]);
 
   useEffect(() => {
     try {
@@ -743,6 +748,7 @@ export default function Index() {
     setQuery("");
     setError(null);
     setResult(null);
+    setLatestTitle("");
     const el = fileInputRef.current;
     if (el) el.value = "";
   };
@@ -1059,6 +1065,7 @@ export default function Index() {
                     }
                     onReset={onReset}
                     loading={loading}
+                    onResultTitle={(title) => setLatestTitle(title)}
                   />
                 </div>
 
