@@ -327,7 +327,7 @@ export default function QnA() {
           form.append("query", q);
           try {
             const res = await withTimeout(
-              fetch("/.netlify/functions/proxy", {
+              fetch("/api/proxy", {
                 method: "POST",
                 body: form,
                 headers: { Accept: "application/json" },
@@ -361,7 +361,7 @@ export default function QnA() {
       form.append("query", q);
 
       const attempt = await withTimeout(
-        fetch("/.netlify/functions/proxy", {
+        fetch("/api/proxy", {
           method: "POST",
           body: form,
           headers: { Accept: "application/json" },
