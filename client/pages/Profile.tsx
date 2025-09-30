@@ -366,18 +366,13 @@ export default function Profile() {
                   </Avatar>
                   <div>
                     <h2 className="text-2xl font-semibold">{form.name || user?.displayName || "My Profile"}</h2>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{user?.email}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <Badge variant="outline">Member</Badge>
-                      <span className="text-xs text-muted-foreground">Profile updated {new Date(Number(lastSavedRef.current?.updatedAt ?? Date.now())).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <Button type="button" variant="outline" onClick={onEdit} className="px-4">
-                    Edit Profile
-                  </Button>
-                </div>
+                {/* Edit Profile button removed as requested */}
               </div>
 
               <form
