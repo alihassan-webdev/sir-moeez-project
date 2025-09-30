@@ -1,8 +1,6 @@
 import React from "react";
 import { Lock } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useProfileLock } from "@/hooks/useProfileLock";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function ToolLock({
