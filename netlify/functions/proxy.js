@@ -1,5 +1,7 @@
 import crypto from "node:crypto";
 
+const crypto = require("crypto");
+
 // In-memory cache (survives warm invocations)
 const responseCache = new Map(); // key -> { ts, contentType, bodyString }
 const MAX_CACHE_AGE_MS = 24 * 60 * 60 * 1000; // 24h
@@ -36,7 +38,6 @@ export const handler = async (event, context) => {
     .filter(Boolean)
     .map((s) => String(s).trim());
 
-  const TARGET_API_KEY = process.env.TARGET_API_KEY || null;
   const MAX_RETRIES = 3;
   const TIMEOUT_MS = 5000; // per attempt
 
