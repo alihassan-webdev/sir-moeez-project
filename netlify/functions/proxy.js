@@ -22,6 +22,9 @@ function makeKey(event) {
 }
 
 export const handler = async (event) => {
+  if (!process.env.TARGET_API_KEY) {
+    console.warn("[proxy] TARGET_API_KEY not set – proceeding without Authorization header");
+  }
   const TARGETS = [
     process.env.TARGET_API_URL,
     process.env.GENERATE_API_URL,
