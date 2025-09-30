@@ -808,7 +808,7 @@ export default function Index() {
     }
 
     // Compute a stable cache key based on the file content and query
-    const [{ makeKey, getCached, setCached }] = await Promise.all([
+    const [{ makeKey, getCached, setCached, getLatest, setLatest }] = await Promise.all([
       import("@/lib/cache"),
     ]);
     const buffer = await theFile.arrayBuffer();
@@ -819,134 +819,83 @@ export default function Index() {
       .join("");
     const cacheKey = makeKey(["v1", "exam", fileHash, q]);
     const cached = getCached(cacheKey);
+
     if (cached) {
       setResult(cached);
-      // No return: optionally refresh in background, but ensure UI is instant
-    }
-
-    const sendTo = async (urlStr: string, timeoutMs: number) => {
-      const isExternal = /^https?:/i.test(urlStr);
-
-      let finalUrl = urlStr;
-      if (isExternal && q) {
-        try {
-          const u = new URL(urlStr);
-          u.searchParams.set("query", q);
-          finalUrl = u.toString();
-        } catch {}
-      }
-
-      try {
-        if (!theFile) {
-          const res = await withTimeout(
-            fetch(finalUrl, {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ query: q }),
-              ...(isExternal
-                ? {
-                    mode: "cors" as const,
-                    credentials: "omit" as const,
-                    referrerPolicy: "no-referrer" as const,
-                  }
-                : {}),
-            }),
-            timeoutMs,
-          );
-          return res;
-        }
-
+      setLoading(false);
+      // background refresh
+      void (async () => {
         const form = new FormData();
         form.append("pdf", theFile);
         form.append("query", q);
+        try {
+          const res = await withTimeout(
+            fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+            10000,
+          );
+          if (res && res.ok) {
+            const ct = res.headers.get("content-type") || "";
+            const txt = ct.includes("application/json")
+              ? String((await res.json().catch(async () => await res.text())) ?? "")
+              : await res.text();
+            setResult(txt);
+            setCached(cacheKey, txt);
+            setLatest("exam", txt, "anon");
+          }
+        } catch {}
+      })();
+      return;
+    }
 
-        const res = await withTimeout(
-          fetch(finalUrl, {
-            method: "POST",
-            body: form,
-            headers: { Accept: "application/json" },
-            ...(isExternal
-              ? {
-                  mode: "cors" as const,
-                  credentials: "omit" as const,
-                  referrerPolicy: "no-referrer" as const,
-                }
-              : {}),
-          }),
-          timeoutMs,
-        );
-        return res;
-      } catch (err: any) {
-        return null;
-      }
-    };
+    // No exact cache → show latest per-type if available
+    const latest = getLatest("exam", "anon");
+    if (latest) setResult(latest);
 
-    const checkEndpoint = async (_urlStr: string, _timeoutMs = 3000) => {
-      return true;
-    };
+    const form = new FormData();
+    form.append("pdf", theFile);
+    form.append("query", q);
 
     try {
       setLoading(true);
-      let res: Response | null = null;
-      res = null as any;
 
-      if (!res || !res.ok) {
-        const proxies = ["/.netlify/functions/proxy"];
-        for (const proxyPath of proxies) {
-          try {
-            const attempt = await sendTo(proxyPath, settings.retryTimeoutMs);
-            if (attempt && attempt.ok) {
-              res = attempt;
-              break;
-            }
-          } catch {}
-        }
+      const attempt = await withTimeout(
+        fetch("/.netlify/functions/proxy", { method: "POST", body: form, headers: { Accept: "application/json" } }),
+        15000,
+      ).catch(() => null as any);
+
+      if (!attempt) {
+        return; // keep showing latest if present
+      }
+      if (!attempt.ok) {
+        return;
       }
 
-      if (!res) {
-        if (cached) return; // show cached silently
-        throw new Error("Network error. Please try again.");
-      }
-
-      const contentType = res.headers.get("content-type") || "";
-      if (!res.ok) {
-        let detail = "";
-        try {
-          detail = await res.clone().text();
-        } catch (e) {
-          detail = res.statusText || "";
-        }
-        if (cached) return; // keep cached
-        throw new Error(detail || `HTTP ${res.status}`);
-      }
+      const contentType = attempt.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         try {
-          const json = await res.clone().json();
+          const json = await attempt.json().catch(async () => await attempt.text());
           const text =
             typeof json === "string"
               ? json
-              : (json?.questions ??
-                json?.result ??
-                json?.message ??
-                JSON.stringify(json, null, 2));
+              : (json?.questions ?? json?.result ?? json?.message ?? JSON.stringify(json, null, 2));
           const out = String(text);
           setResult(out);
           setCached(cacheKey, out);
+          setLatest("exam", out, "anon");
         } catch (e) {
-          const txt = await res
+          const txt = await attempt
             .clone()
             .text()
             .catch(() => "");
           setResult(txt);
           setCached(cacheKey, txt);
+          setLatest("exam", txt, "anon");
         }
       } else {
-        const text = await res.clone().text();
+        const text = await attempt.clone().text();
         setResult(text);
         setCached(cacheKey, text);
+        setLatest("exam", text, "anon");
       }
     } catch (err: any) {
       const msg =
