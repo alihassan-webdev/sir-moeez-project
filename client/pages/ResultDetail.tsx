@@ -69,27 +69,25 @@ export default function ResultDetail() {
       return;
     }
     const col = collection(db, "users", u.uid, "results");
-    const qy = query(
-      col,
-      where("examTypeSlug", "==", type),
-      orderBy("createdAt", "desc"),
-    );
+    const qy = query(col, where("examTypeSlug", "==", type));
     const unsub = onSnapshot(qy, (snap) => {
-      const next = snap.docs.map((d) => {
-        const data = d.data() as any;
-        const ts =
-          (data.createdAt as any)?.toMillis?.() ||
-          Number(data.generatedDateTime || 0) ||
-          0;
-        return {
-          id: d.id,
-          title: String(data.title || ""),
-          content: String(data.resultData ?? data.content ?? ""),
-          ts,
-          downloadUrl:
-            typeof data.downloadUrl === "string" ? data.downloadUrl : null,
-        };
-      });
+      const next = snap.docs
+        .map((d) => {
+          const data = d.data() as any;
+          const ts =
+            (data.createdAt as any)?.toMillis?.() ||
+            Number(data.generatedDateTime || 0) ||
+            0;
+          return {
+            id: d.id,
+            title: String(data.title || ""),
+            content: String(data.resultData ?? data.content ?? ""),
+            ts,
+            downloadUrl:
+              typeof data.downloadUrl === "string" ? data.downloadUrl : null,
+          };
+        })
+        .sort((a, b) => b.ts - a.ts);
       setItems(next);
     });
     return () => unsub();
