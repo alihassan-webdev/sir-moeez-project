@@ -410,7 +410,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
       form.append("query", q);
 
       const attempt = await withTimeout(
-        fetch("/.netlify/functions/proxy", {
+        fetch("/api/proxy", {
           method: "POST",
           body: form,
           headers: { Accept: "application/json" },
