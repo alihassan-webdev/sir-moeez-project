@@ -115,6 +115,10 @@ export const handler = async (event) => {
     }
   }
 
+  if (lastError) {
+    console.error("[proxy] All upstream attempts failed:", lastError);
+  }
+
   // Fallback to cached last success for this key
   const cached = getCached();
   if (cached) {
