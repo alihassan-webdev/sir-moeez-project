@@ -35,7 +35,7 @@ const API_URL = (() => {
   const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
     | string
     | undefined;
-  return env && env.trim() ? env : "/api/generate-questions";
+  return env && env.trim() ? env : "/api/proxy";
 })();
 
 export default function MCQs() {
@@ -377,7 +377,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
           form.append("query", q);
           try {
             const res = await withTimeout(
-              fetch("/.netlify/functions/proxy", {
+              fetch("/api/proxy", {
                 method: "POST",
                 body: form,
                 headers: { Accept: "application/json" },
