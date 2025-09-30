@@ -563,7 +563,7 @@ export default function Profile() {
                             // Sign out and redirect with success toast
                             try { await signOut(auth); } catch {}
                             toast({ title: "Your account and all data have been deleted successfully." });
-                            navigate("/signup", { replace: true });
+                            navigate("/login", { replace: true });
                           } catch (e: any) {
                             console.error(e);
                             const code = e?.code || e?.message || "";
