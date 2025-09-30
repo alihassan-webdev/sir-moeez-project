@@ -442,29 +442,25 @@ export default function Profile() {
 
             {/* Danger Zone */}
             <div className="rounded-xl bg-white p-6 border border-destructive/30 card-yellow-shadow mt-6">
-              <h3 className="text-lg font-semibold text-destructive">
-                Delete Profile
-              </h3>
+              <h3 className="text-lg font-semibold text-destructive">Delete Account</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                This will permanently delete your profile and all your results.
-                This action cannot be undone.
+                This will permanently delete your profile, results history, and login credentials. This action cannot be undone.
               </p>
               <div className="mt-3">
                 <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                   <AlertDialogTrigger asChild>
                     <Button
                       variant="destructive"
-                      className="inline-flex items-center gap-2"
+                      className="inline-flex items-center gap-2 w-full font-bold justify-center"
                     >
-                      <Trash2 className="h-4 w-4" /> Delete Profile
+                      <Trash2 className="h-4 w-4" /> Delete My Account
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete your profile?</AlertDialogTitle>
+                      <AlertDialogTitle>Delete Account?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will remove your profile and all generated results.
-                        This action cannot be undone. Type DELETE to confirm.
+                        This will permanently delete your profile, results history, and login credentials. This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <div className="mt-4 space-y-3">
@@ -543,9 +539,7 @@ export default function Profile() {
                             await deleteDoc(doc(db, "users", uid));
 
                             // Delete Firebase Auth user account
-                            if (auth.currentUser?.delete) {
-                              await auth.currentUser.delete();
-                            } else if (auth.currentUser) {
+                            if (auth.currentUser) {
                               await deleteUser(auth.currentUser);
                             }
 
@@ -566,16 +560,18 @@ export default function Profile() {
                             });
                             setExists(false);
 
-                            // Sign out and redirect
+                            // Sign out and redirect with success toast
                             try { await signOut(auth); } catch {}
-                            navigate("/login", { replace: true });
+                            toast({ title: "Your account and all data have been deleted successfully." });
+                            navigate("/signup", { replace: true });
                           } catch (e: any) {
                             console.error(e);
-                            toast({
-                              title: "Delete failed",
-                              description: e?.message || "Please try again.",
-                              variant: "destructive",
-                            });
+                            const code = e?.code || e?.message || "";
+                            if (String(code).includes("recent") || String(code).includes("auth/requires-recent-login")) {
+                              toast({ title: "Session expired, please re-login and try again.", variant: "destructive" });
+                            } else {
+                              toast({ title: "Delete failed", description: e?.message || "Please try again.", variant: "destructive" });
+                            }
                           } finally {
                             setDeleting(false);
                             setConfirmOpen(false);
