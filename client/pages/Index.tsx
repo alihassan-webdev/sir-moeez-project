@@ -59,6 +59,7 @@ function ExternalPdfSelector({
   onReset,
   loading,
   onResultTitle,
+  canReset,
 }: {
   onLoadFile: (f: File | null) => void;
   onSetPrompt: (p: string) => void;
@@ -66,6 +67,7 @@ function ExternalPdfSelector({
   onReset: () => void;
   loading?: boolean;
   onResultTitle?: (title: string) => void;
+  canReset?: boolean;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -619,8 +621,12 @@ function ExternalPdfSelector({
               const shortTitle = `${selectedClass ? selectedClass + " • " : ""}${subjectName || "Exam"} — Exam`;
               onResultTitle?.(shortTitle.slice(0, 80));
               onSetPrompt(generated);
-              setIsLocked(true); // lock all fields
-              await onGenerate(generated);
+              setIsLocked(true);
+              try {
+                await onGenerate(generated);
+              } finally {
+                setIsLocked(false);
+              }
             }}
             className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
           >
@@ -638,7 +644,7 @@ function ExternalPdfSelector({
 
           <Button
             className="bg-primary/10 border-primary/60 text-blue-600 hover:!bg-primary/10 hover:!border-primary/60 hover:!text-blue-600 hover:!shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={!isLocked}
+            disabled={!canReset || loading || isLocked}
             onClick={() => {
               setSelectedClass("");
               setSelectedSubjectPath("");
@@ -1064,9 +1070,10 @@ export default function Index() {
                       await runSubmit(undefined, p)
                     }
                     onReset={onReset}
-                    loading={loading}
-                    onResultTitle={(title) => setLatestTitle(title)}
-                  />
+            loading={loading}
+            onResultTitle={(title) => setLatestTitle(title)}
+            canReset={canReset}
+          />
                 </div>
 
                 {result && (
