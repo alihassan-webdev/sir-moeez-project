@@ -59,7 +59,6 @@ function ExternalPdfSelector({
   onReset,
   loading,
   onResultTitle,
-  canReset,
 }: {
   onLoadFile: (f: File | null) => void;
   onSetPrompt: (p: string) => void;
@@ -67,7 +66,6 @@ function ExternalPdfSelector({
   onReset: () => void;
   loading?: boolean;
   onResultTitle?: (title: string) => void;
-  canReset?: boolean;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -107,6 +105,26 @@ function ExternalPdfSelector({
   const [isMerging, setIsMerging] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const pdfBytesCache = useRef<Map<string, ArrayBuffer>>(new Map());
+
+  const canReset = useMemo(
+    () =>
+      Boolean(
+        selectedClass ||
+          selectedSubjectName ||
+          selectedSubjectPath ||
+          selectedChapterPaths.length ||
+          totalMarks != null ||
+          promptText,
+      ),
+    [
+      selectedClass,
+      selectedSubjectName,
+      selectedSubjectPath,
+      selectedChapterPaths,
+      totalMarks,
+      promptText,
+    ],
+  );
 
   const chapterOptionsForSubject = useMemo(
     () =>
@@ -1098,7 +1116,6 @@ export default function Index() {
                     onReset={onReset}
             loading={loading}
             onResultTitle={(title) => setLatestTitle(title)}
-            canReset={canReset}
           />
                 </div>
 
