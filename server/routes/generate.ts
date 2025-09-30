@@ -87,7 +87,7 @@ export const handleGenerate: RequestHandler = async (req, res) => {
     const proto = String(req.headers["x-forwarded-proto"] || "https");
     if (host)
       upstreams.push(
-        `${proto}://${host}/.netlify/functions/proxy${query ? `?query=${encodeURIComponent(query)}` : ""}`,
+        `${proto}://${host}/api/proxy${query ? `?query=${encodeURIComponent(query)}` : ""}`,
       );
 
     let finalResp: Response | null = null;
