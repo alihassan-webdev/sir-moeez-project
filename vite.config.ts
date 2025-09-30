@@ -31,12 +31,12 @@ export default defineConfig(({ mode }) => ({
     },
     proxy: {
       // Proxy the Netlify function path to the external API during local dev to avoid CORS
-      "/.netlify/functions/proxy": {
+      "/api/proxy": {
         target: process.env.PREDICT_ENDPOINT || "https://api-va5v.onrender.com",
         changeOrigin: true,
         secure: true,
         rewrite: (path) =>
-          path.replace("/.netlify/functions/proxy", "/generate-questions"),
+          path.replace("/api/proxy", "/generate-questions"),
       },
     },
   },
