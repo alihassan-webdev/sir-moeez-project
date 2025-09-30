@@ -58,12 +58,14 @@ function ExternalPdfSelector({
   onGenerate,
   onReset,
   loading,
+  onResultTitle,
 }: {
   onLoadFile: (f: File | null) => void;
   onSetPrompt: (p: string) => void;
   onGenerate: (prompt?: string) => Promise<void> | void;
   onReset: () => void;
   loading?: boolean;
+  onResultTitle?: (title: string) => void;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     as: "url",
@@ -614,6 +616,8 @@ function ExternalPdfSelector({
                 selectedClass || "",
                 marks,
               );
+              const shortTitle = `${selectedClass ? selectedClass + " • " : ""}${subjectName || "Exam"} — Exam`;
+              onResultTitle?.(shortTitle.slice(0, 80));
               onSetPrompt(generated);
               setIsLocked(true); // lock all fields
               await onGenerate(generated);
