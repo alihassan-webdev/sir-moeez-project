@@ -54,22 +54,6 @@ export default function Landing() {
                 </a>
               </Button>
             </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg">
-                <Link to="/login">Get started</Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="bg-primary/10 border-primary/60"
-              >
-                <a href="#pricing" onClick={scrollToPricing}>
-                  View pricing
-                </a>
-              </Button>
-            </div>
           </Container>
         </section>
 
