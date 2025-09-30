@@ -460,34 +460,45 @@ export default function Profile() {
 
             {/* Change Password */}
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-muted rounded-md">
+                  {/* decorative lock icon */}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M17 8V7a5 5 0 0 0-10 0v1"/><rect x="3" y="8" width="18" height="13" rx="2" ry="2"/></svg>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold">Change Password</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Update your account password. You will need to enter your current password to confirm.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Secure your account by updating your password. You will be asked to confirm your current password.</p>
                 </div>
               </div>
 
-              <div className="mt-5 max-w-2xl">
+              <div className="mt-6 max-w-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-2">
+                  <div className="grid gap-1">
                     <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" value={currentPassword} onChange={(e)=>setCurrentPassword(e.target.value)} placeholder="••••••••" />
+                    <Input id="current-password" type="password" value={currentPassword} onChange={(e)=>setCurrentPassword(e.target.value)} placeholder="Enter current password" />
+                    <p className="text-xs text-muted-foreground mt-1">Required to confirm your identity.</p>
                   </div>
 
-                  <div className="grid gap-2">
+                  <div className="grid gap-1">
                     <Label htmlFor="new-password">New Password</Label>
                     <Input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
+                    <p className="text-xs text-muted-foreground mt-1">Use 6 or more characters. Avoid common words.</p>
                   </div>
                 </div>
 
-                <div className="grid gap-2 mt-4 max-w-md">
+                <div className="grid gap-1 mt-4 max-w-md">
                   <Label htmlFor="confirm-password">Confirm New Password</Label>
                   <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
+                  <p className="text-xs text-muted-foreground mt-1">Must match the new password.</p>
                 </div>
 
-                <div className="mt-5 flex justify-end">
-                  <Button variant="default" onClick={handleChangePassword} disabled={changingPassword}>
-                    {changingPassword ? 'Saving...' : 'Save Password'}
+                <div className="mt-6 flex justify-end">
+                  <Button variant="default" onClick={handleChangePassword} disabled={changingPassword} className="px-6">
+                    {changingPassword ? (
+                      <span className="inline-flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" /> Updating...</span>
+                    ) : (
+                      'Save Password'
+                    )}
                   </Button>
                 </div>
               </div>
