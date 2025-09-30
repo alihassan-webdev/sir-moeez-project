@@ -105,6 +105,30 @@ export default function ResultDetail() {
     });
   };
 
+  const handleDelete = async (id: string) => {
+    const u = auth.currentUser;
+    if (!u?.uid) return;
+    try {
+      await deleteDoc(doc(db, "users", u.uid, "results", id));
+      toast({ title: "Deleted", description: "Result removed." });
+    } catch (e: any) {
+      toast({
+        title: "Delete failed",
+        description: e?.message || "Could not delete result.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteMany = async (ids: string[]) => {
+    if (!ids.length) return;
+    const u = auth.currentUser;
+    if (!u?.uid) return;
+    const batch = writeBatch(db);
+    ids.forEach((rid) => batch.delete(doc(db, "users", u.uid, "results", rid)));
+    await batch.commit();
+  };
+
   return (
     <div className="min-h-svh">
       <Container className="py-6">
