@@ -7,9 +7,16 @@ type AnimatedNumberProps = {
   className?: string;
 };
 
-export default function AnimatedNumber({ value, format, duration = 1200, className }: AnimatedNumberProps) {
+export default function AnimatedNumber({
+  value,
+  format,
+  duration = 1200,
+  className,
+}: AnimatedNumberProps) {
   const ref = React.useRef<HTMLSpanElement | null>(null);
-  const [display, setDisplay] = React.useState<string>(format ? format(0) : "0");
+  const [display, setDisplay] = React.useState<string>(
+    format ? format(0) : "0",
+  );
   const rafRef = React.useRef<number | null>(null);
   const startRef = React.useRef<number | null>(null);
   const observedRef = React.useRef<boolean>(false);
