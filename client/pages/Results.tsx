@@ -12,7 +12,8 @@ import {
 function formatWhen(ts?: number): string {
   if (!ts) return "No attempts";
   try {
-    return new Date(ts).toLocaleString();
+    // Use user's locale but force 12-hour time with AM/PM
+    return new Date(ts).toLocaleString(undefined, { hour12: true, hour: "numeric", minute: "2-digit", year: "numeric", month: "short", day: "numeric" });
   } catch {
     return "No attempts";
   }
