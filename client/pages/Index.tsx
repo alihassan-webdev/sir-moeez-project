@@ -773,11 +773,25 @@ export default function Index() {
       return;
     }
 
+    // Compute a stable cache key based on the file content and query
+    const [{ makeKey, getCached, setCached }] = await Promise.all([
+      import("@/lib/cache"),
+    ]);
+    const buffer = await theFile.arrayBuffer();
+    const hashBuf = await crypto.subtle.digest("SHA-256", buffer);
+    const hashArr = Array.from(new Uint8Array(hashBuf));
+    const fileHash = hashArr.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const cacheKey = makeKey(["v1", "exam", fileHash, q]);
+    const cached = getCached(cacheKey);
+    if (cached) {
+      setResult(cached);
+      // No return: optionally refresh in background, but ensure UI is instant
+    }
+
     const sendTo = async (urlStr: string, timeoutMs: number) => {
       const isExternal = /^https?:/i.test(urlStr);
 
       let finalUrl = urlStr;
-      // If external and a query is provided, attach as query param for compatibility
       if (isExternal && q) {
         try {
           const u = new URL(urlStr);
@@ -787,11 +801,6 @@ export default function Index() {
       }
 
       try {
-        console.debug("Attempting fetch ->", finalUrl, {
-          isExternal,
-          hasFile: !!theFile,
-        });
-        // If no file attached, send a lightweight JSON body with the query only
         if (!theFile) {
           const res = await withTimeout(
             fetch(finalUrl, {
@@ -814,7 +823,6 @@ export default function Index() {
           return res;
         }
 
-        // Otherwise send multipart form with the PDF
         const form = new FormData();
         form.append("pdf", theFile);
         form.append("query", q);
@@ -836,30 +844,10 @@ export default function Index() {
         );
         return res;
       } catch (err: any) {
-        try {
-          if (err?.message === "timeout") {
-            console.warn("Request timed out:", finalUrl);
-          } else if (
-            err?.message === "Failed to fetch" ||
-            err?.name === "TypeError"
-          ) {
-            console.warn(
-              "Network or CORS error when fetching:",
-              finalUrl,
-              err?.message ?? err,
-            );
-          } else if (err?.name === "AbortError") {
-            // Should not happen now, but silently handle
-            console.warn("Fetch aborted:", finalUrl);
-          } else {
-            console.warn("Fetch error:", finalUrl, err?.message ?? err);
-          }
-        } catch {}
         return null;
       }
     };
 
-    // Check whether a lightweight request to the given URL responds (used to test proxies)
     const checkEndpoint = async (_urlStr: string, _timeoutMs = 3000) => {
       return true;
     };
@@ -867,12 +855,8 @@ export default function Index() {
     try {
       setLoading(true);
       let res: Response | null = null;
-
-      // Direct API call disabled; route via Netlify proxy only
-      let initialRes: Response | null = null;
       res = null as any;
 
-      // Try internal proxy paths
       if (!res || !res.ok) {
         const proxies = ["/.netlify/functions/proxy"];
         for (const proxyPath of proxies) {
@@ -882,14 +866,12 @@ export default function Index() {
               res = attempt;
               break;
             }
-          } catch {
-            // continue to next proxy
-          }
+          } catch {}
         }
       }
 
       if (!res) {
-        // If we get here, it likely failed due to CORS or network. Provide a helpful error.
+        if (cached) return; // show cached silently
         throw new Error("Network error. Please try again.");
       }
 
@@ -901,6 +883,7 @@ export default function Index() {
         } catch (e) {
           detail = res.statusText || "";
         }
+        if (cached) return; // keep cached
         throw new Error(detail || `HTTP ${res.status}`);
       }
       if (contentType.includes("application/json")) {
@@ -913,18 +896,21 @@ export default function Index() {
                 json?.result ??
                 json?.message ??
                 JSON.stringify(json, null, 2));
-          setResult(String(text));
+          const out = String(text);
+          setResult(out);
+          setCached(cacheKey, out);
         } catch (e) {
-          // fallback if json parsing fails
           const txt = await res
             .clone()
             .text()
             .catch(() => "");
           setResult(txt);
+          setCached(cacheKey, txt);
         }
       } else {
         const text = await res.clone().text();
         setResult(text);
+        setCached(cacheKey, text);
       }
     } catch (err: any) {
       const msg =
@@ -932,7 +918,6 @@ export default function Index() {
           ? "Request timed out. Please try again."
           : err?.message || "Request failed";
       setError(msg);
-      // Silent: avoid user-facing toast; background fallbacks already tried
     } finally {
       setLoading(false);
     }
