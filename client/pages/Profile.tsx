@@ -478,13 +478,16 @@ export default function Profile() {
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
-                        disabled={deleting}
+                        disabled={deleting || !canConfirmDelete}
                         onClick={async () => {
                           if (!user?.uid) {
                             toast({
                               title: "Not authenticated",
                               variant: "destructive",
                             });
+                            return;
+                          }
+                          if (!canConfirmDelete) {
                             return;
                           }
                           setDeleting(true);
