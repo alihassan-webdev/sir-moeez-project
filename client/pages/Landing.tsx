@@ -4,6 +4,7 @@ import Container from "@/components/layout/Container";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Pricing from "./Pricing";
+import AnimatedNumber from "@/components/ui/animated-number";
 import Footer from "@/components/layout/Footer";
 
 export default function Landing() {
