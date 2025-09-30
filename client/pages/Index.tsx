@@ -864,7 +864,7 @@ export default function Index() {
       setLoading(true);
 
       const attempt = await withTimeout(
-        fetch("/.netlify/functions/proxy", {
+        fetch("/api/proxy", {
           method: "POST",
           body: form,
           headers: { Accept: "application/json" },
