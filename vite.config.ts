@@ -35,8 +35,7 @@ export default defineConfig(({ mode }) => ({
         target: process.env.PREDICT_ENDPOINT || "https://api-va5v.onrender.com",
         changeOrigin: true,
         secure: true,
-        rewrite: (path) =>
-          path.replace("/api/proxy", "/generate-questions"),
+        rewrite: (path) => path.replace("/api/proxy", "/generate-questions"),
       },
     },
   },
