@@ -44,7 +44,13 @@ export default function Profile() {
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [confirmText, setConfirmText] = React.useState("");
   const navigate = useNavigate();
+
+  const canConfirmDelete = React.useMemo(
+    () => confirmText.trim().toUpperCase() === "DELETE",
+    [confirmText],
+  );
 
   const [form, setForm] = React.useState({
     name: "",
