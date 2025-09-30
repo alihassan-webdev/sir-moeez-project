@@ -34,7 +34,6 @@ import {
 } from "@/lib/account";
 import { Upload, Trash2 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -366,13 +365,14 @@ export default function Profile() {
                   </Avatar>
                   <div>
                     <h2 className="text-2xl font-semibold">{form.name || user?.displayName || "My Profile"}</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">{user?.email}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <Badge variant="outline">Member</Badge>
-                    </div>
+                    <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
-                {/* Edit Profile button removed as requested */}
+                <div>
+                  <Button type="button" variant="outline" onClick={onEdit} className="px-4">
+                    Edit Profile
+                  </Button>
+                </div>
               </div>
 
               <form
