@@ -4,14 +4,23 @@ import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import {
   examTypeLabels,
-  fetchAllResultsByType,
   type ExamTypeSlug as ExamType,
 } from "@/lib/results";
 import { Button } from "@/components/ui/button";
-import { Download, ArrowLeft } from "lucide-react";
+import { Download, ArrowLeft, Trash2 } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
 import { auth, db } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+  writeBatch,
+} from "firebase/firestore";
+import { toast } from "@/hooks/use-toast";
 
 function useInstituteHeader() {
   const [inst, setInst] = useState<{
