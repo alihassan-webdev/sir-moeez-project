@@ -344,15 +344,36 @@ export default function QnA() {
       };
 
       let res: Response | null = null;
+      const tried: string[] = [];
+
       const proxies = ["/.netlify/functions/proxy"]; // Route via Netlify Function only
       for (const p of proxies) {
+        tried.push(p);
         const attempt = await sendTo(p, retryTimeoutMs);
         if (attempt && attempt.ok) {
           res = attempt;
           break;
         }
       }
-      if (!res) throw new Error("Network error. Please try again.");
+
+      if (!res) {
+        const directCandidates = [API_URL, "/api/generate-questions"];
+        for (const d of directCandidates) {
+          if (!d) continue;
+          tried.push(d);
+          const attempt = await sendTo(d, retryTimeoutMs);
+          if (attempt && attempt.ok) {
+            res = attempt;
+            break;
+          }
+        }
+      }
+
+      if (!res) {
+        console.warn("All generate attempts failed:", tried);
+        throw new Error("Network error. Please try again.");
+      }
+
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         throw new Error(t || `HTTP ${res.status}`);
