@@ -393,15 +393,38 @@ Use concise, exam-style wording suitable for classroom tests.`;
       };
 
       let res: Response | null = null;
-      const proxies = ["/.netlify/functions/proxy"]; // Route via Netlify Function only
+      const tried: string[] = [];
+
+      // Try Netlify function proxy first (if available), then direct server endpoint(s)
+      const proxies = ["/.netlify/functions/proxy"];
       for (const p of proxies) {
+        tried.push(p);
         const attempt = await sendTo(p, retryTimeoutMs);
         if (attempt && attempt.ok) {
           res = attempt;
           break;
         }
       }
-      if (!res) throw new Error("Network error. Please try again.");
+
+      // If proxy failed, try configured API_URL (VITE_PREDICT_ENDPOINT) and then direct server path
+      if (!res) {
+        const directCandidates = [API_URL, "/api/generate-questions"];
+        for (const d of directCandidates) {
+          if (!d) continue;
+          tried.push(d);
+          const attempt = await sendTo(d, retryTimeoutMs);
+          if (attempt && attempt.ok) {
+            res = attempt;
+            break;
+          }
+        }
+      }
+
+      if (!res) {
+        console.warn("All generate attempts failed:", tried);
+        throw new Error("Network error. Please try again.");
+      }
+
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         throw new Error(t || `HTTP ${res.status}`);
