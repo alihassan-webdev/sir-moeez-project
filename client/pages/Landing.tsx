@@ -131,7 +131,7 @@ export default function Landing() {
                   <li className="flex items-start gap-3">
                     <span className="mt-1 text-primary">•</span>
                     <span>
-                      Zero typing effort. We have 7,00,000+ questions.
+                      Zero typing effort. We have <AnimatedNumber value={700000} format={(n)=>n.toLocaleString("en-IN") + "+"} /> questions.
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
