@@ -21,9 +21,11 @@ function makeKey(event) {
   return `v1|${ct}|${q}|${bodyHash}`;
 }
 
-export const handler = async (event) => {
-  if (!process.env.TARGET_API_KEY) {
-    console.warn("[proxy] TARGET_API_KEY not set – proceeding without Authorization header");
+export const handler = async (event, context) => {
+  // Netlify Function entry point: use environment variable for API key
+  const TARGET_API_KEY = process.env.TARGET_API_KEY || process.env.PREDICT_API_KEY || null;
+  if (!TARGET_API_KEY) {
+    console.warn("[proxy] WARNING: TARGET_API_KEY / PREDICT_API_KEY not set. Upstream requests will be unauthenticated.");
   }
   const TARGETS = [
     process.env.TARGET_API_URL,
