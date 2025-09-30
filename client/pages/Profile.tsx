@@ -13,6 +13,7 @@ import {
   deleteUser,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  updatePassword,
 } from "firebase/auth";
 import {
   doc,
@@ -237,6 +238,60 @@ export default function Profile() {
     }
   };
 
+  // Change password states
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [changingPassword, setChangingPassword] = React.useState(false);
+
+  const validatePasswordForm = () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast({ title: "All fields are required", variant: "destructive" });
+      return false;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+      return false;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "New passwords do not match", variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
+  const handleChangePassword = async () => {
+    if (!user?.uid || !auth.currentUser) {
+      toast({ title: "Not authenticated", variant: "destructive" });
+      return;
+    }
+    if (!validatePasswordForm()) return;
+    setChangingPassword(true);
+    try {
+      const email = auth.currentUser.email;
+      if (!email) throw new Error("Missing email on account");
+      const cred = EmailAuthProvider.credential(email, currentPassword);
+      await reauthenticateWithCredential(auth.currentUser, cred);
+      await updatePassword(auth.currentUser, newPassword);
+      toast({ title: "Password updated successfully" });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      console.error(err);
+      const msg = err?.code || err?.message || "";
+      if (String(msg).includes("auth/wrong-password") || String(msg).toLowerCase().includes("incorrect")) {
+        toast({ title: "Incorrect current password", variant: "destructive" });
+      } else if (String(msg).includes("recent") || String(msg).includes("auth/requires-recent-login")) {
+        toast({ title: "Session expired, please re-login and try again.", variant: "destructive" });
+      } else {
+        toast({ title: "Failed to update password", description: err?.message || "Please try again.", variant: "destructive" });
+      }
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const onCancel = () => {
     setForm(lastSavedRef.current);
     setIsEditing(false);
@@ -438,6 +493,31 @@ export default function Profile() {
                   )}
                 </div>
               </form>
+            </div>
+
+            {/* Change Password */}
+            <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-6">
+              <h3 className="text-lg font-semibold">Change Password</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Update your account password. You will need to enter your current password to confirm.</p>
+              <div className="mt-4 max-w-xl">
+                <div className="grid gap-2">
+                  <Label htmlFor="current-password">Current Password</Label>
+                  <Input id="current-password" type="password" value={currentPassword} onChange={(e)=>setCurrentPassword(e.target.value)} placeholder="••••••••" />
+                </div>
+                <div className="grid gap-2 mt-3">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
+                </div>
+                <div className="grid gap-2 mt-3">
+                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
+                </div>
+                <div className="mt-4">
+                  <Button variant="default" onClick={handleChangePassword} disabled={changingPassword}>
+                    {changingPassword ? 'Saving...' : 'Save Password'}
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {/* Danger Zone */}
