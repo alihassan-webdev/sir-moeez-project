@@ -242,20 +242,15 @@ export default function Profile() {
   // Change password states
   const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
   const [changingPassword, setChangingPassword] = React.useState(false);
 
   const validatePasswordForm = () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (!currentPassword || !newPassword) {
       toast({ title: "All fields are required", variant: "destructive" });
       return false;
     }
     if (newPassword.length < 6) {
       toast({ title: "Password must be at least 6 characters", variant: "destructive" });
-      return false;
-    }
-    if (newPassword !== confirmPassword) {
-      toast({ title: "New passwords do not match", variant: "destructive" });
       return false;
     }
     return true;
@@ -277,7 +272,6 @@ export default function Profile() {
       toast({ title: "Password updated successfully" });
       setCurrentPassword("");
       setNewPassword("");
-      setConfirmPassword("");
     } catch (err: any) {
       console.error(err);
       const msg = err?.code || err?.message || "";
@@ -484,12 +478,6 @@ export default function Profile() {
                     <Input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Minimum 6 characters" />
                     <p className="text-xs text-muted-foreground mt-1">Use 6 or more characters. Avoid common words.</p>
                   </div>
-                </div>
-
-                <div className="grid gap-1 mt-4 max-w-md">
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
-                  <p className="text-xs text-muted-foreground mt-1">Must match the new password.</p>
                 </div>
 
                 <div className="mt-6 flex justify-end">
