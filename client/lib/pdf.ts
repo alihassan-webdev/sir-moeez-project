@@ -44,15 +44,48 @@ export async function generateExamStylePdf(params: {
     wrapper.style.top = "0";
     wrapper.style.width = "794px"; // approx A4 width in px at 96dpi
     wrapper.className = "paper-view";
+
+    // Header: institute logo + name (fixed size, maintain aspect ratio)
+    const header = document.createElement("div");
+    header.style.display = "flex";
+    header.style.alignItems = "center";
+    header.style.gap = "12px";
+    header.style.padding = "12px 18px";
+    header.style.boxSizing = "border-box";
+    header.style.width = "100%";
+
+    if (params.instituteHeader?.instituteLogo) {
+      const img = document.createElement("img");
+      img.src = params.instituteHeader.instituteLogo;
+      img.alt = params.instituteHeader.instituteName || "";
+      img.style.width = "90px"; // fixed width
+      img.style.height = "40px"; // fixed height
+      img.style.objectFit = "contain";
+      img.style.flex = "0 0 auto";
+      header.appendChild(img);
+    }
+    if (params.instituteHeader?.instituteName) {
+      const h = document.createElement("div");
+      h.textContent = params.instituteHeader.instituteName;
+      h.style.fontWeight = "700";
+      h.style.fontSize = "16px";
+      h.style.color = "#000";
+      h.style.flex = "1 1 auto";
+      header.appendChild(h);
+    }
+
     const inner = document.createElement("div");
     inner.className =
       "paper-body prose prose-invert prose-lg leading-relaxed max-w-none break-words";
+    inner.style.marginTop = "8px";
     try {
       const fmt = await import("@/lib/format");
+      // Use body only; do not inject extra title headings
       inner.innerHTML = fmt.formatResultHtml(body || "");
     } catch {
       inner.textContent = body || "";
     }
+    wrapper.appendChild(header);
     wrapper.appendChild(inner);
     document.body.appendChild(wrapper);
     container = inner;
