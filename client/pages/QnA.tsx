@@ -25,6 +25,7 @@ import {
 import { formatResultHtml } from "@/lib/format";
 import ToolLock from "@/components/ToolLock";
 import { saveUserResult } from "@/lib/results";
+import { fetchOnce } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -37,7 +38,8 @@ const API_URL = (() => {
 
 export default function QnA() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
-    as: "url",
+    query: "?url",
+    import: "default",
     eager: true,
   }) as Record<string, string>;
   const entries: Entry[] = Object.entries(pdfModules).map(([path, url]) => ({
@@ -363,29 +365,16 @@ export default function QnA() {
         let text = "";
         let success = false;
         for (let attempt = 0; attempt < 3; attempt++) {
-          const controller = new AbortController();
-          const res = await withTimeout(
-            fetch(API_URL, {
-              method: "POST",
-              body: form,
-              headers: { Accept: "application/json" },
-              cache: "no-store",
-              signal: controller.signal as any,
-            }),
-            30000,
-          ).catch(() => null as any);
-          if (res && res.ok) {
-            text = stripAnswers(await extractText(res));
-            success = true;
-            break;
-          }
-          if (res && res.status === 422) {
-            try {
-              const j = await res
-                .json()
-                .catch(async () => ({ result: await res.text() }));
-              text = stripAnswers(String(j?.result ?? ""));
-            } catch {}
+          const res = await withTimeout(fetchOnce(form), 30000).catch(
+            () => null as any,
+          );
+          if (res && res.success !== false) {
+            if (typeof res === "string") text = stripAnswers(String(res));
+            else if (typeof res?.result === "string") text = stripAnswers(res.result);
+            else {
+              const got = res?.questions ?? res?.message ?? "";
+              text = stripAnswers(String(got));
+            }
             success = true;
             break;
           }

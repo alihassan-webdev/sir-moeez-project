@@ -25,7 +25,4 @@
   to = "/index.html"
   status = 200
 
-# Edge function for static caching
-[[edge_functions]]
-  function = "edge-cache"
-  path = "/*"
+## Removed edge function to prevent caching API responses

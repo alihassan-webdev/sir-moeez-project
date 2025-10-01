@@ -69,7 +69,8 @@ function ExternalPdfSelector({
   onResultTitle?: (title: string) => void;
 }) {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
-    as: "url",
+    query: "?url",
+    import: "default",
     eager: true,
   }) as Record<string, string>;
   const entries = Object.entries(pdfModules).map(([path, url]) => ({

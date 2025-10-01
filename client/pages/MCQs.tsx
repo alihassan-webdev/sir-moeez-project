@@ -35,7 +35,8 @@ type Entry = { path: string; url: string; name: string };
 
 export default function MCQs() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
-    as: "url",
+    query: "?url",
+    import: "default",
     eager: true,
   }) as Record<string, string>;
 
