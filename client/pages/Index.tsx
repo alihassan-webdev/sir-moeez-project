@@ -47,11 +47,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 const MAX_SIZE = 15 * 1024 * 1024; // 15MB
 
-// API endpoint selection: env override -> Netlify serverless proxy (always)
-const API_URL = (() => {
-  const env = import.meta.env.VITE_PREDICT_ENDPOINT as string | undefined;
-  return env && env.trim() ? env : "/api/proxy";
-})();
+// API handled centrally via `@/lib/endpoints` (direct Render endpoint, no proxy)
 
 function ExternalPdfSelector({
   onLoadFile,
@@ -825,12 +821,11 @@ export default function Index() {
     form.append("pdf", theFile);
     form.append("query", q);
     form.append("requestId", String(Date.now()));
-
     try {
       setLoading(true);
-      const resp = await withTimeout(fetchWithRetry(form, 1), 30000).catch(() => null as any);
+      const resp = await withTimeout(fetchWithRetry(form), 30000).catch(() => null as any);
       if (!resp || resp.success === false) {
-        setError("Request failed. Please try again.");
+        setError("Server busy, please try again.");
         return;
       }
       if (typeof resp === "string") {
@@ -842,16 +837,11 @@ export default function Index() {
         setResult(String(text).trim());
       }
     } catch (err: any) {
-      const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
-      setError(msg);
+      setError("Server busy, please try again.");
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!result) return;
-    if (lastSavedRef.current === result) return;
     lastSavedRef.current = result;
     (async () => {
       try {

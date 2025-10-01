@@ -1,6 +1,7 @@
 // Centralized API endpoint and helper
 
-export const API_URL = "/api/proxy" as const;
+// Use direct API endpoint everywhere (localhost and production)
+export const API_URL = "https://api-va5v.onrender.com/generate-questions" as const;
 
 export type FetchOnceResult = any;
 
@@ -9,12 +10,9 @@ export async function fetchOnce(payload: Record<string, any> | FormData): Promis
   const isForm = typeof FormData !== "undefined" && payload instanceof FormData;
 
   try {
-    // Append cache-busting timestamp and support absolute URL in preview/live
+    // Append cache-busting timestamp and always use direct API (no proxy)
     const ts = Date.now();
-    const netlifySite = (import.meta as any)?.env?.VITE_NETLIFY_SITE_URL as string | undefined;
-    const isLocal = typeof window !== "undefined" && /localhost|127\.0\.0\.1/i.test(window.location.host);
-    const base = !isLocal && netlifySite ? netlifySite.replace(/\/$/, "") : "";
-    const url = `${base}${API_URL}?t=${ts}`;
+    const url = `${API_URL}?t=${ts}`;
 
     let res: Response;
     if (isForm) {
@@ -38,9 +36,9 @@ export async function fetchOnce(payload: Record<string, any> | FormData): Promis
       // Try to parse error JSON; fall back to generic
       try {
         const j = await res.json();
-        return j ?? { success: false, message: "⚠️ Server busy, please try again." };
+        return j ?? { success: false, message: "Server busy, please try again." };
       } catch {
-        return { success: false, message: "⚠️ Server busy, please try again." };
+        return { success: false, message: "Server busy, please try again." };
       }
     }
 
@@ -52,22 +50,16 @@ export async function fetchOnce(payload: Record<string, any> | FormData): Promis
     const text = await res.text();
     return { success: true, result: text };
   } catch {
-    return { success: false, message: "⚠️ Server busy, please try again." };
+    return { success: false, message: "Server busy, please try again." };
   }
 }
 
 // Single-retry wrapper with small backoff
+// Single-attempt wrapper (no auto-retries)
 export async function fetchWithRetry(
   payload: Record<string, any> | FormData,
-  retryCount = 1,
+  _retryCount = 0,
 ): Promise<FetchOnceResult> {
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-  let last: FetchOnceResult | null = null;
-  for (let attempt = 0; attempt <= retryCount; attempt++) {
-    const res = await fetchOnce(payload);
-    if (res && res.success !== false) return res;
-    last = res;
-    if (attempt < retryCount) await sleep(800);
-  }
-  return last ?? { success: false, message: "⚠️ Server busy, please try again." };
+  const res = await fetchOnce(payload);
+  return res ?? { success: false, message: "Server busy, please try again." };
 }

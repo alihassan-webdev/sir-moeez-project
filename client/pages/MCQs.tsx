@@ -138,6 +138,7 @@ export default function MCQs() {
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
   const canEnterCount = !!file && !isMerging;
+  const isCountValid = mcqCount != null && mcqCount >= 5 && mcqCount <= 30;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -636,7 +637,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           <input
                             type="number"
                             min={5}
-                            max={100}
+                            max={30}
                             value={mcqCount ?? ""}
                             onChange={(e) =>
                               setMcqCount(
@@ -649,6 +650,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                             placeholder="Enter count"
                           />
+                          {!isCountValid && mcqCount != null && (
+                            <span className="text-xs text-destructive">Enter between 5–30</span>
+                          )}
                           <button
                             type="button"
                             onClick={() => setMcqCount(10)}
@@ -679,7 +683,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                     <div className="mt-4 flex gap-3">
                       <Button
-                        disabled={!file || !mcqCount || loading || isMerging}
+                        disabled={!file || !mcqCount || !isCountValid || loading || isMerging}
                         onClick={runSubmit}
                         className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                       >
