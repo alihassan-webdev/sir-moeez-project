@@ -27,16 +27,11 @@ import { Link } from "react-router-dom";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { saveUserResult } from "@/lib/results";
+import { fetchOnce } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
-// API endpoint selection: same fallback as Index
-const API_URL = (() => {
-  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
-    | string
-    | undefined;
-  return env && env.trim() ? env : "/api/proxy";
-})();
+// Using centralized API_URL from endpoints.ts via fetchOnce
 
 export default function MCQs() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
@@ -337,6 +332,8 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
   const runSubmit = async () => {
     setLoading(true);
+    // Always clear previous result before a fresh generation
+    setResult(null);
     try {
       if (!file) {
         toast({
@@ -346,123 +343,131 @@ Use concise, exam-style wording suitable for classroom tests.`;
         setLoading(false);
         return;
       }
-      if (!mcqCount || mcqCount < 5 || mcqCount > 100) {
-        toast({ title: "Invalid count", description: "Enter 5–100 MCQs." });
+      if (!mcqCount || mcqCount < 5 || mcqCount > 30) {
+        toast({ title: "Invalid count", description: "Enter 5–30 MCQs." });
         setLoading(false);
         return;
       }
+      // Batching strategy
+      const total = mcqCount;
+      const BATCH_SIZE = 30;
+      const batches: number[] = [];
+      let remaining = total;
+      while (remaining > 0) {
+        const chunk = Math.min(BATCH_SIZE, remaining);
+        batches.push(chunk);
+        remaining -= chunk;
+      }
 
-      const { makeKey, getCached, setCached, getLatest, setLatest } =
-        await import("@/lib/cache");
-      const uid = (auth.currentUser && auth.currentUser.uid) || "anon";
-      const cacheKey = makeKey([
-        "v1",
-        "mcqs",
-        selectedClass,
-        selectedSubject,
-        [...selectedChapterPaths].sort().join(";"),
-        mcqCount,
-      ]);
-      const latestKeyVal = getLatest("mcqs", uid);
-      const cached = getCached(cacheKey);
+      const assembled: string[] = [];
 
-      if (cached) {
-        setResult(cached);
-        setLoading(false);
-        // Background refresh
-        void (async () => {
-          const q = buildMcqPrompt(mcqCount);
-          const form = new FormData();
-          form.append("pdf", file);
-          form.append("query", q);
-          try {
-            const res = await withTimeout(
-              fetch(API_URL, {
-                method: "POST",
-                body: form,
-                headers: { Accept: "application/json" },
-              }),
-              7000,
-            );
-            if (res && res.ok) {
-              const ct = res.headers.get("content-type") || "";
-              const txt = ct.includes("application/json")
-                ? String(
-                    (await res.json().catch(async () => await res.text())) ??
-                      "",
-                  )
-                : await res.text();
-              setResult(txt);
-              setCached(cacheKey, txt);
-              setLatest("mcqs", txt, uid);
+      const extractText = async (r: Response | null) => {
+        if (!r) return "";
+        const ct = r.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          const j = await r.json().catch(async () => await r.text());
+          const got =
+            typeof j === "string"
+              ? j
+              : (j?.questions ?? j?.result ?? j?.message ?? JSON.stringify(j));
+          return String(got ?? "").trim();
+        }
+        return String((await r.text()) ?? "").trim();
+      };
+
+      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+      const backoffs = [500, 1000, 2000];
+
+      const validateCount = (txt: string, exp: number) => {
+        if (!txt) return false;
+        let matches = txt.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
+        let count = matches.length;
+        if (count === 0) {
+          matches = txt.match(/^\s*\d+\s*[\.)\:]/gim) || [];
+          count = matches.length;
+        }
+        return count === exp;
+      };
+
+      let hadHardFailure = false;
+
+      for (let i = 0; i < batches.length; i++) {
+        const want = batches[i];
+        const q = buildMcqPrompt(want);
+
+        // New form per batch (payload kept minimal)
+        const form = new FormData();
+        form.append("pdf", file);
+        form.append("query", q);
+        form.append("expected", String(want));
+        form.append("requestId", String(Date.now()));
+
+        let text = "";
+        let success = false;
+
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const res = await withTimeout(fetchOnce(form), 30000).catch(
+            () => null as any,
+          );
+
+          if (res && res.success !== false) {
+            if (typeof res === "string") text = String(res);
+            else if (typeof res?.result === "string") text = res.result;
+            else {
+              const got = res?.questions ?? res?.message ?? "";
+              text = String(got);
             }
-          } catch {}
-        })();
-        return;
-      }
+            success = true;
+            break;
+          }
 
-      // No exact cache → use latest per type immediately if available
-      if (latestKeyVal) setResult(latestKeyVal);
-
-      const q = buildMcqPrompt(mcqCount);
-      const form = new FormData();
-      form.append("pdf", file);
-      form.append("query", q);
-
-      const attempt = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        10000,
-      ).catch(() => null as any);
-
-      if (!attempt) {
-        // Keep whatever cached/latest was shown
-        return;
-      }
-      if (!attempt.ok) {
-        // Keep cached/latest
-        return;
-      }
-
-      const contentType = attempt.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
-        const json = await attempt
-          .json()
-          .catch(async () => await attempt.text());
-        const text =
-          typeof json === "string"
-            ? json
-            : (json?.questions ??
-              json?.result ??
-              json?.message ??
-              JSON.stringify(json));
-        const finalText = String(text || "").trim();
-        setResult(finalText);
-        setCached(cacheKey, finalText);
-        setLatest("mcqs", finalText, uid);
-        if (!finalText) {
-          console.warn("MCQ generation: empty result from API (json)");
-          toast({
-            title: "No content",
-            description: "The generation service returned no content.",
-          });
+          // backoff before next try
+          await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
         }
-      } else {
-        const text = String((await attempt.text()) || "").trim();
-        setResult(text);
-        setCached(cacheKey, text);
-        setLatest("mcqs", text, uid);
-        if (!text) {
-          console.warn("MCQ generation: empty result from API (text)");
-          toast({
-            title: "No content",
-            description: "The generation service returned no content.",
-          });
+
+        if (!success) {
+          hadHardFailure = true;
+          break;
+        }
+
+        // Append batch result and update UI progressively
+        if (text) {
+          assembled.push(text);
+          setResult(assembled.join("\n\n"));
         }
       }
+
+      const final = (assembled.join("\n\n")).trim();
+      if (!final) {
+        toast({
+          title: "Generation failed",
+          description:
+            "Too many questions requested. Please reduce count or try again.",
+          variant: "destructive",
+        });
+        setResult(null);
+        return;
+      }
+
+      // Final validation: total count should match request; otherwise show warning but keep content
+      const totalOk = (() => {
+        let matches = final.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
+        let count = matches.length;
+        if (count === 0) {
+          matches = final.match(/^\s*\d+\s*[\.)\:]/gim) || [];
+          count = matches.length;
+        }
+        return count === total;
+      })();
+
+      if (!totalOk) {
+        toast({
+          title: "Assembled with differences",
+          description:
+            "Generated count differs from requested. Please review the paper.",
+        });
+      }
+      setResult(final);
     } finally {
       setLoading(false);
     }

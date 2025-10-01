@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
+import { fetchOnce } from "@/lib/endpoints";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -150,11 +151,13 @@ function ExternalPdfSelector({
   const canSelectSubject = !!selectedClass && !isLocked;
   const canSelectChapters = !!selectedSubjectName && !isLocked;
   const canEnterMarks = selectedChapterPaths.length > 0 && !isLocked;
+  const isMarksValid = totalMarks != null && totalMarks >= 20 && totalMarks <= 100;
   const canGenerate =
     !!selectedClass &&
     !!selectedSubjectName &&
     selectedChapterPaths.length > 0 &&
     totalMarks != null &&
+    isMarksValid &&
     !loading &&
     !isMerging &&
     !isLocked;
@@ -568,6 +571,9 @@ function ExternalPdfSelector({
                 className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                 placeholder="Enter marks"
               />
+              {!isMarksValid && totalMarks != null && (
+                <span className="text-xs text-destructive">Enter between 20–100</span>
+              )}
               <button
                 type="button"
                 onClick={() => setTotalMarks(30)}
@@ -628,9 +634,14 @@ function ExternalPdfSelector({
                   description: "Please enter a value between 20 and 100.",
                 });
               }
+              if (!isMarksValid) {
+                return toast({
+                  title: "Invalid marks",
+                  description: "Marks must be between 20 and 100.",
+                });
+              }
               const subjectName = selectedSubjectName || "";
-              const marks = Math.min(100, Math.max(20, Number(totalMarks)));
-              if (marks !== totalMarks) setTotalMarks(marks);
+              const marks = Number(totalMarks);
               const generated = buildPaperSchemePrompt(
                 subjectName,
                 selectedClass || "",
@@ -793,6 +804,7 @@ export default function Index() {
 
   const runSubmit = async (fArg?: File | null, qArg?: string) => {
     setError(null);
+    // Never show old results
     setResult(null);
     const theFile = fArg ?? file;
     const q = (qArg ?? query).trim();
@@ -807,115 +819,29 @@ export default function Index() {
       return;
     }
 
-    // Compute a stable cache key based on the file content and query
-    const [{ makeKey, getCached, setCached, getLatest, setLatest }] =
-      await Promise.all([import("@/lib/cache")]);
-    const buffer = await theFile.arrayBuffer();
-    const hashBuf = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArr = Array.from(new Uint8Array(hashBuf));
-    const fileHash = hashArr
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    const cacheKey = makeKey(["v1", "exam", fileHash, q]);
-    const cached = getCached(cacheKey);
-
-    if (cached) {
-      setResult(cached);
-      setLoading(false);
-      // background refresh
-      void (async () => {
-        const form = new FormData();
-        form.append("pdf", theFile);
-        form.append("query", q);
-        try {
-          const res = await withTimeout(
-            fetch(API_URL, {
-              method: "POST",
-              body: form,
-              headers: { Accept: "application/json" },
-            }),
-            10000,
-          );
-          if (res && res.ok) {
-            const ct = res.headers.get("content-type") || "";
-            const txt = ct.includes("application/json")
-              ? String(
-                  (await res.json().catch(async () => await res.text())) ?? "",
-                )
-              : await res.text();
-            setResult(txt);
-            setCached(cacheKey, txt);
-            setLatest("exam", txt, "anon");
-          }
-        } catch {}
-      })();
-      return;
-    }
-
-    // No exact cache → show latest per-type if available
-    const latest = getLatest("exam", "anon");
-    if (latest) setResult(latest);
-
+    // Build fresh form request with cache-busting
     const form = new FormData();
     form.append("pdf", theFile);
     form.append("query", q);
+    form.append("requestId", String(Date.now()));
 
     try {
       setLoading(true);
-
-      const attempt = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        15000,
-      ).catch(() => null as any);
-
-      if (!attempt) {
-        return; // keep showing latest if present
-      }
-      if (!attempt.ok) {
+      const resp = await withTimeout(fetchOnce(form), 30000).catch(() => null as any);
+      if (!resp || resp.success === false) {
+        setError("Request failed. Please try again.");
         return;
       }
-
-      const contentType = attempt.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
-        try {
-          const json = await attempt
-            .json()
-            .catch(async () => await attempt.text());
-          const text =
-            typeof json === "string"
-              ? json
-              : (json?.questions ??
-                json?.result ??
-                json?.message ??
-                JSON.stringify(json, null, 2));
-          const out = String(text);
-          setResult(out);
-          setCached(cacheKey, out);
-          setLatest("exam", out, "anon");
-        } catch (e) {
-          const txt = await attempt
-            .clone()
-            .text()
-            .catch(() => "");
-          setResult(txt);
-          setCached(cacheKey, txt);
-          setLatest("exam", txt, "anon");
-        }
+      if (typeof resp === "string") {
+        setResult(String(resp).trim());
+      } else if (typeof resp?.result === "string") {
+        setResult(String(resp.result).trim());
       } else {
-        const text = await attempt.clone().text();
-        setResult(text);
-        setCached(cacheKey, text);
-        setLatest("exam", text, "anon");
+        const text = resp?.questions ?? resp?.message ?? "";
+        setResult(String(text).trim());
       }
     } catch (err: any) {
-      const msg =
-        err?.message === "timeout"
-          ? "Request timed out. Please try again."
-          : err?.message || "Request failed";
+      const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
       setError(msg);
     } finally {
       setLoading(false);
@@ -928,11 +854,21 @@ export default function Index() {
     lastSavedRef.current = result;
     (async () => {
       try {
-        const { saveResult } = await import("@/lib/results");
-        await saveResult({ examType: "exam", content: result });
+        const { saveUserResult } = await import("@/lib/results");
+        const { getInstitute } = await import("@/lib/account");
+        const inst = getInstitute();
+        await saveUserResult({
+          examType: "exam",
+          title: latestTitle || "Exam",
+          resultData: result,
+          downloadUrl: null,
+          score: null,
+          instituteName: inst?.name,
+          instituteLogo: inst?.logo,
+        });
       } catch {}
     })();
-  }, [result]);
+  }, [result, latestTitle]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -55,11 +55,14 @@ export const handleProxy: RequestHandler = async (req, res) => {
       headers: forwardHeaders,
       body: req as any,
       signal: controller.signal,
+      cache: "no-store",
     }).finally(() => clearTimeout(timeout));
 
     // Mirror status and headers
     const headers = new Headers(upstream.headers);
     headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    headers.set("Pragma", "no-cache");
 
     const buf = Buffer.from(await upstream.arrayBuffer());
     res.status(upstream.status);
@@ -67,6 +70,8 @@ export const handleProxy: RequestHandler = async (req, res) => {
     return res.send(buf);
   } catch (err: any) {
     Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    res.setHeader("Pragma", "no-cache");
     const message = err?.message || String(err);
     return res
       .status(502)

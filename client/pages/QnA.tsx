@@ -32,7 +32,7 @@ const API_URL = (() => {
   const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
     | string
     | undefined;
-  return env && env.trim() ? env : "/api/proxy";
+  return env && env.trim() ? env : "/api/generate-questions";
 })();
 
 export default function QnA() {
@@ -285,6 +285,8 @@ export default function QnA() {
 
   const runSubmit = async () => {
     setLoading(true);
+    // Always clear previous result before a fresh generation
+    setResult(null);
     try {
       if (!file) {
         toast({
@@ -302,103 +304,139 @@ export default function QnA() {
         setLoading(false);
         return;
       }
-
-      const { makeKey, getCached, setCached, getLatest, setLatest } =
-        await import("@/lib/cache");
-      const uid = "anon";
-
-      const cacheKey = makeKey([
-        "v1",
-        "qna",
-        selectedClass,
-        selectedSubject,
-        [...selectedChapterPaths].sort().join(";"),
-        qaCount,
-      ]);
-      const cached = getCached(cacheKey);
-      if (cached) {
-        setResult(cached);
-        setLoading(false);
-        // background refresh
-        void (async () => {
-          const q = buildQaPrompt(qaCount);
-          const form = new FormData();
-          form.append("pdf", file);
-          form.append("query", q);
-          try {
-            const res = await withTimeout(
-              fetch(API_URL, {
-                method: "POST",
-                body: form,
-                headers: { Accept: "application/json" },
-              }),
-              7000,
-            );
-            if (res && res.ok) {
-              const ct = res.headers.get("content-type") || "";
-              const txt = ct.includes("application/json")
-                ? String(
-                    (await res.json().catch(async () => await res.text())) ??
-                      "",
-                  )
-                : await res.text();
-              setResult(txt);
-              setCached(cacheKey, txt);
-              setLatest("qna", txt, uid);
-            }
-          } catch {}
-        })();
-        return;
+      // Batching strategy
+      const total = qaCount;
+      const BATCH_SIZE = 30;
+      const batches: number[] = [];
+      let remaining = total;
+      while (remaining > 0) {
+        const chunk = Math.min(BATCH_SIZE, remaining);
+        batches.push(chunk);
+        remaining -= chunk;
       }
 
-      // No exact cache → use latest per type immediately if available
-      const latest = getLatest("qna", uid);
-      if (latest) setResult(latest);
+      const extractText = async (r: Response | null) => {
+        if (!r) return "";
+        const ct = r.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          const j = await r.json().catch(async () => await r.text());
+          const got =
+            typeof j === "string"
+              ? j
+              : (j?.questions ?? j?.result ?? j?.message ?? JSON.stringify(j));
+          return String(got ?? "").trim();
+        }
+        return String((await r.text()) ?? "").trim();
+      };
 
-      const q = buildQaPrompt(qaCount);
-      const form = new FormData();
-      form.append("pdf", file);
-      form.append("query", q);
-
-      const attempt = await withTimeout(
-        fetch(API_URL, {
-          method: "POST",
-          body: form,
-          headers: { Accept: "application/json" },
-        }),
-        10000,
-      ).catch(() => null as any);
-
-      if (!attempt) return; // keep showing cached/latest
-      if (!attempt.ok) return;
-
-      const contentType = attempt.headers.get("content-type") || "";
       const stripAnswers = (s: string) =>
         s
           .replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "")
           .replace(/\n{3,}/g, "\n\n");
-      if (contentType.includes("application/json")) {
-        const json = await attempt
-          .json()
-          .catch(async () => await attempt.text());
-        const text =
-          typeof json === "string"
-            ? json
-            : (json?.questions ??
-              json?.result ??
-              json?.message ??
-              JSON.stringify(json));
-        const finalText = stripAnswers(String(text));
-        setResult(finalText);
-        setCached(cacheKey, finalText);
-        setLatest("qna", finalText, uid);
-      } else {
-        const text = await attempt.text();
-        const finalText = stripAnswers(text);
-        setResult(finalText);
-        setCached(cacheKey, finalText);
-        setLatest("qna", finalText, uid);
+
+      const validateCount = (txt: string, exp: number) => {
+        if (!txt) return false;
+        let matches = txt.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
+        let count = matches.length;
+        if (count === 0) {
+          matches = txt.match(/^\s*\d+\s*[\.)\:]/gim) || [];
+          count = matches.length;
+        }
+        return count === exp;
+      };
+
+      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+      const backoffs = [500, 1000, 2000];
+
+      const assembled: string[] = [];
+
+      for (let i = 0; i < batches.length; i++) {
+        const want = batches[i];
+        const q = buildQaPrompt(want);
+
+        const form = new FormData();
+        form.append("pdf", file);
+        form.append("query", q);
+        form.append("expected", String(want));
+        form.append("requestId", String(Date.now()));
+
+        let text = "";
+        let success = false;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const controller = new AbortController();
+          const res = await withTimeout(
+            fetch(API_URL, {
+              method: "POST",
+              body: form,
+              headers: { Accept: "application/json" },
+              cache: "no-store",
+              signal: controller.signal as any,
+            }),
+            30000,
+          ).catch(() => null as any);
+          if (res && res.ok) {
+            text = stripAnswers(await extractText(res));
+            success = true;
+            break;
+          }
+          if (res && res.status === 422) {
+            try {
+              const j = await res
+                .json()
+                .catch(async () => ({ result: await res.text() }));
+              text = stripAnswers(String(j?.result ?? ""));
+            } catch {}
+            success = true;
+            break;
+          }
+          await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
+        }
+        if (!success) {
+          toast({
+            title: "Generation failed",
+            description:
+              "Too many questions requested. Please reduce count or try again.",
+            variant: "destructive",
+          });
+          setResult(null);
+          return;
+        }
+        if (text) {
+          assembled.push(text);
+          setResult(assembled.join("\n\n"));
+        }
       }
+
+      const final = assembled.join("\n\n").trim();
+      if (!final) {
+        toast({
+          title: "Generation failed",
+          description:
+            "Too many questions requested. Please reduce count or try again.",
+          variant: "destructive",
+        });
+        setResult(null);
+        return;
+      }
+
+      const totalOk = (() => {
+        let matches = final.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
+        let count = matches.length;
+        if (count === 0) {
+          matches = final.match(/^\s*\d+\s*[\.)\:]/gim) || [];
+          count = matches.length;
+        }
+        return count === total;
+      })();
+
+      if (!totalOk) {
+        toast({
+          title: "Assembled with differences",
+          description:
+            "Generated count differs from requested. Please review the paper.",
+        });
+      }
+      setResult(final);
     } finally {
       setLoading(false);
     }
