@@ -29,7 +29,12 @@ import { fetchWithRetry } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
-// API endpoint handled centrally in `@/lib/endpoints`.
+const API_URL = (() => {
+  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
+    | string
+    | undefined;
+  return env && env.trim() ? env : "/api/generate-questions";
+})();
 
 export default function QnA() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
@@ -376,7 +381,8 @@ export default function QnA() {
         if (!success) {
           toast({
             title: "Generation failed",
-            description: "Server busy, please try again.",
+            description:
+              "Too many questions requested. Please reduce count or try again.",
             variant: "destructive",
           });
           setResult(null);
@@ -392,7 +398,8 @@ export default function QnA() {
       if (!final) {
         toast({
           title: "Generation failed",
-          description: "Server busy, please try again.",
+          description:
+            "Too many questions requested. Please reduce count or try again.",
           variant: "destructive",
         });
         setResult(null);
