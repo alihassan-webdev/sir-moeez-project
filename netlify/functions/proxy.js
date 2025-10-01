@@ -5,8 +5,8 @@ exports.handler = async (event) => {
       statusCode: 500,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         Pragma: "no-cache",
         "Content-Type": "application/json",
@@ -21,8 +21,8 @@ exports.handler = async (event) => {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         Pragma: "no-cache",
       },
@@ -39,39 +39,50 @@ exports.handler = async (event) => {
     const isBase64 = !!event.isBase64Encoded;
     const body = event.body
       ? isBase64
-        ? Buffer.from(event.body, "base64")
+        ? Buffer.from(event.body, "base64").toString("utf8")
         : event.body
       : undefined;
 
+    // Always send JSON upstream. If body looks like form/multipart, try to pass raw.
+    let upstreamHeaders = { ...headers };
+    if (!upstreamHeaders["content-type"]) {
+      upstreamHeaders["Content-Type"] = "application/json";
+    }
+
     const upstream = await fetch(url, {
       method: "POST",
-      headers,
+      headers: upstreamHeaders,
       body,
     });
-    const buf = Buffer.from(await upstream.arrayBuffer());
-    const contentType = upstream.headers.get("content-type") || "application/json";
+    const text = await upstream.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { success: true, result: text };
+    }
     return {
       statusCode: upstream.status,
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         Pragma: "no-cache",
       },
-      body: buf.toString("utf8"),
+      body: JSON.stringify(data),
     };
   } catch (err) {
     return {
       statusCode: 502,
       headers: {
+        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         Pragma: "no-cache",
-        "Content-Type": "application/json",
       },
       body: JSON.stringify({ success: false, message: "Server busy, try again." }),
     };
