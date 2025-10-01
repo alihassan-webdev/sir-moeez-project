@@ -1,6 +1,12 @@
 [build]
-  command = "npm run build"
+  command = "pnpm build"
   publish = "dist/"
+
+[build.environment]
+  VITE_API_URL = "https://api-va5v.onrender.com/generate-questions"
+  VITE_NETLIFY_SITE_URL = "https://freetestgenerator.netlify.app"
+  NETLIFY_USE_PNPM = "true"
+  NODE_VERSION = "18"
 
 [functions]
   node_bundler = "esbuild"

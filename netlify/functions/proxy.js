@@ -1,4 +1,4 @@
-export const handler = async (event) => {
+exports.handler = async (event) => {
   const target = process.env.VITE_API_URL || process.env.PREDICT_ENDPOINT;
   if (!target) {
     return {
