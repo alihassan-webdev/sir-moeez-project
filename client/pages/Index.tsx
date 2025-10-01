@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import { fetchOnce } from "@/lib/endpoints";
+import { fetchWithRetry } from "@/lib/endpoints";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -828,7 +828,7 @@ export default function Index() {
 
     try {
       setLoading(true);
-      const resp = await withTimeout(fetchOnce(form), 30000).catch(() => null as any);
+      const resp = await withTimeout(fetchWithRetry(form, 1), 30000).catch(() => null as any);
       if (!resp || resp.success === false) {
         setError("Request failed. Please try again.");
         return;

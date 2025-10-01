@@ -27,7 +27,7 @@ import { Link } from "react-router-dom";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { saveUserResult } from "@/lib/results";
-import { fetchOnce } from "@/lib/endpoints";
+import { fetchWithRetry } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -406,8 +406,8 @@ Use concise, exam-style wording suitable for classroom tests.`;
         let text = "";
         let success = false;
 
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const res = await withTimeout(fetchOnce(form), 30000).catch(
+        for (let attempt = 0; attempt < 1; attempt++) {
+          const res = await withTimeout(fetchWithRetry(form, 1), 30000).catch(
             () => null as any,
           );
 
@@ -422,7 +422,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
             break;
           }
 
-          // backoff before next try
+          // backoff before next try (only happens if retry wrapper also failed)
           await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
         }
 

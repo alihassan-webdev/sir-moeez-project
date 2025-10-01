@@ -25,7 +25,7 @@ import {
 import { formatResultHtml } from "@/lib/format";
 import ToolLock from "@/components/ToolLock";
 import { saveUserResult } from "@/lib/results";
-import { fetchOnce } from "@/lib/endpoints";
+import { fetchWithRetry } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -100,6 +100,7 @@ export default function QnA() {
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
   const canEnterCount = !!file && !isMerging;
+  const isCountValid = qaCount != null && qaCount >= 5 && qaCount <= 30;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -298,11 +299,8 @@ export default function QnA() {
         setLoading(false);
         return;
       }
-      if (!qaCount || qaCount < 1 || qaCount > 200) {
-        toast({
-          title: "Invalid count",
-          description: "Enter 1–200 Q&A pairs.",
-        });
+      if (!qaCount || qaCount < 5 || qaCount > 30) {
+        toast({ title: "Invalid count", description: "Enter 5–30 Q&A pairs." });
         setLoading(false);
         return;
       }
@@ -364,8 +362,8 @@ export default function QnA() {
 
         let text = "";
         let success = false;
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const res = await withTimeout(fetchOnce(form), 30000).catch(
+        for (let attempt = 0; attempt < 1; attempt++) {
+          const res = await withTimeout(fetchWithRetry(form, 1), 30000).catch(
             () => null as any,
           );
           if (res && res.success !== false) {
@@ -592,8 +590,8 @@ export default function QnA() {
                         <div className="flex gap-2 items-center flex-wrap">
                           <input
                             type="number"
-                            min={1}
-                            max={200}
+                            min={5}
+                            max={30}
                             value={qaCount ?? ""}
                             onChange={(e) =>
                               setQaCount(
@@ -606,6 +604,9 @@ export default function QnA() {
                             className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                             placeholder="Enter count"
                           />
+                          {!isCountValid && qaCount != null && (
+                            <span className="text-xs text-destructive">Enter between 5–30</span>
+                          )}
                           <button
                             type="button"
                             onClick={() => setQaCount(5)}
@@ -636,7 +637,7 @@ export default function QnA() {
 
                     <div className="mt-4 flex gap-3">
                       <Button
-                        disabled={!file || !qaCount || loading || isMerging}
+                        disabled={!file || !qaCount || !isCountValid || loading || isMerging}
                         onClick={runSubmit}
                         className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                       >

@@ -34,7 +34,6 @@ export async function fetchOnce(payload: Record<string, any> | FormData): Promis
         cache: "no-store",
       });
     }
-
     if (!res.ok) {
       // Try to parse error JSON; fall back to generic
       try {
@@ -55,4 +54,20 @@ export async function fetchOnce(payload: Record<string, any> | FormData): Promis
   } catch {
     return { success: false, message: "⚠️ Server busy, please try again." };
   }
+}
+
+// Single-retry wrapper with small backoff
+export async function fetchWithRetry(
+  payload: Record<string, any> | FormData,
+  retryCount = 1,
+): Promise<FetchOnceResult> {
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  let last: FetchOnceResult | null = null;
+  for (let attempt = 0; attempt <= retryCount; attempt++) {
+    const res = await fetchOnce(payload);
+    if (res && res.success !== false) return res;
+    last = res;
+    if (attempt < retryCount) await sleep(800);
+  }
+  return last ?? { success: false, message: "⚠️ Server busy, please try again." };
 }

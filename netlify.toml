@@ -26,3 +26,8 @@
   status = 200
 
 ## Removed edge function to prevent caching API responses
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-cache"

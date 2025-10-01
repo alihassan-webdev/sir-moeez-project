@@ -48,12 +48,15 @@ exports.handler = async (event) => {
     if (!upstreamHeaders["content-type"]) {
       upstreamHeaders["Content-Type"] = "application/json";
     }
-
+    const controller = new AbortController();
+    const to = setTimeout(() => controller.abort(), 8000);
     const upstream = await fetch(url, {
       method: "POST",
       headers: upstreamHeaders,
       body,
+      signal: controller.signal,
     });
+    clearTimeout(to);
     const text = await upstream.text();
     let data;
     try {
