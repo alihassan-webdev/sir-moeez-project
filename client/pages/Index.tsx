@@ -19,6 +19,7 @@ import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { fetchOnce } from "@/lib/endpoints";
+import { formatResultHtml } from "@/lib/format";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -363,7 +364,7 @@ function ExternalPdfSelector({
     marks: number,
   ) => {
     // Build a prompt that asks the AI to generate a full exam paper (questions, not just scheme)
-    return `Generate a complete exam-style question paper for Class ${cls} in the subject "${subjectName}" of total ${marks} marks.\n\nStructure requirements:\n1) Section A - MCQs: allocate between 10% and 20% of total marks to MCQs. Each MCQ should be 1 mark and include four options labeled a), b), c), d). Number all MCQs sequentially (Q1, Q2, ...).\n2) Section B - Short Questions: allocate between 30% and 40% of total marks. Each short question should be 4 or 5 marks. Number questions sequentially continuing from MCQs.\n3) Section C - Long Questions: allocate between 30% and 40% of total marks. Each long question should be 8 to 10 marks. Number questions sequentially continuing from Section B.\n\nContent and formatting instructions:\n- Provide actual question text for every item (do NOT output only a scheme).\n- For MCQs include clear options (a/b/c/d) and ensure only one correct option logically exists (do NOT reveal answers).\n- Short and long questions should be clear, exam-style (descriptive, conceptual or numerical as appropriate), and require the indicated length of answer.\n- Use headings exactly: "Section A - MCQs", "Section B - Short Questions", "Section C - Long Questions".\n- Use numbering like Q1, Q2, Q3 ... across the paper.\n- Ensure the marks per question and number of questions sum exactly to the total ${marks} marks. If multiple valid distributions exist, choose a balanced distribution that fits the percentage ranges and explain the distribution briefly at the top in one line.\n- Do NOT provide answers or solutions.\n- Keep layout professional and easy to read (use line breaks, headings, and spacing similar to an exam paper).\n\nOutput only the exam paper text (no metadata, no commentary).`;
+    return `Generate a complete exam-style question paper for Class ${cls} in the subject "${subjectName}" of total ${marks} marks.\n\nStructure requirements:\n1) Section A - MCQs: allocate between 10% and 20% of total marks to MCQs. Each MCQ should be 1 mark and include four options labeled a), b), c), d). Number all MCQs sequentially (Q1, Q2, ...).\n2) Section B - Short Questions: allocate between 30% and 40% of total marks. Each short question should be 4 or 5 marks. Number questions sequentially continuing from MCQs.\n3) Section C - Long Questions: allocate between 30% and 40% of total marks. Each long question should be 8 to 10 marks. Number questions sequentially continuing from Section B.\n\nContent and formatting instructions:\n- Provide actual question text for every item (do NOT output only a scheme).\n- For MCQs include clear options (a/b/c/d) and ensure only one correct option logically exists (do NOT reveal answers).\n- Short and long questions should be clear, exam-style (descriptive, conceptual or numerical as appropriate), and require the indicated length of answer.\n- Use headings exactly: "Section A - MCQs", "Section B - Short Questions", "Section C - Long Questions".\n- Use numbering like Q1, Q2, Q3 ... across the paper.\n- Ensure the marks per question and number of questions sum exactly to the total ${marks} marks.\n- Do NOT include any line like "Distribution:" or any percentage distribution summary in the output.\n- Do NOT provide answers or solutions.\n- Keep layout professional and easy to read (use line breaks, headings, and spacing similar to an exam paper).\n\nOutput only the exam paper text (no metadata, no commentary).`;
   };
 
   function subjectOf(p: string) {
@@ -878,70 +879,6 @@ export default function Index() {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
-  // Enhanced formatter: renumber per section, convert **bold** to <strong>, style headings, questions and options
-  const formatResultHtml = (txt: string) => {
-    if (!txt) return "";
-
-    // 1) Renumber questions per section: reset to Q1 at each "Section ..." heading
-    const renumbered = (() => {
-      const lines = txt.split(/\r?\n/);
-      let count = 0;
-      let inSection = false;
-      const out: string[] = [];
-      const headingRe = /^\s*Section\s+[A-Z0-9\-–].*$/i;
-      const qRe = /^(\s*)Q\d+\.\s*/i;
-      for (const line of lines) {
-        if (headingRe.test(line)) {
-          inSection = true;
-          count = 0;
-          out.push(line);
-          continue;
-        }
-        if (inSection && qRe.test(line)) {
-          count += 1;
-          out.push(line.replace(qRe, `$1Q${count}. `));
-        } else {
-          out.push(line);
-        }
-      }
-      return out.join("\n");
-    })();
-
-    // 2) Escape HTML to avoid XSS
-    let out = escapeHtml(renumbered);
-
-    // 3) Convert bold **text**
-    out = out.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-    // 4) Headings: lines starting with Section or Section A/B/C -> styled h3 in theme color
-    out = out.replace(
-      /^\s*(Section\s+[A-Z0-9\-���].*)$/gim,
-      '<h3 class="text-xl font-extrabold text-secondary mb-3">$1</h3>',
-    );
-
-    // 5) Question lines 'Q1.' -> larger bold line
-    out = out.replace(
-      /^\s*(Q\d+\.)\s*(.*)$/gim,
-      '<p class="text-lg font-semibold mb-3"><strong>$1</strong> $2</p>',
-    );
-
-    // 6) MCQ options like 'a) text'
-    out = out.replace(
-      /^\s*([a-d])\)\s*(.*)$/gim,
-      '<div class="ml-6 mb-2 text-base"><strong class="mr-2">$1)</strong>$2</div>',
-    );
-
-    // 7) Paragraph spacing
-    out = out.replace(/\n{2,}/g, '</p><p class="mb-4">');
-    out = out.replace(/\n/g, "<br />");
-
-    if (!out.startsWith("<h3>") && !out.startsWith("<p>")) {
-      out = `<p class=\"mb-4\">${out}</p>`;
-    }
-
-    return out;
-  };
-
   return (
     <div className="min-h-svh">
       <Container className="py-6">
@@ -991,6 +928,26 @@ export default function Index() {
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold">Result</h3>
                       <div className="flex items-center gap-2">
+                        <Button
+                          aria-label="Copy to clipboard"
+                          variant="secondary"
+                          size="icon"
+                          disabled={!result || !!loading}
+                          onClick={async () => {
+                            if (!result) return;
+                            try {
+                              await navigator.clipboard.writeText(result);
+                              toast({ title: "Copied", description: "Result copied to clipboard." });
+                            } catch {
+                              toast({ title: "Copy failed", description: "Could not copy to clipboard." });
+                            }
+                          }}
+                        >
+                          {/* Using Lucide Copy icon via Download as placeholder is not ideal; ensure proper import elsewhere */}
+                          <span className="sr-only">Copy</span>
+                          {/* Add a simple SVG copy icon inline to avoid extra imports */}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </Button>
                         <Button
                           aria-label="Download PDF"
                           variant="secondary"
