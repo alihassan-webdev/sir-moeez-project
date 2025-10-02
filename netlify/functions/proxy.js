@@ -71,19 +71,29 @@ exports.handler = async (event) => {
       }
     };
 
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const backoffs = [800, 1600]; // two retries after the first attempt
+    let attempt = 0;
     let upstream = await doRequest();
-
-    // Handle 429 with Retry-After (seconds) or small default backoff
-    if (upstream.status === 429) {
-      const retryAfter = upstream.headers.get("retry-after");
-      const waitMs = retryAfter ? Math.min(5000, Number(retryAfter) * 1000 || 0) : 1200;
-      if (waitMs > 0) await new Promise((r) => setTimeout(r, waitMs));
-      upstream = await doRequest();
-    }
-
-    // Retry once for transient 502/503/504
-    if ([502, 503, 504].includes(upstream.status)) {
-      await new Promise((r) => setTimeout(r, 800));
+    while (attempt < backoffs.length && (upstream.status === 429 || [502,503,504].includes(upstream.status))) {
+      let waitMs = backoffs[attempt];
+      if (upstream.status === 429) {
+        const ra = upstream.headers.get("retry-after");
+        if (ra) {
+          const sec = Number(ra);
+          if (!Number.isNaN(sec)) {
+            waitMs = Math.min(7000, Math.max(waitMs, sec * 1000));
+          } else {
+            const dateMs = Date.parse(ra);
+            if (!Number.isNaN(dateMs)) {
+              const diff = dateMs - Date.now();
+              if (diff > 0) waitMs = Math.min(10000, Math.max(waitMs, diff));
+            }
+          }
+        }
+      }
+      await sleep(waitMs);
+      attempt++;
       upstream = await doRequest();
     }
 

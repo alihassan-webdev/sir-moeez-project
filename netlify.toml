@@ -4,6 +4,7 @@
 
 [build.environment]
   PREDICT_ENDPOINT = "https://api-va5v.onrender.com/generate-questions"
+  VITE_PREDICT_ENDPOINT = "/api/predict"
 
 [[redirects]]
   from = "/api/predict"
@@ -12,7 +13,7 @@
   force = true
 
 [[redirects]]
-  from = "/api/*"
-  to = "https://api-va5v.onrender.com/:splat"
+  from = "/api/proxy"
+  to = "/.netlify/functions/proxy"
   status = 200
   force = true
