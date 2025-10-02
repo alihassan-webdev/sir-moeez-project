@@ -23,12 +23,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatResultHtml } from "@/lib/format";
+import ToolLock from "@/components/ToolLock";
 import { saveUserResult } from "@/lib/results";
-import { fetchDirect } from "@/lib/endpoints";
+import { fetchWithRetry } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
-  // Direct API is used via fetchDirect helper
+const API_URL = (() => {
+  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
+    | string
+    | undefined;
+  return env && env.trim() ? env : "/api/generate-questions";
+})();
 
 export default function QnA() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
@@ -263,7 +269,18 @@ export default function QnA() {
     await mergeSelected(next);
   };
 
-  // No request-level timeouts or retries for direct calls
+  const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T> => {
+    return await new Promise<T>((resolve, reject) => {
+      const id = setTimeout(() => reject(new Error("timeout")), ms);
+      p.then((v) => {
+        clearTimeout(id);
+        resolve(v);
+      }).catch((e) => {
+        clearTimeout(id);
+        reject(e);
+      });
+    });
+  };
 
   const buildQaPrompt = (n: number) => {
     return `Generate exactly ${n} QUESTIONS strictly from the attached PDF chapter.\n\nRules:\n- Output QUESTIONS ONLY (no answers, solutions, hints, or explanations).\n- Number sequentially starting at Q1., Q2., ...\n- Use clear, exam-style wording; each question 1–2 sentences.\n- Do NOT include MCQ options.\n\nFormat:\nQ1. <question>\nQ2. <question>\n...`;
@@ -287,29 +304,126 @@ export default function QnA() {
         setLoading(false);
         return;
       }
-      // Single-call direct request
-      const want = qaCount;
-      const q = buildQaPrompt(want);
-      const form = new FormData();
-      form.append("pdf", file);
-      form.append("query", q);
-      form.append("expected", String(want));
+      // Batching strategy
+      const total = qaCount;
+      const BATCH_SIZE = 30;
+      const batches: number[] = [];
+      let remaining = total;
+      while (remaining > 0) {
+        const chunk = Math.min(BATCH_SIZE, remaining);
+        batches.push(chunk);
+        remaining -= chunk;
+      }
 
-      const res = await fetchDirect(form);
-      if (!res || res.success === false) {
-        toast({ title: "Server busy, please try again." });
+      const extractText = async (r: Response | null) => {
+        if (!r) return "";
+        const ct = r.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          const j = await r.json().catch(async () => await r.text());
+          const got =
+            typeof j === "string"
+              ? j
+              : (j?.questions ?? j?.result ?? j?.message ?? JSON.stringify(j));
+          return String(got ?? "").trim();
+        }
+        return String((await r.text()) ?? "").trim();
+      };
+
+      const stripAnswers = (s: string) =>
+        s
+          .replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "")
+          .replace(/\n{3,}/g, "\n\n");
+
+      const validateCount = (txt: string, exp: number) => {
+        if (!txt) return false;
+        let matches = txt.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
+        let count = matches.length;
+        if (count === 0) {
+          matches = txt.match(/^\s*\d+\s*[\.)\:]/gim) || [];
+          count = matches.length;
+        }
+        return count === exp;
+      };
+
+      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+      const backoffs = [500, 1000, 2000];
+
+      const assembled: string[] = [];
+
+      for (let i = 0; i < batches.length; i++) {
+        const want = batches[i];
+        const q = buildQaPrompt(want);
+
+        const form = new FormData();
+        form.append("pdf", file);
+        form.append("query", q);
+        form.append("expected", String(want));
+        form.append("requestId", String(Date.now()));
+
+        let text = "";
+        let success = false;
+        for (let attempt = 0; attempt < 1; attempt++) {
+          const res = await withTimeout(fetchWithRetry(form, 1), 30000).catch(
+            () => null as any,
+          );
+          if (res && res.success !== false) {
+            if (typeof res === "string") text = stripAnswers(String(res));
+            else if (typeof res?.result === "string") text = stripAnswers(res.result);
+            else {
+              const got = res?.questions ?? res?.message ?? "";
+              text = stripAnswers(String(got));
+            }
+            success = true;
+            break;
+          }
+          await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
+        }
+        if (!success) {
+          toast({
+            title: "Generation failed",
+            description:
+              "Too many questions requested. Please reduce count or try again.",
+            variant: "destructive",
+          });
+          setResult(null);
+          return;
+        }
+        if (text) {
+          assembled.push(text);
+          setResult(assembled.join("\n\n"));
+        }
+      }
+
+      const final = assembled.join("\n\n").trim();
+      if (!final) {
+        toast({
+          title: "Generation failed",
+          description:
+            "Too many questions requested. Please reduce count or try again.",
+          variant: "destructive",
+        });
         setResult(null);
         return;
       }
-      let text = "";
-      if (typeof res === "string") text = String(res);
-      else if (typeof res?.result === "string") text = res.result;
-      else text = String(res?.questions ?? res?.message ?? "");
-      // Strip accidental answers/hints to keep questions-only
-      text = text
-        .replace(/^\s*(Answer|Ans)\s*[:.-]\s*.*$/gim, "")
-        .replace(/\n{3,}/g, "\n\n");
-      setResult(text.trim());
+
+      const totalOk = (() => {
+        let matches = final.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
+        let count = matches.length;
+        if (count === 0) {
+          matches = final.match(/^\s*\d+\s*[\.)\:]/gim) || [];
+          count = matches.length;
+        }
+        return count === total;
+      })();
+
+      if (!totalOk) {
+        toast({
+          title: "Assembled with differences",
+          description:
+            "Generated count differs from requested. Please review the paper.",
+        });
+      }
+      setResult(final);
     } finally {
       setLoading(false);
     }
