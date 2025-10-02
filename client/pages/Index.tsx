@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import { fetchWithRetry } from "@/lib/endpoints";
+import { fetchDirect } from "@/lib/endpoints";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -47,11 +47,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 const MAX_SIZE = 15 * 1024 * 1024; // 15MB
 
-// API endpoint selection: env override -> Netlify serverless proxy (always)
-const API_URL = (() => {
-  const env = import.meta.env.VITE_PREDICT_ENDPOINT as string | undefined;
-  return env && env.trim() ? env : "/api/proxy";
-})();
+// Direct API is used via fetchDirect helper
 
 function ExternalPdfSelector({
   onLoadFile,
@@ -789,19 +785,7 @@ export default function Index() {
     if (el) el.value = "";
   };
 
-  // Utility: promise timeout without aborting the underlying fetch
-  const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T> => {
-    return await new Promise<T>((resolve, reject) => {
-      const id = setTimeout(() => reject(new Error("timeout")), ms);
-      p.then((v) => {
-        clearTimeout(id);
-        resolve(v);
-      }).catch((e) => {
-        clearTimeout(id);
-        reject(e);
-      });
-    });
-  };
+  // No request-level timeouts or retries for direct calls
 
   const runSubmit = async (fArg?: File | null, qArg?: string) => {
     setError(null);
@@ -820,27 +804,22 @@ export default function Index() {
       return;
     }
 
-    // Build fresh form request with cache-busting
+    // Build fresh form request (direct API helper adds cache-busting & requestId)
     const form = new FormData();
     form.append("pdf", theFile);
     form.append("query", q);
-    form.append("requestId", String(Date.now()));
+    // requestId is appended by fetchDirect
 
     try {
       setLoading(true);
-      const resp = await withTimeout(fetchWithRetry(form, 1), 30000).catch(() => null as any);
+      const resp = await fetchDirect(form);
       if (!resp || resp.success === false) {
-        setError("Request failed. Please try again.");
+        setError("Server busy, please try again.");
         return;
       }
-      if (typeof resp === "string") {
-        setResult(String(resp).trim());
-      } else if (typeof resp?.result === "string") {
-        setResult(String(resp.result).trim());
-      } else {
-        const text = resp?.questions ?? resp?.message ?? "";
-        setResult(String(text).trim());
-      }
+      if (typeof resp === "string") setResult(String(resp).trim());
+      else if (typeof resp?.result === "string") setResult(String(resp.result).trim());
+      else setResult(String(resp?.questions ?? resp?.message ?? "").trim());
     } catch (err: any) {
       const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
       setError(msg);

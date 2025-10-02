@@ -27,7 +27,7 @@ import { Link } from "react-router-dom";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { saveUserResult } from "@/lib/results";
-import { fetchWithRetry } from "@/lib/endpoints";
+import { fetchDirect } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -72,6 +72,7 @@ export default function MCQs() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const lastSavedRef = React.useRef<string | null>(null);
+  const isCountValid = mcqCount != null && mcqCount >= 5 && mcqCount <= 30;
 
   const [profile, setProfile] = useState<{
     name?: string;
@@ -344,131 +345,30 @@ Use concise, exam-style wording suitable for classroom tests.`;
         setLoading(false);
         return;
       }
-      if (!mcqCount || mcqCount < 5 || mcqCount > 30) {
+      if (!mcqCount || !isCountValid) {
         toast({ title: "Invalid count", description: "Enter 5–30 MCQs." });
         setLoading(false);
         return;
       }
-      // Batching strategy
-      const total = mcqCount;
-      const BATCH_SIZE = 30;
-      const batches: number[] = [];
-      let remaining = total;
-      while (remaining > 0) {
-        const chunk = Math.min(BATCH_SIZE, remaining);
-        batches.push(chunk);
-        remaining -= chunk;
-      }
+      // Single request (max 30)
+      const want = mcqCount;
+      const q = buildMcqPrompt(want);
+      const form = new FormData();
+      form.append("pdf", file);
+      form.append("query", q);
+      form.append("expected", String(want));
 
-      const assembled: string[] = [];
-
-      const extractText = async (r: Response | null) => {
-        if (!r) return "";
-        const ct = r.headers.get("content-type") || "";
-        if (ct.includes("application/json")) {
-          const j = await r.json().catch(async () => await r.text());
-          const got =
-            typeof j === "string"
-              ? j
-              : (j?.questions ?? j?.result ?? j?.message ?? JSON.stringify(j));
-          return String(got ?? "").trim();
-        }
-        return String((await r.text()) ?? "").trim();
-      };
-
-      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-      const backoffs = [500, 1000, 2000];
-
-      const validateCount = (txt: string, exp: number) => {
-        if (!txt) return false;
-        let matches = txt.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
-        let count = matches.length;
-        if (count === 0) {
-          matches = txt.match(/^\s*\d+\s*[\.)\:]/gim) || [];
-          count = matches.length;
-        }
-        return count === exp;
-      };
-
-      let hadHardFailure = false;
-
-      for (let i = 0; i < batches.length; i++) {
-        const want = batches[i];
-        const q = buildMcqPrompt(want);
-
-        // New form per batch (payload kept minimal)
-        const form = new FormData();
-        form.append("pdf", file);
-        form.append("query", q);
-        form.append("expected", String(want));
-        form.append("requestId", String(Date.now()));
-
-        let text = "";
-        let success = false;
-
-        for (let attempt = 0; attempt < 1; attempt++) {
-          const res = await withTimeout(fetchWithRetry(form, 1), 30000).catch(
-            () => null as any,
-          );
-
-          if (res && res.success !== false) {
-            if (typeof res === "string") text = String(res);
-            else if (typeof res?.result === "string") text = res.result;
-            else {
-              const got = res?.questions ?? res?.message ?? "";
-              text = String(got);
-            }
-            success = true;
-            break;
-          }
-
-          // backoff before next try (only happens if retry wrapper also failed)
-          await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
-        }
-
-        if (!success) {
-          hadHardFailure = true;
-          break;
-        }
-
-        // Append batch result and update UI progressively
-        if (text) {
-          assembled.push(text);
-          setResult(assembled.join("\n\n"));
-        }
-      }
-
-      const final = (assembled.join("\n\n")).trim();
-      if (!final) {
-        toast({
-          title: "Generation failed",
-          description:
-            "Too many questions requested. Please reduce count or try again.",
-          variant: "destructive",
-        });
+      const res = await fetchDirect(form);
+      if (!res || res.success === false) {
+        toast({ title: "Server busy, please try again." });
         setResult(null);
         return;
       }
-
-      // Final validation: total count should match request; otherwise show warning but keep content
-      const totalOk = (() => {
-        let matches = final.match(/^\s*Q\s*\d+\s*[\.)\:]/gim) || [];
-        let count = matches.length;
-        if (count === 0) {
-          matches = final.match(/^\s*\d+\s*[\.)\:]/gim) || [];
-          count = matches.length;
-        }
-        return count === total;
-      })();
-
-      if (!totalOk) {
-        toast({
-          title: "Assembled with differences",
-          description:
-            "Generated count differs from requested. Please review the paper.",
-        });
-      }
-      setResult(final);
+      let text = "";
+      if (typeof res === "string") text = String(res);
+      else if (typeof res?.result === "string") text = res.result;
+      else text = String(res?.questions ?? res?.message ?? "");
+      setResult(text.trim());
     } finally {
       setLoading(false);
     }
@@ -636,7 +536,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           <input
                             type="number"
                             min={5}
-                            max={100}
+                            max={30}
                             value={mcqCount ?? ""}
                             onChange={(e) =>
                               setMcqCount(
@@ -649,6 +549,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                             placeholder="Enter count"
                           />
+                          {!isCountValid && mcqCount != null && (
+                            <span className="text-xs text-destructive">Enter between 5–30</span>
+                          )}
                           <button
                             type="button"
                             onClick={() => setMcqCount(10)}
@@ -679,7 +582,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                     <div className="mt-4 flex gap-3">
                       <Button
-                        disabled={!file || !mcqCount || loading || isMerging}
+                        disabled={!file || !mcqCount || !isCountValid || loading || isMerging}
                         onClick={runSubmit}
                         className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                       >
