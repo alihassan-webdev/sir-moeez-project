@@ -1,6 +1,5 @@
 // Centralized API endpoint and helper (no env, no proxies)
-const EXTERNAL_API = "https://api-va5v.onrender.com/generate-questions" as const;
-const LOCAL_PROXY = "/api/proxy" as const; // available in dev server (`server/index.ts`)
+const PROXY_URL = "/api/proxy" as const; // served by Express in dev and Netlify function in prod
 
 export type FetchOnceResult = any;
 
@@ -13,10 +12,7 @@ export type FetchOnceResult = any;
 export async function fetchOnce(payload: Record<string, any> | FormData): Promise<FetchOnceResult> {
   const isForm = typeof FormData !== "undefined" && payload instanceof FormData;
   const ts = Date.now();
-  // Prefer local proxy only on localhost to avoid CORS during development
-  const isLocal = typeof window !== "undefined" && /^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(window.location.host);
-  const baseUrl = isLocal ? LOCAL_PROXY : EXTERNAL_API;
-  const url = `${baseUrl}?t=${ts}`;
+  const url = `${PROXY_URL}?t=${ts}`;
 
   try {
     let res: Response;

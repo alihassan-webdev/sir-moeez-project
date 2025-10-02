@@ -1,5 +1,5 @@
 exports.handler = async (event) => {
-  const target = process.env.VITE_API_URL || process.env.PREDICT_ENDPOINT;
+  const target = process.env.VITE_API_URL || process.env.PREDICT_ENDPOINT || "https://api-va5v.onrender.com/generate-questions";
   const baseHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST,OPTIONS",
