@@ -2,9 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  PREDICT_ENDPOINT = "https://api-va5v.onrender.com/generate-questions"
+
 [[redirects]]
   from = "/api/predict"
-  to = "https://api-va5v.onrender.com/generate-questions"
+  to = "/.netlify/functions/proxy"
   status = 200
   force = true
 

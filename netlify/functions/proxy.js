@@ -55,16 +55,37 @@ exports.handler = async (event) => {
   }
 
   try {
-    const controller = new AbortController();
-    const to = setTimeout(() => controller.abort(), 60000);
-    const upstream = await fetch(target, {
-      method: "POST",
-      headers,
-      body,
-      signal: controller.signal,
-      cache: "no-store",
-    });
-    clearTimeout(to);
+    const doRequest = async () => {
+      const controller = new AbortController();
+      const to = setTimeout(() => controller.abort(), 60000);
+      try {
+        return await fetch(target, {
+          method: "POST",
+          headers,
+          body,
+          signal: controller.signal,
+          cache: "no-store",
+        });
+      } finally {
+        clearTimeout(to);
+      }
+    };
+
+    let upstream = await doRequest();
+
+    // Handle 429 with Retry-After (seconds) or small default backoff
+    if (upstream.status === 429) {
+      const retryAfter = upstream.headers.get("retry-after");
+      const waitMs = retryAfter ? Math.min(5000, Number(retryAfter) * 1000 || 0) : 1200;
+      if (waitMs > 0) await new Promise((r) => setTimeout(r, waitMs));
+      upstream = await doRequest();
+    }
+
+    // Retry once for transient 502/503/504
+    if ([502, 503, 504].includes(upstream.status)) {
+      await new Promise((r) => setTimeout(r, 800));
+      upstream = await doRequest();
+    }
 
     // Pass-through JSON when possible, otherwise return text
     const ct = upstream.headers.get("content-type") || "";
