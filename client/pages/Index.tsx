@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
-import { fetchWithRetry } from "@/lib/endpoints";
+import { fetchOnce } from "@/lib/endpoints";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -47,11 +47,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 const MAX_SIZE = 15 * 1024 * 1024; // 15MB
 
-// API endpoint selection: env override -> Netlify serverless proxy (always)
-const API_URL = (() => {
-  const env = import.meta.env.VITE_PREDICT_ENDPOINT as string | undefined;
-  return env && env.trim() ? env : "/api/proxy";
-})();
+// API endpoint is centralized in '@/lib/endpoints' (no env, no proxies)
 
 function ExternalPdfSelector({
   onLoadFile,
@@ -828,9 +824,9 @@ export default function Index() {
 
     try {
       setLoading(true);
-      const resp = await withTimeout(fetchWithRetry(form, 1), 30000).catch(() => null as any);
+      const resp = await fetchOnce(form).catch(() => null as any);
       if (!resp || resp.success === false) {
-        setError("Request failed. Please try again.");
+        setError("Server busy, please try again.");
         return;
       }
       if (typeof resp === "string") {
@@ -841,9 +837,6 @@ export default function Index() {
         const text = resp?.questions ?? resp?.message ?? "";
         setResult(String(text).trim());
       }
-    } catch (err: any) {
-      const msg = err?.message === "timeout" ? "Request timed out. Please try again." : err?.message || "Request failed";
-      setError(msg);
     } finally {
       setLoading(false);
     }

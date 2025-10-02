@@ -25,16 +25,11 @@ import {
 import { formatResultHtml } from "@/lib/format";
 import ToolLock from "@/components/ToolLock";
 import { saveUserResult } from "@/lib/results";
-import { fetchWithRetry } from "@/lib/endpoints";
+import { fetchOnce } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
-const API_URL = (() => {
-  const env = (import.meta.env as any).VITE_PREDICT_ENDPOINT as
-    | string
-    | undefined;
-  return env && env.trim() ? env : "/api/generate-questions";
-})();
+// Endpoint is centralized in '@/lib/endpoints' (no env, no proxies)
 
 export default function QnA() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
@@ -269,18 +264,7 @@ export default function QnA() {
     await mergeSelected(next);
   };
 
-  const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T> => {
-    return await new Promise<T>((resolve, reject) => {
-      const id = setTimeout(() => reject(new Error("timeout")), ms);
-      p.then((v) => {
-        clearTimeout(id);
-        resolve(v);
-      }).catch((e) => {
-        clearTimeout(id);
-        reject(e);
-      });
-    });
-  };
+  // No extra retry/timeout wrapping; delegated to direct fetch in endpoints
 
   const buildQaPrompt = (n: number) => {
     return `Generate exactly ${n} QUESTIONS strictly from the attached PDF chapter.\n\nRules:\n- Output QUESTIONS ONLY (no answers, solutions, hints, or explanations).\n- Number sequentially starting at Q1., Q2., ...\n- Use clear, exam-style wording; each question 1–2 sentences.\n- Do NOT include MCQ options.\n\nFormat:\nQ1. <question>\nQ2. <question>\n...`;
@@ -362,10 +346,8 @@ export default function QnA() {
 
         let text = "";
         let success = false;
-        for (let attempt = 0; attempt < 1; attempt++) {
-          const res = await withTimeout(fetchWithRetry(form, 1), 30000).catch(
-            () => null as any,
-          );
+        {
+          const res = await fetchOnce(form).catch(() => null as any);
           if (res && res.success !== false) {
             if (typeof res === "string") text = stripAnswers(String(res));
             else if (typeof res?.result === "string") text = stripAnswers(res.result);
@@ -374,9 +356,7 @@ export default function QnA() {
               text = stripAnswers(String(got));
             }
             success = true;
-            break;
           }
-          await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
         }
         if (!success) {
           toast({

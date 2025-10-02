@@ -27,7 +27,7 @@ import { Link } from "react-router-dom";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { saveUserResult } from "@/lib/results";
-import { fetchWithRetry } from "@/lib/endpoints";
+import { fetchOnce } from "@/lib/endpoints";
 
 type Entry = { path: string; url: string; name: string };
 
@@ -138,6 +138,7 @@ export default function MCQs() {
   const canSelectSubject = !!selectedClass;
   const canSelectChapter = !!selectedSubject;
   const canEnterCount = !!file && !isMerging;
+  const isCountValid = mcqCount != null && mcqCount >= 5 && mcqCount <= 30;
 
   const allChapterPaths = chapterOptions.map((c) => c.path);
   const isAllSelected =
@@ -306,18 +307,7 @@ export default function MCQs() {
     await mergeSelected(next);
   };
 
-  const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T> => {
-    return await new Promise<T>((resolve, reject) => {
-      const id = setTimeout(() => reject(new Error("timeout")), ms);
-      p.then((v) => {
-        clearTimeout(id);
-        resolve(v);
-      }).catch((e) => {
-        clearTimeout(id);
-        reject(e);
-      });
-    });
-  };
+  // No extra retry/timeout wrapping; delegated to direct fetch in endpoints
 
   const buildMcqPrompt = (n: number) => {
     return `Generate exactly ${n} multiple-choice questions (MCQs) based strictly on the attached PDF chapter. Each MCQ must:
@@ -404,35 +394,22 @@ Use concise, exam-style wording suitable for classroom tests.`;
         form.append("requestId", String(Date.now()));
 
         let text = "";
-        let success = false;
+        const res = await fetchOnce(form).catch(() => null as any);
+        if (!(res && res.success !== false)) {
+          hadHardFailure = true;
+          break;
+        }
 
-        for (let attempt = 0; attempt < 1; attempt++) {
-          const res = await withTimeout(fetchWithRetry(form, 1), 30000).catch(
-            () => null as any,
-          );
-
-          if (res && res.success !== false) {
+        // Append batch result and update UI progressively
+        if (text || res) {
+          if (!text) {
             if (typeof res === "string") text = String(res);
             else if (typeof res?.result === "string") text = res.result;
             else {
               const got = res?.questions ?? res?.message ?? "";
               text = String(got);
             }
-            success = true;
-            break;
           }
-
-          // backoff before next try (only happens if retry wrapper also failed)
-          await sleep(backoffs[Math.min(attempt, backoffs.length - 1)]);
-        }
-
-        if (!success) {
-          hadHardFailure = true;
-          break;
-        }
-
-        // Append batch result and update UI progressively
-        if (text) {
           assembled.push(text);
           setResult(assembled.join("\n\n"));
         }
@@ -636,7 +613,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
                           <input
                             type="number"
                             min={5}
-                            max={100}
+                            max={30}
                             value={mcqCount ?? ""}
                             onChange={(e) =>
                               setMcqCount(
@@ -649,6 +626,9 @@ Use concise, exam-style wording suitable for classroom tests.`;
                             className="w-28 rounded-md border border-input bg-muted/40 px-3 py-2 text-base hover:border-primary focus:border-primary focus:ring-0"
                             placeholder="Enter count"
                           />
+                          {!isCountValid && mcqCount != null && (
+                            <span className="text-xs text-destructive">Enter between 5–30</span>
+                          )}
                           <button
                             type="button"
                             onClick={() => setMcqCount(10)}
@@ -679,7 +659,7 @@ Use concise, exam-style wording suitable for classroom tests.`;
 
                     <div className="mt-4 flex gap-3">
                       <Button
-                        disabled={!file || !mcqCount || loading || isMerging}
+                        disabled={!file || !mcqCount || !isCountValid || loading || isMerging}
                         onClick={runSubmit}
                         className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                       >
