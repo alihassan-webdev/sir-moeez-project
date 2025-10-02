@@ -1,6 +1,15 @@
 // Centralized API endpoint and helper
 
-export const API_URL = "/api/proxy" as const;
+// Prefer VITE_PREDICT_ENDPOINT (e.g., "/api/predict" -> Netlify redirect),
+// fall back to local proxy for dev, then to generate-questions path.
+const ENV_EP = (import.meta as any)?.env?.VITE_PREDICT_ENDPOINT as
+  | string
+  | undefined;
+export const API_URL: string = (() => {
+  const fromEnv = (ENV_EP || "").trim();
+  if (fromEnv) return fromEnv;
+  return "/api/proxy"; // local dev route registered in server/index.ts
+})();
 
 export type FetchOnceResult = any;
 

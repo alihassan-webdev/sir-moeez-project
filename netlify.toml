@@ -1,33 +1,15 @@
 [build]
-  command = "pnpm build"
-  publish = "dist/"
+  command = "npm run build"
+  publish = "dist"
 
-[build.environment]
-  VITE_API_URL = "https://api-va5v.onrender.com/generate-questions"
-  VITE_NETLIFY_SITE_URL = "https://freetestgenerator.netlify.app"
-  NETLIFY_USE_PNPM = "true"
-  NODE_VERSION = "18"
-
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["express", "cors", "multer", "serverless-http", "dotenv"]
-
-# All API calls go through the proxy function
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/proxy"
+  from = "/api/predict"
+  to = "https://api-va5v.onrender.com/generate-questions"
   status = 200
   force = true
 
-# SPA fallback
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/api/*"
+  to = "https://api-va5v.onrender.com/:splat"
   status = 200
-
-## Removed edge function to prevent caching API responses
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Cache-Control = "no-cache"
+  force = true
