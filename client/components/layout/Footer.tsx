@@ -13,7 +13,7 @@ export default function Footer() {
             href="https://alihassan-online.netlify.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold underline"
+            className="font-bold no-underline hover:no-underline text-inherit hover:text-inherit focus:outline-none"
           >
             Ali Hassan
           </a>{" "}
@@ -22,7 +22,7 @@ export default function Footer() {
             href="https://waseemportfolioweb.netlify.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold underline"
+            className="font-bold no-underline hover:no-underline text-inherit hover:text-inherit focus:outline-none"
           >
             Waseem Ali
           </a>
