@@ -163,7 +163,7 @@ export default function Landing() {
                   <img
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+8n1EAAAAASUVORK5CYII="
                     alt="PaperGen tall"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top -translate-y-4"
                   />
                 </div>
                 <div className="col-span-1 row-span-1 rounded-lg overflow-hidden bg-white card-yellow-shadow">
