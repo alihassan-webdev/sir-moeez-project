@@ -86,7 +86,8 @@ export default function Syllabus() {
                   Syllabus
                 </h1>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Select class and subject to browse chapters. Click a chapter to view or download.
+                  Select class and subject to browse chapters. Click a chapter
+                  to view or download.
                 </p>
               </div>
             </section>

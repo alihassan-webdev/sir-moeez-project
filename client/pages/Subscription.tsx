@@ -82,7 +82,11 @@ export default function SubscriptionPage() {
               )}
               <div className="mt-4 flex gap-2">
                 {sub.cancelAtPeriodEnd ? (
-                  <Button variant="outline" onClick={onResume} className="w-full">
+                  <Button
+                    variant="outline"
+                    onClick={onResume}
+                    className="w-full"
+                  >
                     Resume
                   </Button>
                 ) : (
