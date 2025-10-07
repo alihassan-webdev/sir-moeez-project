@@ -357,12 +357,6 @@ export default function Profile() {
     <div className="min-h-svh">
       <Container className="py-6">
         <div className="space-y-6">
-          <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <SidebarPanelInner />
-            </div>
-          </aside>
-
           <div>
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
               <div className="flex items-center justify-between gap-4">
