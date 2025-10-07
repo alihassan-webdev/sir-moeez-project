@@ -17,7 +17,6 @@ import { Download, ListChecks, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { fetchOnce } from "@/lib/endpoints";
 import { formatResultHtml } from "@/lib/format";
 import {
@@ -882,13 +881,8 @@ export default function Index() {
   return (
     <div className="min-h-svh">
       <Container className="py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
-          <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <SidebarPanelInner />
-            </div>
-          </aside>
-          <div>
+        <div className="space-y-6">
+         <div>
             <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 mt-4">
               <div className="absolute inset-0 bg-background -z-10" />
               <div className="relative mx-auto max-w-3xl text-center">
