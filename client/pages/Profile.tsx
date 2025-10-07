@@ -1,6 +1,5 @@
 import React from "react";
 import Container from "@/components/layout/Container";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
