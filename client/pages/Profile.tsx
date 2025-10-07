@@ -1,6 +1,5 @@
 import React from "react";
 import Container from "@/components/layout/Container";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -357,13 +356,7 @@ export default function Profile() {
   return (
     <div className="min-h-svh">
       <Container className="py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
-          <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <SidebarPanelInner />
-            </div>
-          </aside>
-
+        <div className="space-y-6">
           <div>
             <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
               <div className="flex items-center justify-between gap-4">
