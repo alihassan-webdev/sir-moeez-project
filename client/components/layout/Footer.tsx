@@ -9,9 +9,7 @@ export default function Footer() {
           <div>
             <Link
               to="/"
-              className="text-xl font-extrabold tracking-tight text-black pointer-events-none cursor-default select-none"
-              aria-disabled="true"
-              tabIndex={-1}
+              className="text-xl font-extrabold tracking-tight text-black hover:opacity-90"
             >
               PaperGen
             </Link>
@@ -24,42 +22,22 @@ export default function Footer() {
             <div className="text-sm font-semibold text-foreground">Product</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a
-                  href="#home"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled="true"
-                  tabIndex={-1}
-                >
+                <Link to="/#home" className="text-black hover:underline">
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#how-it-works"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled="true"
-                  tabIndex={-1}
-                >
+                <Link to="/#how-it-works" className="text-black hover:underline">
                   How it works
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#pricing"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled="true"
-                  tabIndex={-1}
-                >
+                <Link to="/#pricing" className="text-black hover:underline">
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
-                <Link
-                  to="/app"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled={true}
-                  tabIndex={-1}
-                >
+                <Link to="/login" className="text-black hover:underline">
                   Get started
                 </Link>
               </li>
@@ -72,23 +50,8 @@ export default function Footer() {
             </div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a
-                  href="#faq"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled="true"
-                  tabIndex={-1}
-                >
+                <Link to="/#faq" className="text-black hover:underline">
                   FAQ
-                </a>
-              </li>
-              <li>
-                <Link
-                  to="/app"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled={true}
-                  tabIndex={-1}
-                >
-                  Guides
                 </Link>
               </li>
             </ul>
@@ -98,23 +61,8 @@ export default function Footer() {
             <div className="text-sm font-semibold text-foreground">Company</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a
-                  href="#home"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled="true"
-                  tabIndex={-1}
-                >
-                  About
-                </a>
-              </li>
-              <li>
-                <Link
-                  to="/app"
-                  className="text-black pointer-events-none cursor-default select-none"
-                  aria-disabled={true}
-                  tabIndex={-1}
-                >
-                  Contact
+                <Link to="/support" className="text-black hover:underline">
+                  Support
                 </Link>
               </li>
             </ul>
