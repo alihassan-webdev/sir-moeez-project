@@ -13,7 +13,8 @@ import { Eye, Download } from "lucide-react";
 
 export default function Syllabus() {
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
-    as: "url",
+    query: "?url",
+    import: "default",
     eager: true,
   }) as Record<string, string>;
 
