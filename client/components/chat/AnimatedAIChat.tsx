@@ -381,7 +381,8 @@ export default function AnimatedAIChat({
 
   const datafileEntries = React.useMemo(() => {
     const modules = import.meta.glob("/datafiles/**/*.pdf", {
-      as: "url",
+      query: "?url",
+      import: "default",
       eager: true,
     }) as Record<string, string>;
     return Object.entries(modules)
