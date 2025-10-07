@@ -7,6 +7,26 @@ export default function Footer() {
         <div className="text-center text-sm text-muted-foreground">
           © 2025 PaperGen. All rights reserved.
         </div>
+        <div className="mt-2 text-center text-xs text-muted-foreground">
+          Developed by{" "}
+          <a
+            href="https://alihassan-online.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold underline"
+          >
+            Ali Hassan
+          </a>{" "}
+          &amp;{" "}
+          <a
+            href="https://waseemportfolioweb.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold underline"
+          >
+            Waseem Ali
+          </a>
+        </div>
       </Container>
     </footer>
   );
