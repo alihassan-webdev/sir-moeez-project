@@ -61,8 +61,45 @@ export default function SubscriptionPage() {
     <div className="min-h-svh">
       <Container className="py-6">
         <div className="space-y-6">
-          <div>
-            <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow mt-4">
+          <div className="space-y-6">
+            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-6">
+              <div className="text-sm font-semibold text-muted-foreground">
+                Current plan
+              </div>
+              <div className="mt-2 text-lg font-extrabold flex items-center gap-2">
+                <span className="capitalize">{sub.planId}</span>
+                <Badge variant="outline" className="capitalize">
+                  {sub.frequency}
+                </Badge>
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                Next renewal: {nextRenewalDate(sub).toLocaleDateString()}
+              </div>
+              {sub.cancelAtPeriodEnd && (
+                <div className="mt-2 text-xs text-destructive">
+                  Cancels at end of period
+                </div>
+              )}
+              <div className="mt-4 flex gap-2">
+                {sub.cancelAtPeriodEnd ? (
+                  <Button variant="outline" onClick={onResume} className="w-full">
+                    Resume
+                  </Button>
+                ) : (
+                  !isFreePlan(sub) && (
+                    <Button
+                      variant="destructive"
+                      onClick={onCancel}
+                      className="w-full"
+                    >
+                      Cancel
+                    </Button>
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-white p-6 border border-input card-yellow-shadow">
               <h2 className="text-2xl font-bold">Manage Subscription</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Choose a plan and billing period. Changes apply immediately and
