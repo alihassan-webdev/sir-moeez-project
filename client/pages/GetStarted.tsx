@@ -16,7 +16,8 @@ import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 export default function GetStarted() {
   // Build real stats from bundled PDFs
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
-    as: "url",
+    query: "?url",
+    import: "default",
     eager: true,
   }) as Record<string, string>;
   const entries = React.useMemo(

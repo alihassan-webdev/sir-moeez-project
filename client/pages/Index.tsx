@@ -17,7 +17,6 @@ import { Download, ListChecks, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ToolLock from "@/components/ToolLock";
 import Container from "@/components/layout/Container";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { fetchOnce } from "@/lib/endpoints";
 import { formatResultHtml } from "@/lib/format";
 import {
@@ -149,7 +148,8 @@ function ExternalPdfSelector({
   const canSelectSubject = !!selectedClass && !isLocked;
   const canSelectChapters = !!selectedSubjectName && !isLocked;
   const canEnterMarks = selectedChapterPaths.length > 0 && !isLocked;
-  const isMarksValid = totalMarks != null && totalMarks >= 20 && totalMarks <= 100;
+  const isMarksValid =
+    totalMarks != null && totalMarks >= 20 && totalMarks <= 100;
   const canGenerate =
     !!selectedClass &&
     !!selectedSubjectName &&
@@ -570,7 +570,9 @@ function ExternalPdfSelector({
                 placeholder="Enter marks"
               />
               {!isMarksValid && totalMarks != null && (
-                <span className="text-xs text-destructive">Enter between 20–100</span>
+                <span className="text-xs text-destructive">
+                  Enter between 20–100
+                </span>
               )}
               <button
                 type="button"
@@ -882,12 +884,7 @@ export default function Index() {
   return (
     <div className="min-h-svh">
       <Container className="py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
-          <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <SidebarPanelInner />
-            </div>
-          </aside>
+        <div className="space-y-6">
           <div>
             <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 mt-4">
               <div className="absolute inset-0 bg-background -z-10" />
@@ -937,16 +934,43 @@ export default function Index() {
                             if (!result) return;
                             try {
                               await navigator.clipboard.writeText(result);
-                              toast({ title: "Copied", description: "Result copied to clipboard." });
+                              toast({
+                                title: "Copied",
+                                description: "Result copied to clipboard.",
+                              });
                             } catch {
-                              toast({ title: "Copy failed", description: "Could not copy to clipboard." });
+                              toast({
+                                title: "Copy failed",
+                                description: "Could not copy to clipboard.",
+                              });
                             }
                           }}
                         >
                           {/* Using Lucide Copy icon via Download as placeholder is not ideal; ensure proper import elsewhere */}
                           <span className="sr-only">Copy</span>
                           {/* Add a simple SVG copy icon inline to avoid extra imports */}
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-copy"
+                          >
+                            <rect
+                              x="9"
+                              y="9"
+                              width="13"
+                              height="13"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
                         </Button>
                         <Button
                           aria-label="Download PDF"

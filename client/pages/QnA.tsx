@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/Container";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { ListChecks, ChevronDown, Download } from "lucide-react";
 import { generateExamStylePdf } from "@/lib/pdf";
 import { getInstitute } from "@/lib/account";
@@ -350,7 +349,8 @@ export default function QnA() {
           const res = await fetchOnce(form).catch(() => null as any);
           if (res && res.success !== false) {
             if (typeof res === "string") text = stripAnswers(String(res));
-            else if (typeof res?.result === "string") text = stripAnswers(res.result);
+            else if (typeof res?.result === "string")
+              text = stripAnswers(res.result);
             else {
               const got = res?.questions ?? res?.message ?? "";
               text = stripAnswers(String(got));
@@ -412,13 +412,7 @@ export default function QnA() {
   return (
     <div className="min-h-svh">
       <Container className="py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
-          <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <SidebarPanelInner />
-            </div>
-          </aside>
-
+        <div className="space-y-6">
           <div>
             <section className="relative overflow-hidden rounded-2xl px-6 pt-0 pb-12 sm:pt-0 sm:pb-14 mt-4">
               <div className="absolute inset-0 bg-background -z-10" />
@@ -585,7 +579,9 @@ export default function QnA() {
                             placeholder="Enter count"
                           />
                           {!isCountValid && qaCount != null && (
-                            <span className="text-xs text-destructive">Enter between 5–30</span>
+                            <span className="text-xs text-destructive">
+                              Enter between 5–30
+                            </span>
                           )}
                           <button
                             type="button"
@@ -617,7 +613,13 @@ export default function QnA() {
 
                     <div className="mt-4 flex gap-3">
                       <Button
-                        disabled={!file || !qaCount || !isCountValid || loading || isMerging}
+                        disabled={
+                          !file ||
+                          !qaCount ||
+                          !isCountValid ||
+                          loading ||
+                          isMerging
+                        }
                         onClick={runSubmit}
                         className="relative flex items-center gap-3 !shadow-none hover:!shadow-none"
                       >
@@ -665,14 +667,41 @@ export default function QnA() {
                               if (!result) return;
                               try {
                                 await navigator.clipboard.writeText(result);
-                                toast({ title: "Copied", description: "Result copied to clipboard." });
+                                toast({
+                                  title: "Copied",
+                                  description: "Result copied to clipboard.",
+                                });
                               } catch {
-                                toast({ title: "Copy failed", description: "Could not copy to clipboard." });
+                                toast({
+                                  title: "Copy failed",
+                                  description: "Could not copy to clipboard.",
+                                });
                               }
                             }}
                           >
                             <span className="sr-only">Copy</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-copy"
+                            >
+                              <rect
+                                x="9"
+                                y="9"
+                                width="13"
+                                height="13"
+                                rx="2"
+                                ry="2"
+                              ></rect>
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
                           </Button>
                           <Button
                             aria-label="Download PDF"
