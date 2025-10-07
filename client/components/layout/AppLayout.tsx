@@ -94,7 +94,9 @@ export function AppLayout({ children }: PropsWithChildren) {
         </aside>
       )}
 
-      <main className={cn("flex-1", isToolRoute && "md:pl-[260px]")}>{children}</main>
+      <main className={cn("flex-1", isToolRoute && "md:pl-[260px]")}>
+        {children}
+      </main>
 
       {path !== "/login" && (
         <footer className="border-t bg-background/50">

@@ -148,7 +148,6 @@ export default function Landing() {
           </Container>
         </section>
 
-
         <section id="how-it-works">
           <Container className="py-12">
             <div className="text-center space-y-4">
