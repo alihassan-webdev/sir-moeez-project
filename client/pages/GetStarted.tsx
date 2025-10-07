@@ -57,13 +57,8 @@ export default function GetStarted() {
     <div className="min-h-svh">
       {/* Main content with sidebar */}
       <Container className="py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* Sidebar (md+) */}
-          <aside className="hidden md:block">
-            <div className="rounded-xl border border-input bg-white card-yellow-shadow p-4 sticky top-4">
-              <SidebarPanelInner />
-            </div>
-          </aside>
 
           {/* Main column */}
           <div>

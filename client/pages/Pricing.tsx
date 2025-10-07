@@ -163,7 +163,7 @@ export default function Pricing() {
       <Container className="py-6">
         <div className="space-y-7 text-center">
           <div className="space-y-4">
-            <h1 className="text-4xl font-extrabold md:text-5xl text-primary">
+            <h1 className="text-4xl font-extrabold md:text-5xl text-black">
               Plans and Pricing
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">

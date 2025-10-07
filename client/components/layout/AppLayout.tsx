@@ -1,13 +1,13 @@
-import { PropsWithChildren } from "react";
+import { useEffect, useState, PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState, PropsWithChildren } from "react";
 import MobileSheet from "@/components/layout/MobileSheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
+import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 
 export function AppLayout({ children }: PropsWithChildren) {
   const location = useLocation();
@@ -86,7 +86,17 @@ export function AppLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <main className={cn("flex-1")}>{children}</main>
+      {isToolRoute && (
+        <aside className="hidden md:block fixed left-0 top-[64px] h-[calc(100vh-64px)] w-[260px] z-20">
+          <div className="h-full overflow-y-auto scrollbar-none border-r border-input bg-white p-4">
+            <SidebarPanelInner />
+          </div>
+        </aside>
+      )}
+
+      <main className={cn("flex-1", isToolRoute && "md:pl-[260px]")}>
+        {children}
+      </main>
 
       {path !== "/login" && (
         <footer className="border-t bg-background/50">
