@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="border-t bg-white">
       <Container className="py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <Link
               to="/"
@@ -44,29 +44,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
-            <div className="text-sm font-semibold text-foreground">
-              Resources
-            </div>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link to="/#faq" className="text-black hover:underline">
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
 
-          <div>
-            <div className="text-sm font-semibold text-foreground">Company</div>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link to="/support" className="text-black hover:underline">
-                  Support
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
         <div className="mt-10 border-t border-input pt-6 text-center text-sm text-muted-foreground">
