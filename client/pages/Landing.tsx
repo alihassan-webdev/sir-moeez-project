@@ -218,12 +218,11 @@ export default function Landing() {
                     <span className="mt-1 text-primary">•</span>
                     <span>Difficulty and topic weighting controls</span>
                   </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 text-primary">•</span>
+                    <span>Export high-quality PDFs with answer keys</span>
+                  </li>
                 </ul>
-                <div className="mt-6">
-                  <Button asChild>
-                    <Link to="/app">Explore templates</Link>
-                  </Button>
-                </div>
               </div>
 
               <div className="rounded-lg border bg-white px-6 py-6 card-yellow-shadow">
