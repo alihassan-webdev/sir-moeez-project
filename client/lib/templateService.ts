@@ -22,14 +22,17 @@ export async function fetchTemplates(): Promise<TemplateDoc[]> {
       name: String(data.name || "Untitled"),
       pdfUrl: String(data.pdfUrl || ""),
       preview: String(data.preview || ""),
-      primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : undefined,
+      primaryColor:
+        typeof data.primaryColor === "string" ? data.primaryColor : undefined,
       font: typeof data.font === "string" ? data.font : undefined,
     });
   });
   return list;
 }
 
-export async function fetchTemplatePdfBytes(pdfUrl: string): Promise<ArrayBuffer> {
+export async function fetchTemplatePdfBytes(
+  pdfUrl: string,
+): Promise<ArrayBuffer> {
   if (!pdfUrl) throw new Error("Missing pdfUrl");
   const noCacheInit: RequestInit = { cache: "no-store" };
   if (/^https?:\/\//i.test(pdfUrl)) {
@@ -45,7 +48,10 @@ export async function fetchTemplatePdfBytes(pdfUrl: string): Promise<ArrayBuffer
   return await res.arrayBuffer();
 }
 
-export async function uploadGeneratedPdf(bytes: Uint8Array | ArrayBuffer, filename: string): Promise<string> {
+export async function uploadGeneratedPdf(
+  bytes: Uint8Array | ArrayBuffer,
+  filename: string,
+): Promise<string> {
   const storage = getStorage(app);
   const safe = filename.replace(/[^a-z0-9-_\.]/gi, "_");
   const path = `generated/${Date.now()}-${safe}`;
