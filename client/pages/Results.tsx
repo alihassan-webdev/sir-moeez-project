@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Container from "@/components/layout/Container";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FileText, ListChecks, MessageSquare, Clock } from "lucide-react";
 import {
   examTypeLabels,
@@ -26,6 +26,7 @@ function formatWhen(ts?: number): string {
 }
 
 export default function Results() {
+  const navigate = useNavigate();
   const [lasts, setLasts] = useState<Record<ExamType, number | undefined>>({
     mcqs: undefined,
     qna: undefined,
@@ -100,10 +101,11 @@ export default function Results() {
           <section className="mx-auto max-w-5xl">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
               {cards.map((c) => (
-                <Link
+                <button
+                  type="button"
                   key={c.type}
-                  to={c.to}
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                  onClick={() => navigate(c.to)}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -118,7 +120,7 @@ export default function Results() {
                       View Results →
                     </div>
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           </section>
