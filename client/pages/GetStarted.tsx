@@ -73,9 +73,10 @@ export default function GetStarted() {
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Exams</h2>
               <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr">
-                <Link
-                  to="/mcqs"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/mcqs")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -89,11 +90,12 @@ export default function GetStarted() {
                       Create multiple-choice questions from chapters
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/qna"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/qna")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -107,11 +109,12 @@ export default function GetStarted() {
                       Generate question–answer cards for quick revision
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/app"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/app")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -125,11 +128,12 @@ export default function GetStarted() {
                       Open the Test Paper Generator
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/syllabus"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/syllabus")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -143,11 +147,12 @@ export default function GetStarted() {
                       Browse and download chapters by class & subject
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/results"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/results")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -161,7 +166,7 @@ export default function GetStarted() {
                       View and download your exam results
                     </div>
                   </div>
-                </Link>
+                </button>
               </div>
             </div>
 
