@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -7,15 +7,20 @@ export default function Header() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const goHome = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
-    // if already on home, scroll to top
+  const goHome = () => {
     if (pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       navigate("/");
-      // after navigation, scroll to top (delay to allow mount)
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+    }
+    setOpen(false);
+  };
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     setOpen(false);
   };
@@ -23,39 +28,40 @@ export default function Header() {
   return (
     <header className="w-full sticky top-0 z-50 bg-white border-b border-input">
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-        <Link
-          to="/"
+        <button
+          type="button"
+          onClick={goHome}
           className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
         >
           <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
             PG
           </span>
           <span>PaperGen</span>
-        </Link>
+        </button>
 
         <nav className="hidden md:flex items-center gap-3">
-          <a
-            href="#home"
+          <button
+            type="button"
             onClick={goHome}
             className="px-3 py-2 rounded-md hover:bg-primary/10 text-black"
           >
             Home
-          </a>
-          <a
-            href="#pricing"
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection("pricing")}
             className="px-3 py-2 rounded-md hover:bg-primary/10 text-black"
           >
             Pricing
-          </a>
-          <a
-            href="#faq"
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection("faq")}
             className="px-3 py-2 rounded-md hover:bg-primary/10 text-black"
           >
             FAQ
-          </a>
-          <Button asChild>
-            <Link to="/login">Login</Link>
-          </Button>
+          </button>
+          <Button onClick={() => navigate("/login")}>Login</Button>
         </nav>
 
         <div className="md:hidden">
@@ -92,36 +98,29 @@ export default function Header() {
         aria-hidden={!open}
       >
         <div className="mx-auto max-w-6xl px-6 py-4 flex flex-col gap-3">
-          <a
-            href="#home"
-            className="px-3 py-2 rounded-md hover:bg-primary/10 text-black"
-            onClick={(e) => {
-              goHome(e);
-              setOpen(false);
-            }}
+          <button
+            type="button"
+            className="px-3 py-2 rounded-md hover:bg-primary/10 text-black text-left"
+            onClick={goHome}
           >
             Home
-          </a>
-          <a
-            href="#pricing"
-            className="px-3 py-2 rounded-md hover:bg-primary/10 text-black"
-            onClick={() => setOpen(false)}
+          </button>
+          <button
+            type="button"
+            className="px-3 py-2 rounded-md hover:bg-primary/10 text-black text-left"
+            onClick={() => scrollToSection("pricing")}
           >
             Pricing
-          </a>
-          <a
-            href="#faq"
-            className="px-3 py-2 rounded-md hover:bg-primary/10 text-black"
-            onClick={() => setOpen(false)}
+          </button>
+          <button
+            type="button"
+            className="px-3 py-2 rounded-md hover:bg-primary/10 text-black text-left"
+            onClick={() => scrollToSection("faq")}
           >
             FAQ
-          </a>
+          </button>
           <div className="pt-2">
-            <Button asChild>
-              <Link to="/login" onClick={() => setOpen(false)}>
-                Login
-              </Link>
-            </Button>
+            <Button onClick={() => navigate("/login")}>Login</Button>
           </div>
         </div>
       </div>

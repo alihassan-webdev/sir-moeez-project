@@ -1,22 +1,19 @@
 import * as React from "react";
 import Header from "@/components/layout/Header";
 import Container from "@/components/layout/Container";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Pricing from "./Pricing";
 import Footer from "@/components/layout/Footer";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const scrollToPricing = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const scrollToPricing = () => {
     const el = document.getElementById("pricing");
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
-      // update hash without jumping
       history.replaceState(null, "", "#pricing");
     } else {
-      // fallback: navigate to pricing section on landing
       navigate("/#pricing");
     }
   };
@@ -105,18 +102,16 @@ export default function Landing() {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg">
-                <Link to="/login">Get started</Link>
+              <Button size="lg" onClick={() => navigate("/login")}>
+                Get started
               </Button>
               <Button
-                asChild
                 variant="outline"
                 size="lg"
                 className="bg-primary/10 border-primary/60"
+                onClick={scrollToPricing}
               >
-                <a href="#pricing" onClick={scrollToPricing}>
-                  View pricing
-                </a>
+                View pricing
               </Button>
             </div>
           </Container>

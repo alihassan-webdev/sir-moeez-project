@@ -1,19 +1,17 @@
 import React from "react";
 import Container from "@/components/layout/Container";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   FileText,
-  Layers,
   BookOpen,
-  Folder,
   ListChecks,
   MessageSquare,
   History,
 } from "lucide-react";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
+  const navigate = useNavigate();
   // Build real stats from bundled PDFs
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     query: "?url",
@@ -81,9 +79,10 @@ export default function GetStarted() {
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Exams</h2>
               <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr">
-                <Link
-                  to="/mcqs"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/mcqs")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -97,11 +96,12 @@ export default function GetStarted() {
                       Create multiple-choice questions from chapters
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/qna"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/qna")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -115,11 +115,12 @@ export default function GetStarted() {
                       Generate question–answer cards for quick revision
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/app"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/app")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -133,11 +134,12 @@ export default function GetStarted() {
                       Open the Test Paper Generator
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/syllabus"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/syllabus")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -151,11 +153,12 @@ export default function GetStarted() {
                       Browse and download chapters by class & subject
                     </div>
                   </div>
-                </Link>
+                </button>
 
-                <Link
-                  to="/results"
-                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => navigate("/results")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
@@ -169,7 +172,7 @@ export default function GetStarted() {
                       View and download your exam results
                     </div>
                   </div>
-                </Link>
+                </button>
               </div>
             </div>
 
@@ -186,6 +189,7 @@ export default function GetStarted() {
 }
 
 function MyAccountCards() {
+  const navigate = useNavigate();
   const sub = React.useMemo(() => getSubscription(), []);
   const renewal = React.useMemo(
     () => nextRenewalDate(sub).toLocaleDateString(),
@@ -193,9 +197,10 @@ function MyAccountCards() {
   );
   return (
     <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
-      <Link
-        to="/subscription"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      <button
+        type="button"
+        onClick={() => navigate("/subscription")}
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between">
@@ -212,11 +217,12 @@ function MyAccountCards() {
             Next renewal: {renewal}
           </div>
         </div>
-      </Link>
+      </button>
 
-      <Link
-        to="/profile"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      <button
+        type="button"
+        onClick={() => navigate("/profile")}
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">My profile</div>
@@ -227,11 +233,12 @@ function MyAccountCards() {
             Email linked to your login.
           </div>
         </div>
-      </Link>
+      </button>
 
-      <Link
-        to="/support"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      <button
+        type="button"
+        onClick={() => navigate("/support")}
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">Support</div>
@@ -242,7 +249,7 @@ function MyAccountCards() {
             Response via email.
           </div>
         </div>
-      </Link>
+      </button>
     </div>
   );
 }

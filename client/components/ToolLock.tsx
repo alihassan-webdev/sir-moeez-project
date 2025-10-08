@@ -1,6 +1,6 @@
 import React from "react";
 import { Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useProfileLock } from "@/hooks/useProfileLock";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ export function ToolLock({
   className?: string;
 }) {
   const { locked } = useProfileLock();
+  const navigate = useNavigate();
 
   return (
     <div className={cn("relative", className)}>
@@ -23,11 +24,11 @@ export function ToolLock({
               Please complete your profile before using this tool.
             </p>
             <Button
-              asChild
               size="sm"
               className="h-9 rounded-md bg-[#2563eb] px-4 text-white transition hover:bg-[#1d4ed8]"
+              onClick={() => navigate("/my-profile")}
             >
-              <Link to="/my-profile">Go to Profile</Link>
+              Go to Profile
             </Button>
           </div>
         </div>

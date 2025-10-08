@@ -2,7 +2,7 @@ import { useEffect, useState, PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import MobileSheet from "@/components/layout/MobileSheet";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { auth } from "@/lib/firebase";
@@ -42,15 +42,16 @@ export function AppLayout({ children }: PropsWithChildren) {
     <div className="flex min-h-svh w-full flex-col">
       <header className="w-full sticky top-0 z-30 bg-white border-b border-input">
         <div className="mx-auto max-w-6xl px-6 py-4 flex w-full items-center gap-2">
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={() => navigate("/")}
             className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-black"
           >
             <span className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
               PG
             </span>
             <span>PaperGen</span>
-          </Link>
+          </button>
           <div className="ml-auto flex items-center gap-2">
             {isGetStarted ? (
               <Button
@@ -87,14 +88,14 @@ export function AppLayout({ children }: PropsWithChildren) {
       </header>
 
       {isToolRoute && (
-        <aside className="hidden md:block fixed left-0 top-[64px] h-[calc(100vh-64px)] w-[260px] z-20">
-          <div className="h-full overflow-y-auto scrollbar-none border-r border-input bg-white p-4">
+        <aside className="hidden md:block fixed left-6 top-24 bottom-0 w-[260px] z-20">
+          <div className="h-full overflow-y-auto scrollbar-none border border-input bg-white p-4 rounded-xl shadow-sm">
             <SidebarPanelInner />
           </div>
         </aside>
       )}
 
-      <main className={cn("flex-1", isToolRoute && "md:pl-[260px]")}>
+      <main className={cn("flex-1", isToolRoute && "md:pl-[320px]")}>
         {children}
       </main>
 

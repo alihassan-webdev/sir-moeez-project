@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Container from "@/components/layout/Container";
 import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
 import { examTypeLabels, type ExamTypeSlug as ExamType } from "@/lib/results";
@@ -46,6 +46,7 @@ function useInstituteHeader() {
 
 export default function ResultDetail() {
   const params = useParams();
+  const navigate = useNavigate();
   const type = (params.type as ExamType) || "mcqs";
   const label = examTypeLabels[type] || "Results";
   const [items, setItems] = useState<
@@ -144,13 +145,14 @@ export default function ResultDetail() {
                   Your generated results for {label} with download options.
                 </p>
                 <div className="mt-4">
-                  <Link
-                    to="/results"
-                    className="inline-flex items-center text-sm text-primary"
+                  <button
+                    type="button"
+                    onClick={() => navigate("/results")}
+                    className="inline-flex items-center text-sm text-primary focus:outline-none focus:ring-2 focus:ring-primary/40 rounded-md px-1"
                   >
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back to Result
                     History
-                  </Link>
+                  </button>
                 </div>
               </div>
             </section>

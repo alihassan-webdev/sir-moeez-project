@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   FileText,
@@ -12,33 +12,35 @@ import {
 } from "lucide-react";
 
 function NavItem({
-  to,
   icon: Icon,
   label,
   active,
+  onClick,
 }: {
-  to: string;
   icon: React.ComponentType<any>;
   label: string;
   active?: boolean;
+  onClick: () => void;
 }) {
   return (
-    <Link
-      to={to}
-      className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 ${
         active
-          ? "bg-primary text-primary-foreground hover:text-primary-foreground"
+          ? "bg-primary text-primary-foreground"
           : "transition-colors hover:bg-primary/10"
       }`}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
       <span className="font-medium">{label}</span>
-    </Link>
+    </button>
   );
 }
 
 export default function SidebarPanelInner() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   return (
     <>
       <div className="mb-3 px-1 text-xs font-semibold text-muted-foreground">
@@ -46,66 +48,66 @@ export default function SidebarPanelInner() {
       </div>
       <nav className="flex flex-col gap-1">
         <NavItem
-          to="/get-started"
           icon={LayoutGrid}
           label="Dashboard"
           active={pathname === "/get-started"}
+          onClick={() => navigate("/get-started")}
         />
 
         <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
           Exams
         </div>
         <NavItem
-          to="/mcqs"
           icon={ListChecks}
           label="Generate MCQs"
           active={pathname === "/mcqs"}
+          onClick={() => navigate("/mcqs")}
         />
         <NavItem
-          to="/qna"
           icon={MessageSquare}
           label="Generate Q&A"
           active={pathname === "/qna"}
+          onClick={() => navigate("/qna")}
         />
         <NavItem
-          to="/app"
           icon={FileText}
           label="Generate Exam"
           active={pathname === "/app"}
+          onClick={() => navigate("/app")}
         />
         <NavItem
-          to="/syllabus"
           icon={BookOpen}
           label="Syllabus"
           active={pathname === "/syllabus"}
+          onClick={() => navigate("/syllabus")}
         />
         <NavItem
-          to="/results"
           icon={History}
           label="Result History"
           active={pathname.startsWith("/results")}
+          onClick={() => navigate("/results")}
         />
 
         <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
           My account
         </div>
         <NavItem
-          to="/subscription"
           icon={LayoutGrid}
           label="Manage Subscription"
           active={pathname === "/subscription"}
+          onClick={() => navigate("/subscription")}
         />
         <NavItem
-          to="/profile"
           icon={User}
           label="My Profile"
           active={pathname === "/profile"}
+          onClick={() => navigate("/profile")}
         />
         <NavItem
-          to="/support"
           icon={LifeBuoy}
           label="Support"
           active={pathname === "/support"}
+          onClick={() => navigate("/support")}
         />
       </nav>
     </>
