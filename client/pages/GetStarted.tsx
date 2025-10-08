@@ -183,6 +183,7 @@ export default function GetStarted() {
 }
 
 function MyAccountCards() {
+  const navigate = useNavigate();
   const sub = React.useMemo(() => getSubscription(), []);
   const renewal = React.useMemo(
     () => nextRenewalDate(sub).toLocaleDateString(),
