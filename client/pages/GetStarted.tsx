@@ -7,6 +7,7 @@ import {
   ListChecks,
   MessageSquare,
   History,
+  LayoutGrid,
 } from "lucide-react";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
