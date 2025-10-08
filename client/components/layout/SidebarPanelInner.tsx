@@ -43,7 +43,7 @@ export default function SidebarPanelInner() {
   const navigate = useNavigate();
   return (
     <>
-      <div className="mb-3 px-1 text-xs font-semibold text-muted-foreground">
+      <div className="mb-3 px-1 text-xs font-bold text-muted-foreground">
         Navigation
       </div>
       <nav className="flex flex-col gap-1">
@@ -54,7 +54,7 @@ export default function SidebarPanelInner() {
           onClick={() => navigate("/get-started")}
         />
 
-        <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+        <div className="mt-3 mb-1 px-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
           Exams
         </div>
         <NavItem
@@ -88,7 +88,7 @@ export default function SidebarPanelInner() {
           onClick={() => navigate("/results")}
         />
 
-        <div className="mt-3 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+        <div className="mt-3 mb-1 px-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
           My account
         </div>
         <NavItem
