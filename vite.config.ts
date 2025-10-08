@@ -17,7 +17,7 @@ const HMR = {
 
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: "0.0.0.0",
     port: Number(process.env.PORT) || 8080,
     // Only include hmr when at least one value is provided; otherwise let Vite decide
     hmr: HMR.protocol || HMR.host || HMR.port ? HMR : undefined,
