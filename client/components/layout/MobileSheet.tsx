@@ -14,13 +14,10 @@ export default function MobileSheet() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const handleNavigate = React.useCallback(
-    (target: string) => {
-      navigate(target);
-      setOpen(false);
-    },
-    [navigate],
-  );
+  const handleNavigate = (target: string) => {
+    navigate(target);
+    setOpen(false);
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
