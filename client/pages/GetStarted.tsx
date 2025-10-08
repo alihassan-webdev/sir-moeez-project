@@ -1,7 +1,13 @@
 import React from "react";
 import Container from "@/components/layout/Container";
 import { useNavigate } from "react-router-dom";
-import { FileText, BookOpen, ListChecks, MessageSquare, History } from "lucide-react";
+import {
+  FileText,
+  BookOpen,
+  ListChecks,
+  MessageSquare,
+  History,
+} from "lucide-react";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
