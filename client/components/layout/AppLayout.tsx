@@ -87,14 +87,15 @@ export function AppLayout({ children }: PropsWithChildren) {
       </header>
 
       {isToolRoute && (
-        <aside className="hidden md:block fixed left-0 top-[64px] h-[calc(100vh-64px)] w-[260px] z-20">
-          <div className="h-full overflow-y-auto scrollbar-none border-r border-input bg-white p-4">
+        <aside className="hidden md:block fixed left-6 top-24 bottom-6 w-[260px] z-20">
+          <div className="h-full overflow-y-auto scrollbar-none border border-input bg-white p-4 rounded-xl shadow-sm">
             <SidebarPanelInner />
           </div>
         </aside>
       )}
 
-      <main className={cn("flex-1", isToolRoute && "md:pl-[260px]")}>
+      <main className={cn("flex-1", isToolRoute && "md:pl-[320px] md:pr-6 md:pt-6")}
+      >
         {children}
       </main>
 
