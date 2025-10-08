@@ -8,11 +8,19 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function MobileSheet() {
   const [open, setOpen] = React.useState(false);
-  const path = window.location.pathname;
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const handleNavigate = React.useCallback(
+    (target: string) => {
+      navigate(target);
+      setOpen(false);
+    },
+    [navigate],
+  );
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -30,96 +38,132 @@ export default function MobileSheet() {
         </SheetHeader>
         <div className="mt-2 flex flex-col gap-2 p-2">
           <SheetClose asChild>
-            <Link
-              to="/get-started"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/get-started" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/get-started")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/get-started"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Dashboard
-            </Link>
+            </button>
           </SheetClose>
 
           <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
             Exams
           </div>
           <SheetClose asChild>
-            <Link
-              to="/mcqs"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/mcqs" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/mcqs")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/mcqs"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Generate MCQs
-            </Link>
+            </button>
           </SheetClose>
 
           <SheetClose asChild>
-            <Link
-              to="/qna"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/qna" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/qna")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/qna"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Generate Q&A
-            </Link>
+            </button>
           </SheetClose>
 
           <SheetClose asChild>
-            <Link
-              to="/app"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/app" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/app")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/app"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Generate Exam
-            </Link>
+            </button>
           </SheetClose>
 
           <SheetClose asChild>
-            <Link
-              to="/syllabus"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/syllabus" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/syllabus")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/syllabus"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Syllabus
-            </Link>
+            </button>
           </SheetClose>
           <SheetClose asChild>
-            <Link
-              to="/results"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path.startsWith("/results") ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/results")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname.startsWith("/results")
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Result History
-            </Link>
+            </button>
           </SheetClose>
 
           <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
             My account
           </div>
           <SheetClose asChild>
-            <Link
-              to="/subscription"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/subscription" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/subscription")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/subscription"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Manage Subscription
-            </Link>
+            </button>
           </SheetClose>
           <SheetClose asChild>
-            <Link
-              to="/profile"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/profile" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/profile")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/profile"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               My Profile
-            </Link>
+            </button>
           </SheetClose>
           <SheetClose asChild>
-            <Link
-              to="/support"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${path === "/support" ? "bg-primary text-primary-foreground hover:text-primary-foreground" : "transition-colors hover:bg-primary/10"}`}
+            <button
+              type="button"
+              onClick={() => handleNavigate("/support")}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                pathname === "/support"
+                  ? "bg-primary text-primary-foreground"
+                  : "transition-colors hover:bg-primary/10"
+              }`}
             >
               Support
-            </Link>
+            </button>
           </SheetClose>
         </div>
       </SheetContent>
