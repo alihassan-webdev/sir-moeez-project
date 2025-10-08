@@ -5,6 +5,7 @@ import { FileText, BookOpen, ListChecks, MessageSquare, History } from "lucide-r
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
+  const navigate = useNavigate();
   // Build real stats from bundled PDFs
   const pdfModules = import.meta.glob("/datafiles/**/*.pdf", {
     query: "?url",
