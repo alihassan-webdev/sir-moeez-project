@@ -1,16 +1,7 @@
 import React from "react";
 import Container from "@/components/layout/Container";
-import { Link } from "react-router-dom";
-import {
-  FileText,
-  Layers,
-  BookOpen,
-  Folder,
-  ListChecks,
-  MessageSquare,
-  History,
-} from "lucide-react";
-import SidebarPanelInner from "@/components/layout/SidebarPanelInner";
+import { useNavigate } from "react-router-dom";
+import { FileText, BookOpen, ListChecks, MessageSquare, History } from "lucide-react";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
 export default function GetStarted() {
