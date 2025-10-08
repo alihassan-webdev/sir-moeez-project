@@ -190,9 +190,10 @@ function MyAccountCards() {
   );
   return (
     <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
-      <Link
-        to="/subscription"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      <button
+        type="button"
+        onClick={() => navigate("/subscription")}
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between">
@@ -209,11 +210,12 @@ function MyAccountCards() {
             Next renewal: {renewal}
           </div>
         </div>
-      </Link>
+      </button>
 
-      <Link
-        to="/profile"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      <button
+        type="button"
+        onClick={() => navigate("/profile")}
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">My profile</div>
@@ -224,11 +226,12 @@ function MyAccountCards() {
             Email linked to your login.
           </div>
         </div>
-      </Link>
+      </button>
 
-      <Link
-        to="/support"
-        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm"
+      <button
+        type="button"
+        onClick={() => navigate("/support")}
+        className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
         <div className="flex flex-col h-full">
           <div className="text-base font-semibold">Support</div>
@@ -239,7 +242,7 @@ function MyAccountCards() {
             Response via email.
           </div>
         </div>
-      </Link>
+      </button>
     </div>
   );
 }
