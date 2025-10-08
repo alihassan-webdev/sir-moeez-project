@@ -94,8 +94,7 @@ export function AppLayout({ children }: PropsWithChildren) {
         </aside>
       )}
 
-      <main className={cn("flex-1", isToolRoute && "md:pl-[320px] md:pr-6 md:pt-6")}
-      >
+      <main className={cn("flex-1", isToolRoute && "md:pl-[320px]")}>
         {children}
       </main>
 
