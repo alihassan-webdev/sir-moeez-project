@@ -28,6 +28,7 @@ import Support from "./pages/Support";
 import Onboarding from "./pages/Onboarding";
 import Results from "./pages/Results";
 import ResultDetail from "./pages/ResultDetail";
+import Templates from "./pages/Templates";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { ProfileLockProvider } from "@/hooks/useProfileLock";
@@ -140,6 +141,14 @@ function AnimatedRoutes() {
             element={
               <PageWrapper>
                 <Syllabus />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/templates"
+            element={
+              <PageWrapper>
+                <Templates />
               </PageWrapper>
             }
           />

@@ -82,6 +82,12 @@ export default function SidebarPanelInner() {
           onClick={() => navigate("/syllabus")}
         />
         <NavItem
+          icon={FileText}
+          label="Templates"
+          active={pathname === "/templates"}
+          onClick={() => navigate("/templates")}
+        />
+        <NavItem
           icon={History}
           label="Result History"
           active={pathname.startsWith("/results")}
