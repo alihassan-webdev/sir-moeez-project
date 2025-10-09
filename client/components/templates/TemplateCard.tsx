@@ -5,10 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TemplatePreview } from "@/components/templates/TemplatePreview";
 import { cn } from "@/lib/utils";
-import {
-  TemplateDefinition,
-  type TemplateTier,
-} from "@/lib/templates";
+import { TemplateDefinition, type TemplateTier } from "@/lib/templates";
 
 type TemplateCardProps = {
   template: TemplateDefinition;
@@ -59,7 +56,10 @@ export const TemplateCard = memo(function TemplateCard({
             <Badge
               variant="outline"
               className="whitespace-nowrap border-primary/30 text-xs font-semibold uppercase text-primary"
-              style={{ borderColor: template.palette.accent, color: template.palette.accent }}
+              style={{
+                borderColor: template.palette.accent,
+                color: template.palette.accent,
+              }}
             >
               {template.tier}
             </Badge>

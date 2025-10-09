@@ -20,9 +20,13 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
     color: preview.bodyTextColor,
   };
 
-  const accentEnabled = layout.accentLine !== "none" && Boolean(preview.accentBar);
+  const accentEnabled =
+    layout.accentLine !== "none" && Boolean(preview.accentBar);
   const accentElement = accentEnabled ? (
-    <div className="h-1.5 w-full rounded-full" style={{ background: preview.accentBar }} />
+    <div
+      className="h-1.5 w-full rounded-full"
+      style={{ background: preview.accentBar }}
+    />
   ) : null;
 
   const headerElement = (

@@ -250,11 +250,16 @@ export function listTemplates() {
   return [...TEMPLATES];
 }
 
-export function groupTemplatesByTier(templates: TemplateDefinition[] = listTemplates()) {
-  const grouped = TEMPLATE_TIERS.reduce((acc, tier) => {
-    acc[tier] = [] as TemplateDefinition[];
-    return acc;
-  }, {} as Record<TemplateTier, TemplateDefinition[]>);
+export function groupTemplatesByTier(
+  templates: TemplateDefinition[] = listTemplates(),
+) {
+  const grouped = TEMPLATE_TIERS.reduce(
+    (acc, tier) => {
+      acc[tier] = [] as TemplateDefinition[];
+      return acc;
+    },
+    {} as Record<TemplateTier, TemplateDefinition[]>,
+  );
 
   for (const template of templates) {
     grouped[template.tier]?.push(template);

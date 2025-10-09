@@ -43,13 +43,17 @@ export default function Templates() {
                 Personalize your PDF exports
               </h1>
               <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-                Browse curated layouts crafted for exams, MCQs, and question banks. Choose a style to update all generated PDFs instantly.
+                Browse curated layouts crafted for exams, MCQs, and question
+                banks. Choose a style to update all generated PDFs instantly.
               </p>
             </div>
             <div className="flex w-full max-w-sm items-center gap-4 rounded-2xl border border-dashed border-border/60 bg-muted/40 p-4">
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-full border border-border/40 text-xs font-semibold uppercase"
-                style={{ background: selectedTemplate.palette.accent, color: selectedTemplate.palette.tagText }}
+                style={{
+                  background: selectedTemplate.palette.accent,
+                  color: selectedTemplate.palette.tagText,
+                }}
               >
                 {selectedTemplate.name
                   .split(" ")
@@ -65,7 +69,10 @@ export default function Templates() {
                   {selectedTemplate.name}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {selectedTemplate.tier} • {selectedTemplate.palette.fontFamily.split(",")[0]?.replace(/['"]/g, "")}
+                  {selectedTemplate.tier} •{" "}
+                  {selectedTemplate.palette.fontFamily
+                    .split(",")[0]
+                    ?.replace(/['"]/g, "")}
                 </div>
               </div>
             </div>
