@@ -54,12 +54,6 @@ export default function SidebarPanelInner() {
           active={pathname === "/get-started"}
           onClick={() => navigate("/get-started")}
         />
-        <NavItem
-          icon={LayoutTemplate}
-          label="Templates"
-          active={pathname === "/templates"}
-          onClick={() => navigate("/templates")}
-        />
 
         <div className="mt-3 mb-1 px-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground/80">
           Exams
@@ -81,6 +75,12 @@ export default function SidebarPanelInner() {
           label="Generate Exam"
           active={pathname === "/app"}
           onClick={() => navigate("/app")}
+        />
+        <NavItem
+          icon={LayoutTemplate}
+          label="Templates"
+          active={pathname === "/templates"}
+          onClick={() => navigate("/templates")}
         />
         <NavItem
           icon={BookOpen}
