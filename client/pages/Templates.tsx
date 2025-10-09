@@ -40,7 +40,8 @@ export default function Templates() {
                 Personalize your PDF exports
               </h2>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                Browse curated layouts crafted for exams, MCQs, and question banks. Choose a style to update all generated PDFs instantly.
+                Browse curated layouts crafted for exams, MCQs, and question
+                banks. Choose a style to update all generated PDFs instantly.
               </p>
             </div>
             <div className="flex w-full max-w-sm items-center gap-3 rounded-xl border border-dashed border-border/60 bg-muted/40 p-3">
@@ -65,7 +66,8 @@ export default function Templates() {
                   {selectedTemplate.name}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
-                  {selectedTemplate.tier} • {selectedTemplate.palette.fontFamily
+                  {selectedTemplate.tier} •{" "}
+                  {selectedTemplate.palette.fontFamily
                     .split(",")[0]
                     ?.replace(/['"]/g, "")}
                 </div>

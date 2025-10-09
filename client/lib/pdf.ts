@@ -136,7 +136,8 @@ export async function generateExamStylePdf(params: {
   headerBand.style.fontSize = "18px";
   headerBand.style.backdropFilter = "blur(2px)";
   headerBand.style.textTransform = layout.uppercaseTitle ? "uppercase" : "none";
-  headerBand.style.textAlign = layout.headerAlign === "center" ? "center" : "left";
+  headerBand.style.textAlign =
+    layout.headerAlign === "center" ? "center" : "left";
   headerBand.textContent = title;
 
   // Accent line top/bottom
@@ -188,7 +189,8 @@ export async function generateExamStylePdf(params: {
   container = inner;
   cleanup = () => {
     try {
-      if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+      if (wrapper && wrapper.parentNode)
+        wrapper.parentNode.removeChild(wrapper);
     } catch {}
   };
 

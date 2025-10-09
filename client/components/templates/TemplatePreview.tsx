@@ -7,7 +7,10 @@ type TemplatePreviewProps = {
   mode?: "compact" | "regular";
 };
 
-export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewProps) {
+export function TemplatePreview({
+  template,
+  mode = "compact",
+}: TemplatePreviewProps) {
   const { preview, layout, palette } = template;
 
   const headerStyle: CSSProperties = {
@@ -21,9 +24,16 @@ export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewP
     color: preview.bodyTextColor,
   };
 
-  const accentEnabled = layout.accentLine !== "none" && Boolean(preview.accentBar);
+  const accentEnabled =
+    layout.accentLine !== "none" && Boolean(preview.accentBar);
   const accentElement = accentEnabled ? (
-    <div className={cn("w-full rounded-full", mode === "compact" ? "h-1" : "h-1.5")} style={{ background: preview.accentBar }} />
+    <div
+      className={cn(
+        "w-full rounded-full",
+        mode === "compact" ? "h-1" : "h-1.5",
+      )}
+      style={{ background: preview.accentBar }}
+    />
   ) : null;
 
   const headerElement = (
@@ -48,7 +58,13 @@ export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewP
       style={{ color: preview.bodyTextColor }}
     >
       <div>Time: 3 hrs</div>
-      <div className={cn(layout.headerAlign === "center" ? "text-center" : "text-left")}>Max Marks: 100</div>
+      <div
+        className={cn(
+          layout.headerAlign === "center" ? "text-center" : "text-left",
+        )}
+      >
+        Max Marks: 100
+      </div>
       <div className="text-right">Section A</div>
     </div>
   );
@@ -57,9 +73,7 @@ export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewP
     <div
       className={cn(
         "rounded border text-left leading-relaxed",
-        mode === "compact"
-          ? "px-3 py-2 text-[10px]"
-          : "px-4 py-3 text-[11px]",
+        mode === "compact" ? "px-3 py-2 text-[10px]" : "px-4 py-3 text-[11px]",
       )}
       style={{
         background: palette.cardBackground,
@@ -67,8 +81,16 @@ export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewP
         color: preview.bodyTextColor,
       }}
     >
-      <div className="font-semibold">{n}. {title}</div>
-      {detail ? <div className={cn("opacity-80", mode === "compact" ? "mt-0.5" : "mt-1")}>{detail}</div> : null}
+      <div className="font-semibold">
+        {n}. {title}
+      </div>
+      {detail ? (
+        <div
+          className={cn("opacity-80", mode === "compact" ? "mt-0.5" : "mt-1")}
+        >
+          {detail}
+        </div>
+      ) : null}
     </div>
   );
 
@@ -78,7 +100,10 @@ export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewP
         "relative overflow-hidden rounded-xl border",
         mode === "compact" ? "border-border/40" : "border-border/30 shadow-sm",
       )}
-      style={{ background: preview.background, minHeight: mode === "compact" ? 140 : 180 }}
+      style={{
+        background: preview.background,
+        minHeight: mode === "compact" ? 140 : 180,
+      }}
     >
       {palette.watermark ? (
         <div
@@ -92,13 +117,26 @@ export function TemplatePreview({ template, mode = "compact" }: TemplatePreviewP
         </div>
       ) : null}
 
-      <div className={cn("relative z-10", mode === "compact" ? "space-y-2 p-3" : "space-y-3 p-5")}>
+      <div
+        className={cn(
+          "relative z-10",
+          mode === "compact" ? "space-y-2 p-3" : "space-y-3 p-5",
+        )}
+      >
         {layout.accentLine === "top" ? accentElement : null}
         {headerElement}
         {metaRow}
         {layout.accentLine === "bottom" ? accentElement : null}
-        {questionCard(1, "Explain the water cycle.", "Describe evaporation, condensation, and precipitation.")}
-        {questionCard(2, "Define photosynthesis.", "Include the chemical equation.")}
+        {questionCard(
+          1,
+          "Explain the water cycle.",
+          "Describe evaporation, condensation, and precipitation.",
+        )}
+        {questionCard(
+          2,
+          "Define photosynthesis.",
+          "Include the chemical equation.",
+        )}
       </div>
     </div>
   );

@@ -194,9 +194,9 @@ export default function Landing() {
                   Customization
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Customize layouts or create your own.
-                  Control layout, fonts, instructions, and marking schemes to
-                  match your institution's standards.
+                  Customize layouts or create your own. Control layout, fonts,
+                  instructions, and marking schemes to match your institution's
+                  standards.
                 </p>
                 <ul className="mt-4 space-y-2 text-sm">
                   <li className="flex items-start gap-3">
@@ -222,9 +222,8 @@ export default function Landing() {
 
               <div className="rounded-lg border bg-white px-6 py-6 card-yellow-shadow">
                 <div className="text-sm text-muted-foreground">
-                  Example layout preview — All papers are fully editable
-                  and export-ready. Use the editor to tweak layout and
-                  marks.
+                  Example layout preview — All papers are fully editable and
+                  export-ready. Use the editor to tweak layout and marks.
                 </div>
               </div>
             </div>
@@ -234,15 +233,27 @@ export default function Landing() {
         <section id="template-gallery">
           <Container className="py-12">
             <div className="text-center space-y-3">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Template gallery</h2>
-              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">Preview exam-style layouts. Apply a template to update all future downloads.</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+                Template gallery
+              </h2>
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+                Preview exam-style layouts. Apply a template to update all
+                future downloads.
+              </p>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {listTemplates().map((t) => (
-                <div key={t.id} className="rounded-xl border bg-white p-3 card-yellow-shadow">
+                <div
+                  key={t.id}
+                  className="rounded-xl border bg-white p-3 card-yellow-shadow"
+                >
                   <TemplatePreview template={t} mode="compact" />
-                  <div className="mt-2 text-sm font-semibold truncate">{t.name}</div>
-                  <div className="text-[11px] text-muted-foreground">{t.tier}</div>
+                  <div className="mt-2 text-sm font-semibold truncate">
+                    {t.name}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {t.tier}
+                  </div>
                 </div>
               ))}
             </div>
@@ -253,27 +264,59 @@ export default function Landing() {
           <Container className="py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-3">
-                <h2 className="text-2xl sm:text-3xl font-bold">Security & Privacy</h2>
-                <p className="text-sm text-muted-foreground max-w-prose">Your data stays private. PDFs are processed client-side where possible and downloads are yours to keep.</p>
+                <h2 className="text-2xl sm:text-3xl font-bold">
+                  Security & Privacy
+                </h2>
+                <p className="text-sm text-muted-foreground max-w-prose">
+                  Your data stays private. PDFs are processed client-side where
+                  possible and downloads are yours to keep.
+                </p>
                 <ul className="mt-3 space-y-2 text-sm">
-                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>No student data required to generate papers</span></li>
-                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">��</span><span>Local PDF export with offline-friendly files</span></li>
-                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>Role-based access for institutes (coming soon)</span></li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 text-primary">•</span>
+                    <span>No student data required to generate papers</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 text-primary">��</span>
+                    <span>Local PDF export with offline-friendly files</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 text-primary">•</span>
+                    <span>Role-based access for institutes (coming soon)</span>
+                  </li>
                 </ul>
               </div>
               <div className="rounded-xl border bg-white p-5 card-yellow-shadow">
                 <div className="grid grid-cols-2 gap-4 text-center text-sm">
-                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">Client-first</div><div className="mt-1 text-xs text-muted-foreground">Render & export locally</div></div>
-                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">No tracking</div><div className="mt-1 text-xs text-muted-foreground">Focus on teaching</div></div>
-                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">Controls</div><div className="mt-1 text-xs text-muted-foreground">Marking schemes</div></div>
-                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">PDF Ready</div><div className="mt-1 text-xs text-muted-foreground">Print optimized</div></div>
+                  <div className="rounded-lg border bg-muted/40 p-4">
+                    <div className="text-xl font-bold">Client-first</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Render & export locally
+                    </div>
+                  </div>
+                  <div className="rounded-lg border bg-muted/40 p-4">
+                    <div className="text-xl font-bold">No tracking</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Focus on teaching
+                    </div>
+                  </div>
+                  <div className="rounded-lg border bg-muted/40 p-4">
+                    <div className="text-xl font-bold">Controls</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Marking schemes
+                    </div>
+                  </div>
+                  <div className="rounded-lg border bg-muted/40 p-4">
+                    <div className="text-xl font-bold">PDF Ready</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Print optimized
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </Container>
         </section>
-
-
 
         <div id="pricing" />
         <Pricing />

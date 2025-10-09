@@ -52,7 +52,10 @@ export const TemplateCard = memo(function TemplateCard({
         <Badge
           variant="outline"
           className="ml-2 whitespace-nowrap border-primary/30 text-[10px] font-semibold uppercase text-primary"
-          style={{ borderColor: template.palette.accent, color: template.palette.accent }}
+          style={{
+            borderColor: template.palette.accent,
+            color: template.palette.accent,
+          }}
         >
           {template.tier}
         </Badge>
