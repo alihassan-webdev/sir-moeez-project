@@ -3,6 +3,12 @@ const isBrowser = () =>
 
 export type TemplateTier = "Standard" | "Professional" | "Premium";
 
+export const TEMPLATE_TIERS: TemplateTier[] = [
+  "Standard",
+  "Professional",
+  "Premium",
+];
+
 type TemplateWatermark = {
   text: string;
   opacity: number;
@@ -242,6 +248,16 @@ function notifySelectionChange() {
 
 export function listTemplates() {
   return [...TEMPLATES];
+}
+
+export function groupTemplatesByTier(templates: TemplateDefinition[] = listTemplates()) {
+  return templates.reduce(
+    (acc, template) => {
+      acc[template.tier] = [...(acc[template.tier] ?? []), template];
+      return acc;
+    },
+    Object.create(null) as Record<TemplateTier, TemplateDefinition[]>,
+  );
 }
 
 export function getTemplateById(id: string | null | undefined) {
