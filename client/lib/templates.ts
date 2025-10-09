@@ -251,13 +251,16 @@ export function listTemplates() {
 }
 
 export function groupTemplatesByTier(templates: TemplateDefinition[] = listTemplates()) {
-  return templates.reduce(
-    (acc, template) => {
-      acc[template.tier] = [...(acc[template.tier] ?? []), template];
-      return acc;
-    },
-    Object.create(null) as Record<TemplateTier, TemplateDefinition[]>,
-  );
+  const grouped = TEMPLATE_TIERS.reduce((acc, tier) => {
+    acc[tier] = [] as TemplateDefinition[];
+    return acc;
+  }, {} as Record<TemplateTier, TemplateDefinition[]>);
+
+  for (const template of templates) {
+    grouped[template.tier]?.push(template);
+  }
+
+  return grouped;
 }
 
 export function getTemplateById(id: string | null | undefined) {
