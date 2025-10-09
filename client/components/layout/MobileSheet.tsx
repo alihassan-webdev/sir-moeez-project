@@ -47,19 +47,6 @@ export default function MobileSheet() {
               Dashboard
             </button>
           </SheetClose>
-          <SheetClose asChild>
-            <button
-              type="button"
-              onClick={() => handleNavigate("/templates")}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
-                pathname === "/templates"
-                  ? "bg-primary text-primary-foreground"
-                  : "transition-colors hover:bg-primary/10"
-              }`}
-            >
-              Templates
-            </button>
-          </SheetClose>
 
           <div className="mt-2 mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
             Exams
