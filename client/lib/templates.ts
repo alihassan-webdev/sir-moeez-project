@@ -1,4 +1,5 @@
-const isBrowser = () => typeof window !== "undefined" && typeof window.document !== "undefined";
+const isBrowser = () =>
+  typeof window !== "undefined" && typeof window.document !== "undefined";
 
 export type TemplateTier = "Standard" | "Professional" | "Premium";
 
@@ -50,7 +51,8 @@ const TEMPLATES: TemplateDefinition[] = [
     id: "standard-classic",
     name: "Classic Blue",
     tier: "Standard",
-    description: "Clean typography with a confident blue underline and subtle watermark.",
+    description:
+      "Clean typography with a confident blue underline and subtle watermark.",
     features: [
       "Blue accent underline for headings",
       "Neutral background ideal for printing",
@@ -91,7 +93,8 @@ const TEMPLATES: TemplateDefinition[] = [
     id: "standard-modern",
     name: "Modern Slate",
     tier: "Standard",
-    description: "Minimal slate styling with tight spacing and crisp section headers.",
+    description:
+      "Minimal slate styling with tight spacing and crisp section headers.",
     features: [
       "Slate grey title band",
       "Sans-serif body copy",
@@ -128,7 +131,8 @@ const TEMPLATES: TemplateDefinition[] = [
     id: "professional-midnight",
     name: "Midnight Professional",
     tier: "Professional",
-    description: "Dark header ribbon with centered title and elevated contrast.",
+    description:
+      "Dark header ribbon with centered title and elevated contrast.",
     features: [
       "Centered exam title",
       "Dark midnight ribbon",
@@ -170,7 +174,8 @@ const TEMPLATES: TemplateDefinition[] = [
     id: "premium-aurora",
     name: "Aurora Elite",
     tier: "Premium",
-    description: "Gradient aurora header, floating card shadow, and elegant serif body.",
+    description:
+      "Gradient aurora header, floating card shadow, and elegant serif body.",
     features: [
       "Aurora gradient banner",
       "Serif body copy",
@@ -254,7 +259,9 @@ export function getSelectedTemplateIdSnapshot() {
 }
 
 export function getSelectedTemplate() {
-  return getTemplateById(getSelectedTemplateIdSnapshot()) ?? getDefaultTemplate();
+  return (
+    getTemplateById(getSelectedTemplateIdSnapshot()) ?? getDefaultTemplate()
+  );
 }
 
 export function setSelectedTemplateId(id: string) {

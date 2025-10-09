@@ -15,10 +15,7 @@ export function useTemplateSelection() {
   );
 
   const templates = useMemo(() => listTemplates(), []);
-  const selectedTemplate = useMemo(
-    () => getSelectedTemplate(),
-    [selectedId],
-  );
+  const selectedTemplate = useMemo(() => getSelectedTemplate(), [selectedId]);
 
   return {
     templates,

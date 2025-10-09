@@ -196,7 +196,6 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </button>
-
               </div>
             </div>
 
