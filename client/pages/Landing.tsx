@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Pricing from "./Pricing";
 import Footer from "@/components/layout/Footer";
+import { TemplatePreview } from "@/components/templates/TemplatePreview";
+import { listTemplates } from "@/lib/templates";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -224,6 +227,86 @@ export default function Landing() {
                   and export-ready. Use the editor to tweak layout and
                   marks.
                 </div>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <section id="template-gallery">
+          <Container className="py-12">
+            <div className="text-center space-y-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Template gallery</h2>
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">Preview exam-style layouts. Apply a template to update all future downloads.</p>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {listTemplates().map((t) => (
+                <div key={t.id} className="rounded-xl border bg-white p-3 card-yellow-shadow">
+                  <TemplatePreview template={t} mode="compact" />
+                  <div className="mt-2 text-sm font-semibold truncate">{t.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{t.tier}</div>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        <section id="security">
+          <Container className="py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-3">
+                <h2 className="text-2xl sm:text-3xl font-bold">Security & Privacy</h2>
+                <p className="text-sm text-muted-foreground max-w-prose">Your data stays private. PDFs are processed client-side where possible and downloads are yours to keep.</p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>No student data required to generate papers</span></li>
+                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>Local PDF export with offline-friendly files</span></li>
+                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>Role-based access for institutes (coming soon)</span></li>
+                </ul>
+              </div>
+              <div className="rounded-xl border bg-white p-5 card-yellow-shadow">
+                <div className="grid grid-cols-2 gap-4 text-center text-sm">
+                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">Client-first</div><div className="mt-1 text-xs text-muted-foreground">Render & export locally</div></div>
+                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">No tracking</div><div className="mt-1 text-xs text-muted-foreground">Focus on teaching</div></div>
+                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">Controls</div><div className="mt-1 text-xs text-muted-foreground">Marking schemes</div></div>
+                  <div className="rounded-lg border bg-muted/40 p-4"><div className="text-xl font-bold">PDF Ready</div><div className="mt-1 text-xs text-muted-foreground">Print optimized</div></div>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <section id="faq">
+          <Container className="py-12">
+            <div className="text-center space-y-3">
+              <h2 className="text-2xl sm:text-3xl font-bold">FAQ</h2>
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">Common questions about generating and exporting test papers.</p>
+            </div>
+            <div className="mt-6 rounded-xl border bg-white p-2 sm:p-4 card-yellow-shadow">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Can I use my own PDFs or chapters?</AccordionTrigger>
+                  <AccordionContent>Yes. Upload your PDFs or pick chapters from the built-in library, then generate papers from them.</AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger>How do I customize marks or difficulty?</AccordionTrigger>
+                  <AccordionContent>Use the customization step to set total marks, question types, and difficulty weighting. Save presets for reuse.</AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                  <AccordionTrigger>Will the exported PDF match my selected template?</AccordionTrigger>
+                  <AccordionContent>Yes. Your selected template applies to all generated PDFs automatically.</AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </Container>
+        </section>
+
+        <section id="cta">
+          <Container className="py-12">
+            <div className="rounded-xl border bg-white p-6 sm:p-8 text-center card-yellow-shadow">
+              <h3 className="text-xl sm:text-2xl font-bold">Create your next test paper in minutes</h3>
+              <p className="mt-2 text-sm text-muted-foreground max-w-2xl mx-auto">Pick a template, choose chapters, and export a print-ready PDF for your class.</p>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                <Button onClick={() => navigate("/get-started")}>Get started</Button>
+                <Button variant="outline" onClick={() => navigate("/templates")}>Browse templates</Button>
               </div>
             </div>
           </Container>
