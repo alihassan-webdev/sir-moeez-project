@@ -190,7 +190,7 @@ export default function Landing() {
           <Container className="py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div>
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-2xl sm:text-3xl font-bold">
                   Customization
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -257,7 +257,7 @@ export default function Landing() {
                 <p className="text-sm text-muted-foreground max-w-prose">Your data stays private. PDFs are processed client-side where possible and downloads are yours to keep.</p>
                 <ul className="mt-3 space-y-2 text-sm">
                   <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>No student data required to generate papers</span></li>
-                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>Local PDF export with offline-friendly files</span></li>
+                  <li className="flex items-start gap-3"><span className="mt-1 text-primary">��</span><span>Local PDF export with offline-friendly files</span></li>
                   <li className="flex items-start gap-3"><span className="mt-1 text-primary">•</span><span>Role-based access for institutes (coming soon)</span></li>
                 </ul>
               </div>
