@@ -38,6 +38,8 @@ export type TemplateDefinition = {
     background: string;
     headerBackground: string;
     accentBar?: string;
+    headerTextColor: string;
+    bodyTextColor: string;
   };
 };
 
@@ -81,6 +83,8 @@ const TEMPLATES: TemplateDefinition[] = [
       background: "linear-gradient(135deg,#f8fafc 0%,#dfe7ff 100%)",
       headerBackground: "#e0e7ff",
       accentBar: "#1d4ed8",
+      headerTextColor: "#1d4ed8",
+      bodyTextColor: "#0f172a",
     },
   },
   {
@@ -116,6 +120,8 @@ const TEMPLATES: TemplateDefinition[] = [
       background: "linear-gradient(135deg,#f5f7fa 0%,#e3e8ef 100%)",
       headerBackground: "#e2e8f0",
       accentBar: "#334155",
+      headerTextColor: "#1f2937",
+      bodyTextColor: "#1f2937",
     },
   },
   {
@@ -156,6 +162,8 @@ const TEMPLATES: TemplateDefinition[] = [
       background: "linear-gradient(135deg,#ede9fe 0%,#c7d2fe 100%)",
       headerBackground: "linear-gradient(90deg,#1e1b4b,#312e81)",
       accentBar: "rgba(49,46,129,0.6)",
+      headerTextColor: "#f8fafc",
+      bodyTextColor: "#1f2937",
     },
   },
   {
@@ -196,6 +204,8 @@ const TEMPLATES: TemplateDefinition[] = [
       background: "linear-gradient(180deg,#fbcfe8 0%,#ede9fe 50%,#faf5ff 100%)",
       headerBackground: "linear-gradient(120deg,#f472b6,#c084fc,#818cf8)",
       accentBar: "rgba(147,51,234,0.6)",
+      headerTextColor: "#fdf4ff",
+      bodyTextColor: "#4c1d95",
     },
   },
 ];
