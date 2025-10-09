@@ -1,4 +1,4 @@
-import { isBrowser } from "@/lib/utils";
+const isBrowser = () => typeof window !== "undefined" && typeof window.document !== "undefined";
 
 export type TemplateTier = "Standard" | "Professional" | "Premium";
 
