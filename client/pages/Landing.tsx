@@ -7,7 +7,6 @@ import Pricing from "./Pricing";
 import Footer from "@/components/layout/Footer";
 import { TemplatePreview } from "@/components/templates/TemplatePreview";
 import { listTemplates } from "@/lib/templates";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -235,7 +234,7 @@ export default function Landing() {
         <section id="template-gallery">
           <Container className="py-12">
             <div className="text-center space-y-3">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Template gallery</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">Template gallery</h2>
               <p className="text-sm text-muted-foreground max-w-2xl mx-auto">Preview exam-style layouts. Apply a template to update all future downloads.</p>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -276,41 +275,12 @@ export default function Landing() {
 
         <section id="faq">
           <Container className="py-12">
-            <div className="text-center space-y-3">
-              <h2 className="text-2xl sm:text-3xl font-bold">FAQ</h2>
-              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">Common questions about generating and exporting test papers.</p>
-            </div>
-            <div className="mt-6 rounded-xl border bg-white p-2 sm:p-4 card-yellow-shadow">
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>Can I use my own PDFs or chapters?</AccordionTrigger>
-                  <AccordionContent>Yes. Upload your PDFs or pick chapters from the built-in library, then generate papers from them.</AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>How do I customize marks or difficulty?</AccordionTrigger>
-                  <AccordionContent>Use the customization step to set total marks, question types, and difficulty weighting. Save presets for reuse.</AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger>Will the exported PDF match my selected template?</AccordionTrigger>
-                  <AccordionContent>Yes. Your selected template applies to all generated PDFs automatically.</AccordionContent>
-                </AccordionItem>
-              </Accordion>
+            <div className="text-center">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">FAQ</h2>
             </div>
           </Container>
         </section>
 
-        <section id="cta">
-          <Container className="py-12">
-            <div className="rounded-xl border bg-white p-6 sm:p-8 text-center card-yellow-shadow">
-              <h3 className="text-xl sm:text-2xl font-bold">Create your next test paper in minutes</h3>
-              <p className="mt-2 text-sm text-muted-foreground max-w-2xl mx-auto">Pick a template, choose chapters, and export a print-ready PDF for your class.</p>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                <Button onClick={() => navigate("/get-started")}>Get started</Button>
-                <Button variant="outline" onClick={() => navigate("/templates")}>Browse templates</Button>
-              </div>
-            </div>
-          </Container>
-        </section>
 
         <div id="pricing" />
         <Pricing />
