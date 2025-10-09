@@ -273,13 +273,6 @@ export default function Landing() {
           </Container>
         </section>
 
-        <section id="faq">
-          <Container className="py-12">
-            <div className="text-center">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">FAQ</h2>
-            </div>
-          </Container>
-        </section>
 
 
         <div id="pricing" />
