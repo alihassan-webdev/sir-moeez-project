@@ -6,7 +6,8 @@ import {
   BookOpen,
   ListChecks,
   MessageSquare,
-  History
+  History,
+  LayoutTemplate,
 } from "lucide-react";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
@@ -132,6 +133,25 @@ export default function GetStarted() {
                     <div className="text-base font-semibold">Generate Exam</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Open the Test Paper Generator
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/templates")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
+                >
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+                      <LayoutTemplate
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="text-base font-semibold">Templates</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Start from ready-made paper formats
                     </div>
                   </div>
                 </button>
