@@ -1,34 +1,8 @@
 import Container from "@/components/layout/Container";
-import { TemplateCard } from "@/components/templates/TemplateCard";
 import { useTemplateSelection } from "@/hooks/use-template-selection";
-import { toast } from "@/hooks/use-toast";
-import type { TemplateDefinition, TemplateTier } from "@/lib/templates";
-
-const tierDescriptions: Record<TemplateTier, string> = {
-  Standard: "Streamlined defaults that balance readability and clarity.",
-  Professional: "Polished visuals ideal for branded assessments.",
-  Premium: "Expressive gradients and typography for flagship exams.",
-};
 
 export default function Templates() {
-  const {
-    groupedTemplates,
-    tiers,
-    selectTemplate,
-    isSelected,
-    selectedTemplate,
-  } = useTemplateSelection();
-
-  const handleSelect = (template: TemplateDefinition) => {
-    if (isSelected(template.id)) {
-      return;
-    }
-    selectTemplate(template.id);
-    toast({
-      title: `${template.name} applied`,
-      description: "Your future downloads will use this template.",
-    });
-  };
+  const { selectedTemplate } = useTemplateSelection();
 
   return (
     <div className="min-h-svh bg-background py-8 lg:py-12">
@@ -66,41 +40,14 @@ export default function Templates() {
                   {selectedTemplate.name}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
-                  {selectedTemplate.tier} •{" "}
-                  {selectedTemplate.palette.fontFamily
+                  {selectedTemplate.tier} • {selectedTemplate.palette.fontFamily
                     .split(",")[0]
-                    ?.replace(/['"]/g, "")}
+                    ?.replace(/["']/g, "")}
                 </div>
               </div>
             </div>
           </div>
         </header>
-
-        {tiers.map((tier) => (
-          <section key={tier} className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-2xl font-semibold text-foreground">
-                  {tier} templates
-                </h2>
-                <p className="text-sm text-muted-foreground sm:max-w-md">
-                  {tierDescriptions[tier]}
-                </p>
-              </div>
-              <div className="h-1 w-24 rounded-full bg-primary/20" />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-              {groupedTemplates[tier]?.map((template) => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  isSelected={isSelected(template.id)}
-                  onSelect={handleSelect}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
       </Container>
     </div>
   );
