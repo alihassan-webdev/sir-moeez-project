@@ -11,7 +11,7 @@ const DEFAULT_TEMPLATE_HTML = `<!doctype html>
     *{box-sizing:border-box;margin:0;padding:0}
     html, body { font-family: 'Poppins', Arial, sans-serif; background: transparent; color:#111; }
     /* Keep the page clean in preview: no border/background/shadow around it */
-    .page { width:210mm; margin:0; padding:12mm 16mm 8mm 16mm; background:#fff; border:none; box-shadow:none; border-radius:0; display:flex; flex-direction:column; gap:0; transform: scale(0.55); transform-origin: top left; }
+    .page { width:160mm; margin:0; padding:12mm 16mm 8mm 16mm; background:#fff; border:none; box-shadow:none; border-radius:0; display:flex; flex-direction:column; gap:0; transform: scale(0.55); transform-origin: top left; }
     header{ display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #111; padding-bottom:8px; margin-bottom:12px; }
     .logo{ font-weight:600; font-size:16px; color:#333; }
     .school-info{ flex:1; text-align:center; }
