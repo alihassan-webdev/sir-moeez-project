@@ -6,7 +6,11 @@ import {
   BookOpen,
   ListChecks,
   MessageSquare,
-  History
+  History,
+  CreditCard,
+  User,
+  LifeBuoy,
+  LayoutTemplate,
 } from "lucide-react";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
@@ -78,7 +82,7 @@ export default function GetStarted() {
             {/* Exams */}
             <div className="mt-4">
               <h2 className="text-xl sm:text-2xl font-bold">Exams</h2>
-              <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr">
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
                 <button
                   type="button"
                   onClick={() => navigate("/mcqs")}
@@ -174,6 +178,24 @@ export default function GetStarted() {
                   </div>
                 </button>
 
+                <button
+                  type="button"
+                  onClick={() => navigate("/templates")}
+                  className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
+                >
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+                      <LayoutTemplate
+                        className="h-7 w-7 sm:h-8 sm:w-8"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="text-base font-semibold">Templates</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Create and manage exam templates
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -197,15 +219,18 @@ function MyAccountCards() {
     [sub],
   );
   return (
-    <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
+    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr">
       <button
         type="button"
         onClick={() => navigate("/subscription")}
         className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between">
-            <div className="text-base font-semibold">Manage subscription</div>
+        <div className="flex flex-col items-center text-center h-full">
+          <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+            <CreditCard className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+          </div>
+          <div className="text-base font-semibold">Manage subscription</div>
+          <div className="mt-1">
             <span className="text-xs rounded-full border border-input px-2 py-0.5 capitalize bg-primary/10 text-primary">
               {sub.frequency}
             </span>
@@ -225,7 +250,10 @@ function MyAccountCards() {
         onClick={() => navigate("/profile")}
         className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col items-center text-center h-full">
+          <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+            <User className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+          </div>
           <div className="text-base font-semibold">My profile</div>
           <div className="mt-1 text-xs text-muted-foreground">
             Update your name and phone.
@@ -241,7 +269,10 @@ function MyAccountCards() {
         onClick={() => navigate("/support")}
         className="group w-full h-full rounded-xl border bg-white p-3.5 sm:p-4 card-yellow-shadow hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-sm text-left"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col items-center text-center h-full">
+          <div className="rounded-full bg-primary/10 p-2.5 sm:p-3 mb-2 text-primary group-hover:bg-primary/15">
+            <LifeBuoy className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden="true" />
+          </div>
           <div className="text-base font-semibold">Support</div>
           <div className="mt-1 text-xs text-muted-foreground">
             Create a ticket for help or billing queries.

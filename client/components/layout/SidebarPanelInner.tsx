@@ -9,6 +9,7 @@ import {
   LifeBuoy,
   BookOpen,
   History,
+  LayoutTemplate,
 } from "lucide-react";
 
 function NavItem({
@@ -74,6 +75,12 @@ export default function SidebarPanelInner() {
           label="Generate Exam"
           active={pathname === "/app"}
           onClick={() => navigate("/app")}
+        />
+        <NavItem
+          icon={LayoutTemplate}
+          label="Templates"
+          active={pathname === "/templates"}
+          onClick={() => navigate("/templates")}
         />
         <NavItem
           icon={BookOpen}
