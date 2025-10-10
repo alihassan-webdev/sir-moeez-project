@@ -63,7 +63,8 @@ export default function Templates() {
                   {selectedTemplate.name}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
-                  {selectedTemplate.tier} • {selectedTemplate.palette.fontFamily
+                  {selectedTemplate.tier} •{" "}
+                  {selectedTemplate.palette.fontFamily
                     .split(",")[0]
                     ?.replace(/["']/g, "")}
                 </div>
@@ -130,7 +131,8 @@ export default function Templates() {
                         {tier} templates
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        {tierTemplates.length} {tierTemplates.length === 1 ? "option" : "options"}
+                        {tierTemplates.length}{" "}
+                        {tierTemplates.length === 1 ? "option" : "options"}
                       </p>
                     </div>
                   </div>

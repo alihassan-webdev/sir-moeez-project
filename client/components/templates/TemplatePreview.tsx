@@ -166,12 +166,14 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
   const headerGap = mode === "compact" ? "gap-3 pb-3" : "gap-4 pb-4";
   const infoTextClass = mode === "compact" ? "text-[7.5px]" : "text-[9px]";
   const bodyTextClass = mode === "compact" ? "text-[8.5px]" : "text-[10px]";
-  const sectionHeadingClass = mode === "compact" ? "text-[9.5px]" : "text-[11px]";
+  const sectionHeadingClass =
+    mode === "compact" ? "text-[9.5px]" : "text-[11px]";
   const footerTextClass = mode === "compact" ? "text-[8.5px]" : "text-[10px]";
   const instructionsPadding = mode === "compact" ? "p-3" : "p-4";
   const questionSpacing = mode === "compact" ? "space-y-1.5" : "space-y-2";
   const optionSpacing = mode === "compact" ? "space-y-0.5" : "space-y-1";
-  const logoSizeClass = mode === "compact" ? "h-10 w-10 text-[8px]" : "h-12 w-12 text-[9px]";
+  const logoSizeClass =
+    mode === "compact" ? "h-10 w-10 text-[8px]" : "h-12 w-12 text-[9px]";
 
   const instructions = [
     "Attempt ALL questions. The paper is divided into Sections A, B and C.",
@@ -216,7 +218,12 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
       )}
       style={{ background: preview.background }}
     >
-      <div className={cn("mx-auto w-full", mode === "compact" ? "max-w-[320px]" : "max-w-[360px]")}>
+      <div
+        className={cn(
+          "mx-auto w-full",
+          mode === "compact" ? "max-w-[320px]" : "max-w-[360px]",
+        )}
+      >
         <div
           className={cn(
             "flex flex-col gap-3 rounded-lg border bg-white shadow-sm",
@@ -244,7 +251,12 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
               >
                 LOGO
               </div>
-              <div className={cn("text-left", mode === "compact" ? "text-[9px]" : "text-[11px]")}>
+              <div
+                className={cn(
+                  "text-left",
+                  mode === "compact" ? "text-[9px]" : "text-[11px]",
+                )}
+              >
                 <div className="font-semibold leading-snug">
                   Board of Intermediate and Secondary Education, Faisalabad
                 </div>
@@ -326,10 +338,7 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
               {marksRows.map(([section, detail, marks]) => (
                 <div
                   key={section}
-                  className={cn(
-                    "grid grid-cols-3 border-t",
-                    infoTextClass,
-                  )}
+                  className={cn("grid grid-cols-3 border-t", infoTextClass)}
                   style={{ borderColor }}
                 >
                   <div className="border-r px-2 py-1" style={{ borderColor }}>
@@ -342,7 +351,10 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
                 </div>
               ))}
               <div
-                className={cn("grid grid-cols-3 border-t font-semibold", infoTextClass)}
+                className={cn(
+                  "grid grid-cols-3 border-t font-semibold",
+                  infoTextClass,
+                )}
                 style={{ borderColor }}
               >
                 <div className="border-r px-2 py-1" style={{ borderColor }}>
@@ -371,7 +383,13 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
                   (Each question carries 2 marks)
                 </span>
               </div>
-              <ol className={cn("list-decimal pl-4", bodyTextClass, questionSpacing)}>
+              <ol
+                className={cn(
+                  "list-decimal pl-4",
+                  bodyTextClass,
+                  questionSpacing,
+                )}
+              >
                 {mcqQuestions.map(({ prompt, options }, index) => (
                   <li key={prompt} className="space-y-1">
                     <div>{prompt}</div>
@@ -408,7 +426,13 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
                   (Attempt all questions)
                 </span>
               </div>
-              <ol className={cn("list-decimal pl-4", bodyTextClass, questionSpacing)}>
+              <ol
+                className={cn(
+                  "list-decimal pl-4",
+                  bodyTextClass,
+                  questionSpacing,
+                )}
+              >
                 {shortAnswers.map((prompt) => (
                   <li key={prompt} className="space-y-1">
                     <div>{prompt}</div>
@@ -437,13 +461,22 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
                   (Answer any two)
                 </span>
               </div>
-              <ol className={cn("list-decimal pl-4", bodyTextClass, questionSpacing)}>
+              <ol
+                className={cn(
+                  "list-decimal pl-4",
+                  bodyTextClass,
+                  questionSpacing,
+                )}
+              >
                 {longAnswers.map((prompt) => (
                   <li key={prompt} className="space-y-1">
                     <div>{prompt}</div>
                     <div
                       className="rounded border border-dashed border-border/60 bg-white/40"
-                      style={{ padding: mode === "compact" ? "8px" : "10px", minHeight: mode === "compact" ? "28px" : "36px" }}
+                      style={{
+                        padding: mode === "compact" ? "8px" : "10px",
+                        minHeight: mode === "compact" ? "28px" : "36px",
+                      }}
                     >
                       Write detailed answer here...
                     </div>
@@ -458,7 +491,10 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
               "flex flex-wrap justify-between gap-3 border-t",
               footerTextClass,
             )}
-            style={{ borderColor: "#cccccc", paddingTop: mode === "compact" ? "10px" : "14px" }}
+            style={{
+              borderColor: "#cccccc",
+              paddingTop: mode === "compact" ? "10px" : "14px",
+            }}
           >
             <div className="text-center">
               Examiner: ___________________
