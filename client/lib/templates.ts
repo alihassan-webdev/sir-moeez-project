@@ -3,6 +3,8 @@ const isBrowser = () =>
 
 export type TemplateTier = "Standard" | "Professional" | "Premium";
 
+type TemplatePreviewVariant = "default" | "board-exam";
+
 export const TEMPLATE_TIERS: TemplateTier[] = [
   "Standard",
   "Professional",
@@ -47,6 +49,7 @@ export type TemplateDefinition = {
     accentBar?: string;
     headerTextColor: string;
     bodyTextColor: string;
+    variant?: TemplatePreviewVariant;
   };
 };
 
@@ -131,6 +134,44 @@ const TEMPLATES: TemplateDefinition[] = [
       accentBar: "#334155",
       headerTextColor: "#1f2937",
       bodyTextColor: "#1f2937",
+    },
+  },
+  {
+    id: "professional-board-paper",
+    name: "Board Style Exam",
+    tier: "Professional",
+    description:
+      "Board inspired A4 layout with editable metadata, tables, and structured sections.",
+    features: [
+      "Dual-column header with board crest placeholder",
+      "Marks breakdown table and instruction callout",
+      "Sectioned MCQ, short, and long answer blocks",
+    ],
+    palette: {
+      pageBackground: "#f2f2f2",
+      cardBackground: "#ffffff",
+      border: "#d6d6d6",
+      accent: "#222222",
+      accentSoft: "#f4f4f4",
+      heading: "#1f2937",
+      text: "#374151",
+      tagBackground: "rgba(34,34,34,0.1)",
+      tagText: "#222222",
+      fontFamily: "'Georgia','Times New Roman',serif",
+    },
+    layout: {
+      headerAlign: "left",
+      rounded: 12,
+      shadow: "0 24px 60px rgba(15,23,42,0.12)",
+      headerShadow: "0 16px 40px rgba(34,34,34,0.15)",
+      accentLine: "none",
+    },
+    preview: {
+      background: "linear-gradient(135deg,#f2f2f2 0%,#ffffff 80%)",
+      headerBackground: "#ffffff",
+      headerTextColor: "#1f2937",
+      bodyTextColor: "#374151",
+      variant: "board-exam",
     },
   },
   {
