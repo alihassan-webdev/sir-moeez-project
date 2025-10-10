@@ -159,12 +159,82 @@ function DefaultPreview({ template, mode }: PreviewRendererProps) {
 }
 
 function BoardExamPreview({ template, mode }: PreviewRendererProps) {
-  const { palette, preview } = template;
-  const borderColor = palette.border ?? "#d6d6d6";
-  const cardPadding = mode === "compact" ? "p-3" : "p-5";
+  const html = `
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Poppins",Arial,sans-serif;background:#f6f6f8;color:#111}
+    .page{width:210mm;min-height:297mm;margin:15mm auto;padding:18mm 16mm;background:#fff;border:1px solid #e5e5e5;box-shadow:0 0 15px rgba(0,0,0,0.05);border-radius:8px}
+    header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:16px}
+    .logo{font-weight:600;font-size:16px;color:#333}
+    .school-info{flex:1;text-align:center}
+    .school-info h1{margin:0;font-size:22px;font-weight:600}
+    .school-info p{font-size:13px;color:#555;margin-top:3px}
+    .meta{width:220px;text-align:left}
+    .meta table{width:100%;border-collapse:collapse}
+    .meta td{padding:4px;font-size:13px;border-bottom:1px solid #eee}
+    .title{text-align:center;margin:20px 0 10px 0}
+    .title h2{font-size:18px;font-weight:600}
+    .subtitle{font-size:13px;color:#555;margin-top:4px}
+    .instructions{border:1px solid #ddd;border-radius:6px;padding:10px;font-size:13px;margin:14px 0;color:#333;background:#fafafa}
+    .marks-table{width:100%;border-collapse:collapse;margin:10px 0}
+    .marks-table th, .marks-table td{border:1px solid #ddd;padding:8px;text-align:center;font-size:13px}
+    .marks-table th{background:#f3f3f3;font-weight:600}
+    section.questions{margin-top:15px}
+    .question{border:1px dashed #ccc;border-radius:5px;padding:10px;margin-bottom:10px;min-height:40px}
+    footer{border-top:1px solid #ddd;margin-top:20px;padding-top:10px;display:flex;justify-content:space-between;font-size:13px;color:#444}
+    .sign{width:30%;text-align:center}
+    @media print{body{background:#fff}.page{box-shadow:none;border:none;border-radius:0;margin:0;padding:12mm}}
+  </style>
+  <div class="page" id="paper">
+    <header>
+      <div class="logo">Logo</div>
+      <div class="school-info">
+        <h1>Institution / School / College Name</h1>
+        <p>Address · Phone · Website</p>
+        <p>Course / Department</p>
+      </div>
+      <div class="meta">
+        <table>
+          <tr><td>Type:</td><td>Exam Paper</td></tr>
+          <tr><td>Subject:</td><td>Subject Name</td></tr>
+          <tr><td>Class:</td><td>10th</td></tr>
+          <tr><td>Duration:</td><td>2 Hours</td></tr>
+          <tr><td>Total Marks:</td><td>100</td></tr>
+        </table>
+      </div>
+    </header>
 
-  const lineClass = mode === "compact" ? "h-2 w-3/4" : "h-3 w-2/3";
-  const smallLine = mode === "compact" ? "h-2 w-1/3" : "h-3 w-1/4";
+    <div class="title">
+      <h2>Government of Pakistan — Examination Paper</h2>
+      <div class="subtitle">Instructions: Read all questions carefully before attempting.</div>
+    </div>
+
+    <div class="instructions">Write exam instructions here...</div>
+
+    <table class="marks-table">
+      <thead>
+        <tr><th>Section</th><th>Questions</th><th>Marks</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A</td><td></td><td></td></tr>
+        <tr><td>B</td><td></td><td></td></tr>
+        <tr><td>C</td><td></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <section class="questions">
+      <div class="question">Question area...</div>
+      <div class="question">Question area...</div>
+      <div class="question">Question area...</div>
+    </section>
+
+    <footer>
+      <div class="sign">Examiner Signature</div>
+      <div class="sign">Date</div>
+      <div class="sign">Instructor Signature</div>
+    </footer>
+  </div>
+  `;
 
   return (
     <div
@@ -172,86 +242,10 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
         "relative overflow-hidden rounded-xl border",
         mode === "compact" ? "border-border/40" : "border-border/30 shadow-sm",
       )}
-      style={{ background: preview.background }}
+      style={{ background: template.preview.background }}
     >
-      <div
-        className={cn(
-          "mx-auto w-full",
-          mode === "compact" ? "max-w-[320px]" : "max-w-[360px]",
-        )}
-      >
-        <div
-          className={cn(
-            "flex flex-col gap-3 rounded-lg border bg-white shadow-sm",
-            cardPadding,
-          )}
-          style={{
-            borderColor,
-            fontFamily: palette.fontFamily,
-            color: preview.bodyTextColor,
-          }}
-        >
-          <header className={cn("flex items-center justify-between border-b-2", mode === "compact" ? "pb-2" : "pb-3")}>
-            <div className="flex items-center gap-3">
-              <div
-                className={cn("flex items-center justify-center rounded-md border bg-white", mode === "compact" ? "h-10 w-10" : "h-12 w-12")}
-                style={{ borderColor: "#bbbbbb", color: palette.accent }}
-              >
-                <div className="text-[10px] font-semibold">LOGO</div>
-              </div>
-              <div>
-                <div className="font-semibold text-sm">{template.name}</div>
-                <div className="mt-0.5 opacity-80 text-xs">{template.description}</div>
-                <div className="mt-1 flex items-center gap-2">
-                  <span className={cn("inline-block rounded-full px-2 py-0.5 text-[11px] font-medium", "bg-[rgba(0,0,0,0.06)] text-[rgba(0,0,0,0.7)]")}>{template.tier}</span>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          <div className="p-3">
-            <div className="animate-pulse">
-              <div className="flex items-center justify-between mb-3">
-                <div className={cn("rounded bg-gray-200", lineClass)} />
-                <div className={cn("rounded bg-gray-200", smallLine)} />
-              </div>
-
-              <div className={cn("rounded border border-dashed bg-[rgba(0,0,0,0.03)] p-3 mb-3")}
-                style={{ borderColor: "#e5e7eb" }}>
-                <div className="space-y-2">
-                  <div className="rounded bg-gray-200 h-2 w-5/6" />
-                  <div className="rounded bg-gray-200 h-2 w-3/4" />
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="rounded bg-gray-200 h-8" />
-                  <div className="rounded bg-gray-200 h-8" />
-                  <div className="rounded bg-gray-200 h-8" />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="rounded border p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="rounded bg-gray-200 h-3 w-1/3" />
-                      <div className="rounded bg-gray-200 h-3 w-1/6" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="rounded bg-gray-200 h-2 w-full" />
-                      <div className="rounded bg-gray-200 h-2 w-5/6" />
-                      <div className="rounded bg-gray-200 h-2 w-2/3" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-4 text-center text-xs text-muted-foreground">This is a visual preview. Actual paper content is removed for clarity.</div>
-          </div>
-        </div>
+      <div className={cn("mx-auto w-full", mode === "compact" ? "max-w-[320px]" : "max-w-[360px]")}>
+        <div className={cn(mode === "compact" ? "p-2" : "p-4")} dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </div>
   );
