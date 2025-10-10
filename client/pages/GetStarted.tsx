@@ -10,7 +10,7 @@ import {
   CreditCard,
   User,
   LifeBuoy,
-  LayoutTemplate
+  LayoutTemplate,
 } from "lucide-react";
 import { getSubscription, nextRenewalDate } from "@/lib/subscription";
 
@@ -196,7 +196,6 @@ export default function GetStarted() {
                     </div>
                   </div>
                 </button>
-
               </div>
             </div>
 
@@ -237,7 +236,8 @@ function MyAccountCards() {
             </span>
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            Current plan: <span className="capitalize font-medium">{sub.planId}</span>
+            Current plan:{" "}
+            <span className="capitalize font-medium">{sub.planId}</span>
           </div>
           <div className="mt-auto pt-3 text-xs text-muted-foreground">
             Next renewal: {renewal}

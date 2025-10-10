@@ -75,7 +75,12 @@ export const DEFAULT_TEMPLATE_HTML: string = `<!doctype html>
 </html>`;
 
 export const AVAILABLE_TEMPLATES: PaperTemplate[] = [
-  { id: "default", name: "Default Template", html: DEFAULT_TEMPLATE_HTML, placeholderSelector: ".questions" },
+  {
+    id: "default",
+    name: "Default Template",
+    html: DEFAULT_TEMPLATE_HTML,
+    placeholderSelector: ".questions",
+  },
 ];
 
 export function getSelectedTemplateId(): string | null {
@@ -92,7 +97,10 @@ export function setSelectedTemplateId(id: string) {
   } catch {}
 }
 
-export function getSelectedTemplateHtml(): { html: string; placeholderSelector?: string } | null {
+export function getSelectedTemplateHtml(): {
+  html: string;
+  placeholderSelector?: string;
+} | null {
   const id = getSelectedTemplateId();
   if (!id) return null;
   const t = AVAILABLE_TEMPLATES.find((t) => t.id === id);
