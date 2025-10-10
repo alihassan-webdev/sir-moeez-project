@@ -28,6 +28,7 @@ import Support from "./pages/Support";
 import Onboarding from "./pages/Onboarding";
 import Results from "./pages/Results";
 import ResultDetail from "./pages/ResultDetail";
+import Templates from "./pages/Templates";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { ProfileLockProvider } from "@/hooks/useProfileLock";
@@ -227,7 +228,18 @@ function AnimatedRoutes() {
             path="/pricing"
             element={<Navigate to="/#pricing" replace />}
           />
-          <Route path="/templates" element={<Navigate to="/get-started" replace />} />
+          <Route
+            path="/templates"
+            element={
+              <RequireAuth>
+                <RequireProfileCompleted>
+                  <PageWrapper>
+                    <Templates />
+                  </PageWrapper>
+                </RequireProfileCompleted>
+              </RequireAuth>
+            }
+          />
           <Route
             path="*"
             element={

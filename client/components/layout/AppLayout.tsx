@@ -22,6 +22,7 @@ export function AppLayout({ children }: PropsWithChildren) {
       "/mcqs",
       "/qna",
       "/syllabus",
+      "/templates",
       "/subscription",
       "/profile",
       "/onboarding",
