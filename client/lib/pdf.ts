@@ -95,6 +95,13 @@ export async function generateExamStylePdf(params: {
     if (!page) {
       // fallback to default rendering if page not found
     } else {
+      // set title if available
+      const titleEl = page.querySelector(".title h2") as HTMLElement | null;
+      if (titleEl && ("title" in (params as any))) {
+        try {
+          titleEl.textContent = String((params as any).title || titleEl.textContent || "");
+        } catch {}
+      }
       try {
         const fmt = await import("@/lib/format");
         const placeholder = selected.placeholderSelector ? (tmp.querySelector(selected.placeholderSelector) as HTMLElement | null) : null;
