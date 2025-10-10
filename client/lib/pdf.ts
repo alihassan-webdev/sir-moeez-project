@@ -8,6 +8,8 @@ function sanitizeFilenameBase(s: string) {
   return out || "document";
 }
 
+import { getSelectedTemplateHtml } from "@/lib/templates";
+
 export async function generateExamStylePdf(params: {
   title: string;
   body: string;
@@ -84,19 +86,56 @@ export async function generateExamStylePdf(params: {
     inner.appendChild(header);
   }
 
-  const bodyEl = document.createElement("div");
-  bodyEl.style.color = "#000000";
-  try {
-    const fmt = await import("@/lib/format");
-    bodyEl.innerHTML = fmt.formatResultHtml(body || "");
-  } catch {
-    bodyEl.textContent = body || "";
+  const selected = getSelectedTemplateHtml();
+
+  if (selected) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = selected.html;
+    const page = (tmp.querySelector(".page") || tmp.firstElementChild) as HTMLElement | null;
+    if (!page) {
+      // fallback to default rendering if page not found
+    } else {
+      try {
+        const fmt = await import("@/lib/format");
+        const placeholder = selected.placeholderSelector ? (tmp.querySelector(selected.placeholderSelector) as HTMLElement | null) : null;
+        const html = fmt.formatResultHtml(body || "");
+        if (placeholder) {
+          placeholder.innerHTML = html;
+        } else {
+          const bodyEl = document.createElement("div");
+          bodyEl.innerHTML = html;
+          page.appendChild(bodyEl);
+        }
+      } catch {
+        // plain text fallback
+        const placeholder = selected.placeholderSelector ? (tmp.querySelector(selected.placeholderSelector) as HTMLElement | null) : null;
+        const bodyEl = document.createElement("div");
+        bodyEl.textContent = body || "";
+        (placeholder || page).appendChild(bodyEl);
+      }
+      page.style.transform = "none";
+      page.style.width = "794px";
+      wrapper.appendChild(page);
+      document.body.appendChild(wrapper);
+      container = page;
+    }
   }
 
-  inner.appendChild(bodyEl);
-  wrapper.appendChild(inner);
-  document.body.appendChild(wrapper);
-  container = inner;
+  if (!container) {
+    const bodyEl = document.createElement("div");
+    bodyEl.style.color = "#000000";
+    try {
+      const fmt = await import("@/lib/format");
+      bodyEl.innerHTML = fmt.formatResultHtml(body || "");
+    } catch {
+      bodyEl.textContent = body || "";
+    }
+
+    inner.appendChild(bodyEl);
+    wrapper.appendChild(inner);
+    document.body.appendChild(wrapper);
+    container = inner;
+  }
   cleanup = () => {
     try {
       if (wrapper && wrapper.parentNode)
