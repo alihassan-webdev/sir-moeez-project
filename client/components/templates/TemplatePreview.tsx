@@ -244,8 +244,16 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
       )}
       style={{ background: template.preview.background }}
     >
-      <div className={cn("mx-auto w-full", mode === "compact" ? "max-w-[320px]" : "max-w-[360px]")}>
-        <div className={cn(mode === "compact" ? "p-2" : "p-4")} dangerouslySetInnerHTML={{ __html: html }} />
+      <div
+        className={cn(
+          "mx-auto w-full",
+          mode === "compact" ? "max-w-[320px]" : "max-w-[360px]",
+        )}
+      >
+        <div
+          className={cn(mode === "compact" ? "p-2" : "p-4")}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       </div>
     </div>
   );
