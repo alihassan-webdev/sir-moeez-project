@@ -1,8 +1,9 @@
 import Container from "@/components/layout/Container";
 import { DEFAULT_TEMPLATE_HTML, getSelectedTemplateId, setSelectedTemplateId } from "@/lib/templates";
+import * as React from "react";
 
 export default function Templates() {
-  const selectedId = getSelectedTemplateId();
+  const [selectedId, setSelectedId] = React.useState<string | null>(getSelectedTemplateId());
   const isSelected = selectedId === "default";
   return (
     <Container className="py-6">
