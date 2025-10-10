@@ -12,7 +12,7 @@ export default function Templates() {
           <h1 className="text-xl sm:text-2xl font-bold">Default Template</h1>
           <button
             type="button"
-            onClick={() => setSelectedTemplateId("default")}
+            onClick={() => { setSelectedTemplateId("default"); setSelectedId("default"); }}
             className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm ${
               isSelected ? "bg-primary text-primary-foreground border-primary" : "bg-white hover:bg-primary/10 border-input"
             }`}
