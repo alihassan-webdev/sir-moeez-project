@@ -14,9 +14,7 @@ type TemplateCardProps = {
 };
 
 const tierHints: Record<TemplateTier, string> = {
-  Standard: "Reliable layouts perfect for everyday exams.",
-  Professional: "Elevated styling with refined typography.",
-  Premium: "Luxury finishes and expressive gradients.",
+  Professional: "Board-certified styling tuned for official papers.",
 };
 
 export const TemplateCard = memo(function TemplateCard({
