@@ -163,6 +163,9 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
   const borderColor = palette.border ?? "#d6d6d6";
   const cardPadding = mode === "compact" ? "p-3" : "p-5";
 
+  const lineClass = mode === "compact" ? "h-2 w-3/4" : "h-3 w-2/3";
+  const smallLine = mode === "compact" ? "h-2 w-1/3" : "h-3 w-1/4";
+
   return (
     <div
       className={cn(
@@ -188,22 +191,66 @@ function BoardExamPreview({ template, mode }: PreviewRendererProps) {
             color: preview.bodyTextColor,
           }}
         >
-          <header className={cn("flex items-center justify-between border-b-2 border-[#222222] pb-3")}>
+          <header className={cn("flex items-center justify-between border-b-2", mode === "compact" ? "pb-2" : "pb-3")}>
             <div className="flex items-center gap-3">
-              <div className={cn("flex items-center justify-center rounded-md border h-12 w-12")}
+              <div
+                className={cn("flex items-center justify-center rounded-md border bg-white", mode === "compact" ? "h-10 w-10" : "h-12 w-12")}
                 style={{ borderColor: "#bbbbbb", color: palette.accent }}
               >
-                LOGO
+                <div className="text-[10px] font-semibold">LOGO</div>
               </div>
               <div>
-                <div className="font-semibold">{template.name}</div>
-                <div className="mt-0.5 opacity-80 text-sm">{template.description}</div>
+                <div className="font-semibold text-sm">{template.name}</div>
+                <div className="mt-0.5 opacity-80 text-xs">{template.description}</div>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className={cn("inline-block rounded-full px-2 py-0.5 text-[11px] font-medium", "bg-[rgba(0,0,0,0.06)] text-[rgba(0,0,0,0.7)]")}>{template.tier}</span>
+                </div>
               </div>
             </div>
-            <div className="text-sm opacity-80">{template.tier}</div>
           </header>
 
-          <div className="py-6 text-center text-sm opacity-80">Preview only — sample content removed</div>
+          <div className="p-3">
+            <div className="animate-pulse">
+              <div className="flex items-center justify-between mb-3">
+                <div className={cn("rounded bg-gray-200", lineClass)} />
+                <div className={cn("rounded bg-gray-200", smallLine)} />
+              </div>
+
+              <div className={cn("rounded border border-dashed bg-[rgba(0,0,0,0.03)] p-3 mb-3")}
+                style={{ borderColor: "#e5e7eb" }}>
+                <div className="space-y-2">
+                  <div className="rounded bg-gray-200 h-2 w-5/6" />
+                  <div className="rounded bg-gray-200 h-2 w-3/4" />
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="rounded bg-gray-200 h-8" />
+                  <div className="rounded bg-gray-200 h-8" />
+                  <div className="rounded bg-gray-200 h-8" />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="rounded border p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="rounded bg-gray-200 h-3 w-1/3" />
+                      <div className="rounded bg-gray-200 h-3 w-1/6" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="rounded bg-gray-200 h-2 w-full" />
+                      <div className="rounded bg-gray-200 h-2 w-5/6" />
+                      <div className="rounded bg-gray-200 h-2 w-2/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4 text-center text-xs text-muted-foreground">This is a visual preview. Actual paper content is removed for clarity.</div>
+          </div>
         </div>
       </div>
     </div>
